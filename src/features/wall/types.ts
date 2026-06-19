@@ -4,12 +4,18 @@ export const cardThemes = ["yellow", "paper", "pink", "cyan", "dark", "cream"] a
 export type CardCategory = Exclude<(typeof categories)[number], "All">;
 export type CardTheme = (typeof cardThemes)[number];
 
+import type { Id } from "../../../convex/_generated/dataModel";
+
 export interface WallCard {
-  id: string;
+  id: string | Id<"cards">;
   name: string;
   category: CardCategory;
   line: string;
   area: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zipcode?: string;
   price?: string;
   theme: CardTheme;
   images: string[];
@@ -21,6 +27,9 @@ export interface WallCard {
   positionLockedAt?: number;
   createdAt: number;
   ownerId?: string;
+  paidAmount?: number;
+  expiresAt?: number;
+  clicks?: number;
 }
 
 export interface CardDraft {
@@ -28,8 +37,13 @@ export interface CardDraft {
   category: CardCategory;
   line: string;
   area: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode?: string;
   price?: string;
   theme: CardTheme;
+  paymentOption: "free" | "1" | "3" | "10" | "20";
   files: File[];
   previews: string[];
 }

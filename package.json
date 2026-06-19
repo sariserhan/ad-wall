@@ -16,12 +16,15 @@
     "@fontsource/barlow-condensed": "^5.2.8",
     "@fontsource/caveat": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
+    "@stripe/stripe-js": "^2.0.0",
     "@tailwindcss/postcss": "^4.3.1",
     "convex": "^1.41.0",
+    "country-state-city": "^3.2.1",
     "lucide-react": "latest",
     "next": "^16.2.9",
     "react": "latest",
     "react-dom": "latest",
+    "stripe": "^12.0.0",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {

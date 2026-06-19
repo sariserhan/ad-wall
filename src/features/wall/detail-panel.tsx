@@ -21,7 +21,7 @@ export function DetailPanel({ card, onClose }: { card: WallCard; onClose: () => 
       {card.price ? <div className="sheet-price">Starting at <strong>{card.price}</strong></div> : null}
       <button className="primary wide"><MessageSquare /> Contact {card.name.split(" ").slice(0, 2).join(" ")}</button>
       <button className="secondary wide"><Bookmark /> Save card</button>
-      <div className="sheet-meta"><span>POSTED THIS WEEK</span><span>CARD #{card.id.slice(-6).toUpperCase()}</span></div>
+      <div className="sheet-meta"><span>{card.clicks ? `${card.clicks} views` : "No views yet"}</span><span>CARD #{card.id.slice(-6).toUpperCase()}</span></div>
     </aside>
   );
 }

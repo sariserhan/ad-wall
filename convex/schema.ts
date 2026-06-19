@@ -29,8 +29,15 @@ export default defineSchema({
     width: v.number(),
     zIndex: v.number(),
     status: v.union(v.literal("published"), v.literal("hidden"), v.literal("expired")),
+    paidAmount: v.number(),
+    expiresAt: v.number(),
     positionLockedAt: v.number(),
     createdAt: v.number(),
+    country: v.string(),
+    state: v.string(),
+    city: v.string(),
+    zipcode: v.optional(v.string()),
+    clicks: v.number(),
   })
     .index("by_status_created", ["status", "createdAt"])
     .index("by_owner", ["ownerId"]),

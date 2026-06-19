@@ -11,16 +11,31 @@ async function requireIdentity(ctx: { auth: { getUserIdentity: () => Promise<{ t
   return identity;
 }
 
+const packageDurations: Record<number, number> = {
+  0: 24 * 60 * 60 * 1000,
+  1: 7 * 24 * 60 * 60 * 1000,
+  3: 30 * 24 * 60 * 60 * 1000,
+  10: 150 * 24 * 60 * 60 * 1000,
+  20: 365 * 24 * 60 * 60 * 1000,
+};
+
+function getExpiryDuration(paidAmount: number): number {
+  return packageDurations[paidAmount] ?? packageDurations[0];
+}
+
 export const listPublished = query({
   args: {},
   handler: async (ctx) => {
+    const now = Date.now();
     const cards = await ctx.db
       .query("cards")
       .withIndex("by_status_created", (q) => q.eq("status", "published"))
       .order("asc")
       .take(200);
 
-    return Promise.all(cards.map(async (card) => {
+    const visibleCards = cards.filter((card) => card.expiresAt > now);
+
+    return Promise.all(visibleCards.map(async (card) => {
       const urls = await Promise.all(card.imageIds.map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId)));
       return {
         id: card._id,
@@ -39,6 +54,9 @@ export const listPublished = query({
         zIndex: card.zIndex,
         positionLockedAt: card.positionLockedAt,
         createdAt: card.createdAt,
+        paidAmount: card.paidAmount,
+        expiresAt: card.expiresAt,
+        clicks: card.clicks,
       };
     }));
   },
@@ -58,7 +76,12 @@ export const create = mutation({
     category,
     line: v.string(),
     area: v.string(),
+    city: v.string(),
+    state: v.string(),
+    country: v.string(),
+    zipcode: v.optional(v.string()),
     price: v.optional(v.string()),
+    paidAmount: v.number(),
     theme,
     imageIds: v.array(v.id("_storage")),
     x: v.number(),
@@ -72,7 +95,12 @@ export const create = mutation({
     if (!args.name.trim() || args.name.length > 60) throw new Error("Business name must be between 1 and 60 characters.");
     if (!args.line.trim() || args.line.length > 90) throw new Error("Service description must be between 1 and 90 characters.");
     if (!args.area.trim() || args.area.length > 50) throw new Error("Neighborhood must be between 1 and 50 characters.");
+    if (!args.city.trim() || args.city.length > 100) throw new Error("City must be specified.");
+    if (!args.state.trim() || args.state.length > 100) throw new Error("State must be specified.");
+    if (!args.country.trim() || args.country.length > 100) throw new Error("Country must be specified.");
+    if (args.zipcode && args.zipcode.length > 20) throw new Error("Zip code must be shorter than 20 characters.");
     if (args.x < 0 || args.x > 88 || args.y < 0 || args.y > 1500) throw new Error("That position is outside the wall.");
+    if (![0, 1, 3, 10, 20].includes(args.paidAmount)) throw new Error("Invalid payment option.");
 
     let user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
     if (!user) {
@@ -89,7 +117,15 @@ export const create = mutation({
     }
     if (!user) throw new Error("Your profile could not be created.");
 
-    const createdAt = Date.now();
+    const now = Date.now();
+    const existingUserCards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", user._id)).collect();
+    const activeCard = existingUserCards.find((card) => card.status === "published" && card.expiresAt > now);
+    if (activeCard) {
+      throw new Error("You already have an active card on the wall. One active card per user is allowed.");
+    }
+
+    const createdAt = now;
+    const expiresAt = createdAt + getExpiryDuration(args.paidAmount);
     const existingCards = await ctx.db.query("cards").withIndex("by_status_created", (q) => q.eq("status", "published")).collect();
     const zIndex = existingCards.reduce((highest, card) => Math.max(highest, card.zIndex), 0) + 1;
     const cardId = await ctx.db.insert("cards", {
@@ -98,6 +134,10 @@ export const create = mutation({
       category: args.category,
       line: args.line.trim(),
       area: args.area.trim(),
+      city: args.city.trim(),
+      state: args.state.trim(),
+      country: args.country.trim(),
+      zipcode: args.zipcode?.trim() || undefined,
       price: args.price?.trim() || undefined,
       theme: args.theme,
       imageIds: args.imageIds,
@@ -107,8 +147,11 @@ export const create = mutation({
       width: args.width,
       zIndex,
       status: "published",
+      paidAmount: args.paidAmount,
+      expiresAt,
       positionLockedAt: createdAt,
       createdAt,
+      clicks: 0,
     });
     const urls = await Promise.all(args.imageIds.map((imageId) => ctx.storage.getUrl(imageId)));
     return {
@@ -118,6 +161,10 @@ export const create = mutation({
       category: args.category,
       line: args.line.trim(),
       area: args.area.trim(),
+      city: args.city.trim(),
+      state: args.state.trim(),
+      country: args.country.trim(),
+      zipcode: args.zipcode?.trim() || undefined,
       price: args.price?.trim() || undefined,
       theme: args.theme,
       images: urls.filter((url): url is string => url !== null),
@@ -128,6 +175,23 @@ export const create = mutation({
       zIndex,
       positionLockedAt: createdAt,
       createdAt,
+      paidAmount: args.paidAmount,
+      expiresAt,
+      clicks: 0,
     };
+  },
+});
+
+export const incrementClicks = mutation({
+  args: {
+    cardId: v.id("cards"),
+  },
+  handler: async (ctx, args) => {
+    const card = await ctx.db.get(args.cardId);
+    if (!card) throw new Error("Card not found.");
+    await ctx.db.patch(args.cardId, {
+      clicks: (card.clicks ?? 0) + 1,
+    });
+    return { success: true };
   },
 });

@@ -2,14 +2,18 @@
 
 import {
   ChevronDown,
+  Globe,
   Layers3,
   MapPin,
   Menu,
   Plus,
   RotateCcw,
   Search,
+  X,
 } from "lucide-react";
-import { startTransition, useDeferredValue, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { startTransition, useDeferredValue, useMemo, useRef, useState, useEffect, type PointerEvent, type ReactNode } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Country, State, City } from "country-state-city";
 import { Composer } from "./composer";
 import { DetailPanel } from "./detail-panel";
 import { PlacementMode } from "./placement-mode";
@@ -21,10 +25,12 @@ interface WallAppProps {
   mode: "demo" | "connected";
   cards?: WallCardModel[];
   onCreateCard?: CreateCard;
+  onCardOpen?: (card: WallCardModel) => void;
   onRequestSignIn?: () => void;
   isSignedIn?: boolean;
   isLoading?: boolean;
   authControl?: ReactNode;
+  notice?: string | null;
 }
 
 function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): WallCardModel {
@@ -34,6 +40,10 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
     category: draft.category,
     line: draft.line,
     area: draft.area,
+    city: draft.city,
+    state: draft.state,
+    country: draft.country,
+    zipcode: draft.zipcode,
     price: draft.price,
     theme: draft.theme,
     images: draft.previews,
@@ -47,7 +57,16 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
   };
 }
 
-export function WallApp({ mode, cards: remoteCards, onCreateCard, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl }: WallAppProps) {
+const defaultSeedLocation = (() => {
+  const seedDefault = seedCards.find((card) => card.country && card.state && card.city) ?? seedCards[0];
+  return {
+    country: seedDefault?.country ?? "US",
+    state: seedDefault?.state ?? "",
+    city: seedDefault?.city ?? "",
+  };
+})();
+
+export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice }: WallAppProps) {
   const [demoCards, setDemoCards] = useState<WallCardModel[]>(seedCards);
   const cards = mode === "connected" ? (remoteCards ?? []) : demoCards;
   const [selected, setSelected] = useState<WallCardModel | null>(null);
@@ -63,13 +82,333 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onRequestSignI
   const [dragging, setDragging] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [locationDropdown, setLocationDropdown] = useState(false);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
+  const [mapPickerOpen, setMapPickerOpen] = useState(false);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapMessage, setMapMessage] = useState("Click on the map to choose a location.");
+  const [selectedMapPoint, setSelectedMapPoint] = useState<{
+    x: number;
+    y: number;
+    lat: number;
+    lon: number;
+    countryCode: string;
+    countryName: string;
+    stateCode: string;
+    stateName: string;
+    city: string;
+  } | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState(defaultSeedLocation.country);
+  const [selectedState, setSelectedState] = useState(defaultSeedLocation.state);
+  const [selectedCity, setSelectedCity] = useState(defaultSeedLocation.city);
   const wallRef = useRef<HTMLElement>(null);
+
+  // Feature flag: hide map picker UI without deleting its code
+  const MAP_ENABLED = false;
+
+  const normalizeKey = (value?: string) => value?.trim().toLowerCase() ?? "";
+
+  const countryFlagEmoji = (isoCode?: string) => {
+    if (!isoCode) return "";
+    const code = isoCode.toUpperCase();
+    return code.replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+  };
+
+  const getCountryName = (isoCode?: string) => {
+    if (!isoCode) return "";
+    return Country.getAllCountries().find((country) => country.isoCode === isoCode)?.name ?? isoCode;
+  };
+
+  const getStateName = (country: string, stateCode: string) => {
+    return State.getStatesOfCountry(country).find((state) => state.isoCode === stateCode)?.name ?? stateCode;
+  };
+
+  const locationLabel = () => {
+    const stateName = selectedState ? getStateName(selectedCountry, selectedState) : "";
+    if (selectedCity) {
+      return `${selectedCity}${stateName ? `, ${stateName}` : ""}`;
+    }
+    if (selectedState) {
+      return stateName;
+    }
+    return getCountryName(selectedCountry);
+  };
+
+  const [locationWeather, setLocationWeather] = useState<{ tempC: number; time: string; timezone?: string } | null>(null);
+
+  const persistLocation = (country: string, state: string, city: string) => {
+    try {
+      window.localStorage.setItem("wallLocation", JSON.stringify({ country, state, city }));
+    } catch {
+      // ignore storage failures
+    }
+  };
+
+  const fetchUserLocation = async () => {
+    try {
+      const response = await fetch("https://ipapi.co/json/");
+      const data = await response.json();
+      const countryCode = String(data.country_code || "US").toUpperCase();
+      const allCountries = Country.getAllCountries();
+      if (!allCountries.some((country) => country.isoCode === countryCode)) return null;
+      const states = State.getStatesOfCountry(countryCode);
+      const regionCode = String(data.region_code || data.region || "").trim();
+      const cityNameRaw = String(data.city || "").trim();
+      const ipLat = Number(data.latitude);
+      const ipLon = Number(data.longitude);
+      let stateCode = "";
+
+      if (regionCode) {
+        const candidate = states.find((state) => state.isoCode.toUpperCase() === regionCode.toUpperCase());
+        if (candidate) {
+          stateCode = candidate.isoCode;
+        } else {
+          const normalizedRegion = normalizeKey(regionCode);
+          const matchedState = states.find((state) => normalizeKey(state.name) === normalizedRegion || normalizeKey(state.isoCode) === normalizedRegion || normalizedRegion.includes(normalizeKey(state.name)) || normalizeKey(state.name).includes(normalizedRegion));
+          stateCode = matchedState?.isoCode ?? "";
+        }
+      }
+
+      const cities = stateCode ? City.getCitiesOfState(countryCode, stateCode) : [];
+      let cityName = "";
+      if (cityNameRaw && cities.length > 0) {
+        const normalizedCity = normalizeKey(cityNameRaw);
+        const exactCity = cities.find((city) => normalizeKey(city.name) === normalizedCity);
+        const fuzzyCity = cities.find((city) => normalizeKey(city.name).includes(normalizedCity) || normalizedCity.includes(normalizeKey(city.name)));
+        if (exactCity || fuzzyCity) {
+          cityName = exactCity?.name ?? fuzzyCity?.name ?? "";
+        } else if (Number.isFinite(ipLat) && Number.isFinite(ipLon)) {
+          let best = cities[0];
+          let bestDistance = Number.POSITIVE_INFINITY;
+          for (const city of cities) {
+            if (city.latitude == null || city.longitude == null) continue;
+            const dLat = Number(city.latitude) - ipLat;
+            const dLon = Number(city.longitude) - ipLon;
+            const distance = dLat * dLat + dLon * dLon;
+            if (distance < bestDistance) {
+              best = city;
+              bestDistance = distance;
+            }
+          }
+          cityName = best?.name ?? cities[0]?.name ?? "";
+        } else {
+          cityName = cities[0]?.name ?? "";
+        }
+      } else {
+        if (Number.isFinite(ipLat) && Number.isFinite(ipLon) && cities.length > 0) {
+          let best = cities[0];
+          let bestDistance = Number.POSITIVE_INFINITY;
+          for (const city of cities) {
+            if (city.latitude == null || city.longitude == null) continue;
+            const dLat = Number(city.latitude) - ipLat;
+            const dLon = Number(city.longitude) - ipLon;
+            const distance = dLat * dLat + dLon * dLon;
+            if (distance < bestDistance) {
+              best = city;
+              bestDistance = distance;
+            }
+          }
+          cityName = best?.name ?? cities[0]?.name ?? "";
+        } else {
+          cityName = cities[0]?.name ?? "";
+        }
+      }
+      return { country: countryCode, state: stateCode, city: cityName };
+    } catch (error) {
+      console.debug("Could not fetch user location:", error);
+      return null;
+    }
+  };
+
+  // Fetch local weather/time when selected location changes (use city coordinates when available)
+  useEffect(() => {
+    let cancelled = false;
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current_weather=true&timezone=auto`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (cancelled) return;
+        const cw = data.current_weather;
+        if (!cw) {
+          setLocationWeather(null);
+          return;
+        }
+        setLocationWeather({ tempC: Number(cw.temperature), time: String(cw.time || ""), timezone: data.timezone });
+      } catch (err) {
+        console.debug(err);
+        if (!cancelled) setLocationWeather(null);
+      }
+    };
+
+    const tryFetchForSelected = () => {
+      if (!selectedCountry) return;
+      const stateCode = selectedState;
+      const cityName = selectedCity;
+      if (stateCode && cityName) {
+        const cities = City.getCitiesOfState(selectedCountry, stateCode);
+        const match = cities.find((c) => c.name === cityName) ?? cities[0];
+        if (match && match.latitude != null && match.longitude != null) {
+          fetchWeather(Number(match.latitude), Number(match.longitude));
+          return;
+        }
+      }
+      // fallback: try first city in state
+      if (selectedCountry && selectedState) {
+        const cities = City.getCitiesOfState(selectedCountry, selectedState);
+        const match = cities[0];
+        if (match && match.latitude != null && match.longitude != null) {
+          fetchWeather(Number(match.latitude), Number(match.longitude));
+          return;
+        }
+      }
+      setLocationWeather(null);
+    };
+
+    tryFetchForSelected();
+    return () => { cancelled = true; };
+  }, [selectedCountry, selectedState, selectedCity]);
+
+  const updateLocationQuery = (country: string, state: string, city: string) => {
+    const query: Record<string, string> = { country };
+    if (state) query.state = state;
+    if (city) query.city = city;
+    router.replace(`${pathname}?${new URLSearchParams(query).toString()}`);
+  };
+
+  useEffect(() => {
+    const urlCountry = searchParams.get("country");
+    const urlState = searchParams.get("state");
+    const urlCity = searchParams.get("city");
+
+    const setLocationFromUrl = () => {
+      if (!urlCountry) return false;
+      const normalizedCountry = String(urlCountry).toUpperCase();
+      const allCountries = Country.getAllCountries();
+      if (!allCountries.some((country) => country.isoCode === normalizedCountry)) return false;
+      const states = State.getStatesOfCountry(normalizedCountry);
+      const stateCode = urlState && states.some((state) => state.isoCode === urlState.toUpperCase()) ? urlState.toUpperCase() : states[0]?.isoCode ?? "";
+      const cities = stateCode ? City.getCitiesOfState(normalizedCountry, stateCode) : [];
+      const cityName = urlCity && cities.some((city) => city.name === urlCity) ? urlCity : cities[0]?.name ?? "";
+      setSelectedCountry(normalizedCountry);
+      setSelectedState(stateCode);
+      setSelectedCity(cityName);
+      return true;
+    };
+
+    const loadLocalLocation = () => {
+      try {
+        const raw = window.localStorage.getItem("wallLocation");
+        if (!raw) return false;
+        const saved = JSON.parse(raw) as { country: string; state: string; city: string };
+        if (!saved?.country) return false;
+        const allCountries = Country.getAllCountries();
+        if (!allCountries.some((country) => country.isoCode === saved.country)) return false;
+        const states = State.getStatesOfCountry(saved.country);
+        const stateCode = states.some((state) => state.isoCode === saved.state) ? saved.state : states[0]?.isoCode ?? "";
+        const cities = stateCode ? City.getCitiesOfState(saved.country, stateCode) : [];
+        const cityName = cities.some((city) => city.name === saved.city) ? saved.city : cities[0]?.name ?? "";
+        setSelectedCountry(saved.country);
+        setSelectedState(stateCode);
+        setSelectedCity(cityName);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    if (!setLocationFromUrl()) {
+      if (!loadLocalLocation()) {
+        fetchUserLocation().then((location) => {
+          if (!location) return;
+          setSelectedCountry(location.country);
+          setSelectedState(location.state);
+          setSelectedCity(location.city);
+          updateLocationQuery(location.country, location.state, location.city);
+          persistLocation(location.country, location.state, location.city);
+        });
+      }
+    }
+  }, [pathname, router, searchParams]);
+
+  const availableStates = State.getStatesOfCountry(selectedCountry);
+  const availableCities = selectedState ? City.getCitiesOfState(selectedCountry, selectedState) : [];
+  const hasStateOptions = availableStates.length > 0;
+  const hasCityOptions = availableCities.length > 0;
+
+  const applyLocation = (country: string, state: string, city: string) => {
+    updateLocationQuery(country, state, city);
+    persistLocation(country, state, city);
+    setLocationNotice(`Location applied. Showing ${locationLabel()} wall.`);
+    window.setTimeout(() => setLocationNotice(null), 3200);
+    setLocationDropdown(false);
+  };
+
+  const resetToDefault = () => {
+    const defaultCountry = defaultSeedLocation.country;
+    const defaultState = defaultSeedLocation.state;
+    const defaultCity = defaultSeedLocation.city;
+    setSelectedCountry(defaultCountry);
+    setSelectedState(defaultState);
+    setSelectedCity(defaultCity);
+    persistLocation(defaultCountry, defaultState, defaultCity);
+    updateLocationQuery(defaultCountry, defaultState, defaultCity);
+    setLocationNotice("Reset to default wall.");
+    window.setTimeout(() => setLocationNotice(null), 3200);
+    setLocationDropdown(false);
+  };
+
+  const useMyLocation = async () => {
+    const location = await fetchUserLocation();
+    if (!location) {
+      setLocationNotice("Could not detect your location.");
+      window.setTimeout(() => setLocationNotice(null), 3200);
+      return;
+    }
+    const stateName = location.state ? getStateName(location.country, location.state) : "";
+    const locationText = location.city ? `${location.city}${stateName ? `, ${stateName}` : ""}` : stateName || getCountryName(location.country);
+    setSelectedCountry(location.country);
+    setSelectedState(location.state);
+    setSelectedCity(location.city);
+    persistLocation(location.country, location.state, location.city);
+    updateLocationQuery(location.country, location.state, location.city);
+    setLocationNotice(`Using your location: ${locationText}`);
+    window.setTimeout(() => setLocationNotice(null), 3200);
+    setLocationDropdown(false);
+  };
+
+  // Ensure map picker is closed when map UI is disabled
+  useEffect(() => {
+    if (!MAP_ENABLED) setMapPickerOpen(false);
+  }, [MAP_ENABLED]);
+
+  useEffect(() => {
+    if (!mapPickerOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMapPickerOpen(false);
+        setSelectedMapPoint(null);
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [mapPickerOpen]);
 
   const visible = useMemo(() => {
     const needle = deferredQuery.toLowerCase();
-    const result = cards.filter((card) => (category === "All" || card.category === category) && `${card.name} ${card.line} ${card.area}`.toLowerCase().includes(needle));
+    const result = cards.filter((card) => {
+      if (category !== "All" && card.category !== category) return false;
+      if (selectedCountry && card.country !== selectedCountry) return false;
+      if (selectedState && card.state !== selectedState) return false;
+      if (selectedCity && card.city !== selectedCity) return false;
+      const text = `${card.name}`.toLowerCase();
+      return text.includes(needle);
+    });
     return fresh ? result.toReversed() : result;
-  }, [cards, category, deferredQuery, fresh]);
+  }, [cards, category, deferredQuery, fresh, selectedCountry, selectedState, selectedCity]);
 
   const front = (id: string) => setLayers((current) => [...current.filter((item) => item !== id), id]);
 
@@ -129,6 +468,12 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onRequestSignI
       setCategory("All");
       setQuery("");
       setFresh(false);
+      const defaultCountry = defaultSeedLocation.country;
+      const defaultState = defaultSeedLocation.state;
+      const defaultCity = defaultSeedLocation.city;
+      setSelectedCountry(defaultCountry);
+      setSelectedState(defaultState);
+      setSelectedCity(defaultCity);
     });
   };
 
@@ -136,9 +481,17 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onRequestSignI
     <main className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={resetFilters}>WALL<span>LOCAL ADS, STUCK HERE</span></button>
-        <button className="location"><MapPin /> Williamsburg, Brooklyn <ChevronDown /></button>
+        <button className="location" onClick={() => setLocationDropdown(!locationDropdown)}>
+          <MapPin />
+          <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
+            <span aria-hidden>{countryFlagEmoji(selectedCountry)}</span>
+            <span>{locationLabel()}</span>
+          </span>
+          <ChevronDown />
+        </button>
+        {/* Map picker temporarily hidden */}
         <nav className={mobileMenu ? "open" : ""}>
-          <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search the wall" aria-label="Search advertisements" /></div>
+          <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by card" aria-label="Search advertisements" /></div>
           <label className="filter-select">Browse<select value={category} onChange={(event) => setCategory(event.target.value as (typeof categories)[number])}>{categories.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown /></label>
           <button className={fresh ? "nav-active" : ""} onClick={() => setFresh((value) => !value)}>Fresh <span className="fresh-dot" /></button>
           <button className="mobile-nav-post" onClick={openComposer}><Plus /> Post your card</button>
@@ -147,21 +500,241 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onRequestSignI
         <button className="primary post-button" onClick={openComposer}><Plus /> Post your card</button>
         <button className="icon-btn mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label="Open menu"><Menu /></button>
       </header>
-      <section className={`wall ${pendingCard ? "is-placing" : ""}`} ref={wallRef} aria-label="Community advertisement wall">
+      {locationDropdown ? (
+        <div className="location-dropdown-backdrop" onClick={() => setLocationDropdown(false)}>
+          <div className="location-dropdown" onClick={(e) => e.stopPropagation()}>
+            <div className="location-dropdown-header">
+              <strong>Choose your location</strong>
+              <button className="icon-btn" onClick={() => setLocationDropdown(false)} aria-label="Close"><X /></button>
+            </div>
+            <div className="location-dropdown-body">
+              <label>Country<select value={selectedCountry} onChange={(event) => {
+                const countryCode = event.target.value;
+                const nextStates = State.getStatesOfCountry(countryCode);
+                const nextState = nextStates[0]?.isoCode ?? "";
+                const nextCities = nextState ? City.getCitiesOfState(countryCode, nextState) : [];
+                const nextCity = nextCities[0]?.name ?? "";
+                setSelectedCountry(countryCode);
+                setSelectedState(nextState);
+                setSelectedCity(nextCity);
+              }}>
+                {Country.getAllCountries().map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}
+              </select></label>
+              {hasStateOptions ? (
+                <label>State<select value={selectedState} onChange={(event) => {
+                  const stateCode = event.target.value;
+                  const nextCities = City.getCitiesOfState(selectedCountry, stateCode);
+                  setSelectedState(stateCode);
+                  setSelectedCity(nextCities[0]?.name ?? "");
+                }}>
+                  {availableStates.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}
+                </select></label>
+              ) : null}
+              {hasCityOptions ? (
+                <label>City<select value={selectedCity} onChange={(event) => setSelectedCity(event.target.value)}>
+                  {availableCities.map((city) => <option key={`${city.name}-${city.latitude}-${city.longitude}`} value={city.name}>{city.name}</option>)}
+                </select></label>
+              ) : null}
+            </div>
+            {locationNotice ? <div className="location-dropdown-notice">{locationNotice}</div> : null}
+            <div className="location-dropdown-actions">
+              <button type="button" className="secondary" onClick={useMyLocation}>Use my location</button>
+              <button type="button" className="secondary" onClick={resetToDefault}>Reset wall</button>
+              <button type="button" className="primary location-dropdown-select" onClick={() => applyLocation(selectedCountry, selectedState, selectedCity)}>Apply location</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {MAP_ENABLED && mapPickerOpen ? (
+        <div className="map-picker-backdrop" onClick={() => setMapPickerOpen(false)}>
+          <div className="map-picker-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="map-picker-header">
+              <strong>Pick a location on the world map</strong>
+              <button className="icon-btn" onClick={() => setMapPickerOpen(false)} aria-label="Close"><X /></button>
+            </div>
+            <p className="map-picker-instructions">{mapMessage}</p>
+            <div className="world-map-wrapper">
+              <div className="world-map-container">
+                <img
+                  className="world-map"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Equirectangular_projection_SW.jpg/1280px-Equirectangular_projection_SW.jpg"
+                  alt="Equirectangular world map for location selection"
+                  draggable={false}
+                  loading="lazy"
+                  onClick={async (event) => {
+                    const target = event.currentTarget as HTMLImageElement;
+                    const rect = target.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+                    
+                    // Account for object-fit: contain scaling
+                    const scale = Math.min(rect.width / target.naturalWidth, rect.height / target.naturalHeight);
+                    const imgWidth = target.naturalWidth * scale;
+                    const imgHeight = target.naturalHeight * scale;
+                    const imgLeft = (rect.width - imgWidth) / 2;
+                    const imgTop = (rect.height - imgHeight) / 2;
+                    
+                    // Check if click is within the actual image bounds
+                    if (x < imgLeft || x > imgLeft + imgWidth || y < imgTop || y > imgTop + imgHeight) {
+                      setMapMessage("Click on the map area.");
+                      return;
+                    }
+                    
+                    // Get normalized coordinates [0, 1] relative to the actual image
+                    const imgX = (x - imgLeft) / imgWidth;
+                    const imgY = (y - imgTop) / imgHeight;
+                    
+                    // Map to lat/lon
+                    const lon = imgX * 360 - 180;
+                    const lat = 90 - imgY * 180;
+                    
+                    setMapLoading(true);
+                    setMapMessage("Resolving location...");
+                    try {
+                      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`);
+                      const data = await response.json();
+                      const address = data.address ?? {};
+                      const countryCode = String(address.country_code || "").toUpperCase();
+                      const countryName = String(address.country || "");
+                      if (!countryCode || !countryName) {
+                        setMapMessage("Could not resolve location. Try another point.");
+                        setMapLoading(false);
+                        return;
+                      }
+                      const states = State.getStatesOfCountry(countryCode);
+                      const stateName = String(address.state || address.region || address.county || "");
+                      
+                      // Improved state matching: try exact match, then partial match, then pick first available
+                      let matchedState = states.find((state) => normalizeKey(state.name) === normalizeKey(stateName) || normalizeKey(state.isoCode) === normalizeKey(stateName));
+                      if (!matchedState && stateName) {
+                        // Try partial match for common variations
+                        const stateNameLower = stateName.toLowerCase();
+                        matchedState = states.find((state) => state.name.toLowerCase().includes(stateNameLower) || stateNameLower.includes(state.name.toLowerCase()));
+                      }
+                      const selectedStateCode = matchedState?.isoCode ?? states[0]?.isoCode ?? "";
+                      
+                      const cityName = String(address.city || address.town || address.village || address.hamlet || address.county || "");
+                      const availableCities = City.getCitiesOfState(countryCode, selectedStateCode);
+                      
+                      // Improved city matching: try exact match first, then find closest by lat/lon
+                      let finalCity = "";
+                      if (cityName) {
+                        const exactCityMatch = availableCities.find((city) => normalizeKey(city.name) === normalizeKey(cityName));
+                        if (exactCityMatch) {
+                          finalCity = exactCityMatch.name;
+                        } else {
+                          // Find closest city by lat/lon
+                          let closestCity = availableCities[0];
+                          let minDistance = Infinity;
+                          availableCities.forEach((city) => {
+                            if (city.latitude != null && city.longitude != null) {
+                              const dist = Math.sqrt(Math.pow(Number(city.latitude) - lat, 2) + Math.pow(Number(city.longitude) - lon, 2));
+                              if (dist < minDistance) {
+                                minDistance = dist;
+                                closestCity = city;
+                              }
+                            }
+                          });
+                          finalCity = closestCity?.name ?? availableCities[0]?.name ?? "";
+                        }
+                      } else {
+                        finalCity = availableCities[0]?.name ?? "";
+                      }
+                      
+                      const xPoint = Math.max(0, Math.min(rect.width, x));
+                      const yPoint = Math.max(0, Math.min(rect.height, y));
+                      setSelectedMapPoint({
+                        x: xPoint,
+                        y: yPoint,
+                        lat,
+                        lon,
+                        countryCode,
+                        countryName,
+                        stateCode: selectedStateCode,
+                        stateName,
+                        city: finalCity,
+                      });
+                      setMapMessage(`Selected ${finalCity || stateName || countryName}, ${countryName}. Confirm to show this wall or click again to change.`);
+                      setMapLoading(false);
+                      return;
+                    } catch (error) {
+                      console.debug(error);
+                      setMapMessage("Map lookup failed. Try another click.");
+                    } finally {
+                      setMapLoading(false);
+                    }
+                  }}
+                />
+                {selectedMapPoint ? (
+                  <div className="map-pin" style={{ left: selectedMapPoint.x, top: selectedMapPoint.y }} />
+                ) : null}
+              </div>
+              {selectedMapPoint ? (
+                (() => {
+                  const hasStates = State.getStatesOfCountry(selectedMapPoint.countryCode).length > 0;
+                  const suppressStateFor = new Set(["TR"]);
+                  const showState = hasStates && selectedMapPoint.stateName && !suppressStateFor.has(selectedMapPoint.countryCode);
+                  return (
+                    <div className="map-selection-summary">
+                      <strong>{selectedMapPoint.city || selectedMapPoint.countryName}</strong>
+                      <span>{showState ? `${selectedMapPoint.stateName}, ${selectedMapPoint.countryName}` : selectedMapPoint.countryName}</span>
+                      <span>{`Lat ${selectedMapPoint.lat.toFixed(2)}, Lon ${selectedMapPoint.lon.toFixed(2)}`}</span>
+                    </div>
+                  );
+                })()
+              ) : null}
+            </div>
+            <div className="map-picker-actions">
+              <button className="secondary" type="button" onClick={() => {
+                setSelectedMapPoint(null);
+                setMapMessage("Click on the map to choose a location.");
+              }}>
+                Cancel
+              </button>
+              <button className="primary" type="button" disabled={!selectedMapPoint || mapLoading} onClick={() => {
+                if (!selectedMapPoint) return;
+                setSelectedCountry(selectedMapPoint.countryCode || selectedCountry);
+                setSelectedState(selectedMapPoint.stateCode || selectedState);
+                setSelectedCity(selectedMapPoint.city || selectedCity);
+                updateLocationQuery(selectedMapPoint.countryCode || selectedCountry, selectedMapPoint.stateCode || selectedState, selectedMapPoint.city || selectedCity);
+                setMapPickerOpen(false);
+                setSelectedMapPoint(null);
+                setLocationDropdown(true);
+              }}>
+                Okay
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      <section
+        className={`wall ${pendingCard ? "is-placing" : ""}`}
+        ref={wallRef}
+        aria-label="Community advertisement wall"
+        style={{ backgroundImage: "linear-gradient(#0001, #0001), url('/assets/wall-texture.png')" }}
+      >
         <div className="wall-grain" />
         {isLoading ? <div className="empty-note"><strong>Finding the fresh paste…</strong></div> : null}
-        {!isLoading ? visible.map((card) => <WallCard key={card.id} card={card} active={selected?.id === card.id} onOpen={setSelected} onFront={front} zIndex={Math.max(card.zIndex, layers.indexOf(card.id) + 1)} />) : null}
-        {!isLoading && !visible.length ? <div className="empty-note"><strong>Nothing stuck here yet.</strong><span>Try another corner of the wall.</span><button onClick={resetFilters}>Reset filters</button></div> : null}
+        {!isLoading ? (
+          visible.length ? (
+            visible.map((card) => <WallCard key={card.id} card={card} active={selected?.id === card.id} onOpen={(cardToOpen) => { setSelected(cardToOpen); onCardOpen?.(cardToOpen); }} onFront={front} zIndex={Math.max(card.zIndex, layers.indexOf(card.id) + 1)} />)
+          ) : (
+            <div className="empty-note"><strong>Nothing stuck here yet.</strong><span>Try another corner of the wall.</span><button onClick={resetFilters}>Reset filters</button></div>
+          )
+        ) : null}
         <div className="wall-tools">
           <button aria-label="Show newest cards" onClick={() => setFresh(true)}><Layers3 /></button>
           <button aria-label="Reset wall" onClick={resetFilters}><RotateCcw /></button>
         </div>
-        <div className="wall-count">{visible.length} CARDS · WILLIAMSBURG</div>
+        <div className="wall-count">
+          {visible.length} CARDS · {locationLabel()}{locationWeather ? ` · ${Math.round(locationWeather.tempC)}°C/${Math.round(locationWeather.tempC * 9 / 5 + 32)}°F` : ''}
+        </div>
         {pendingCard ? <PlacementMode card={pendingCard} position={placement} dragging={dragging} onDragStart={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setDragging(true); }} onMove={movePlacement} onDragEnd={() => setDragging(false)} onCancel={() => { setPendingCard(null); setDragging(false); }} onRandom={() => setPlacement({ x: 8 + Math.random() * (window.innerWidth < 780 ? 35 : 68), y: Math.max(60, window.scrollY + 60 + Math.random() * 450) })} onConfirm={post} isSaving={isSaving} /> : null}
       </section>
+      {notice ? <div className="notice-toast" role="status">{notice}</div> : null}
       {error ? <div className="error-toast" role="alert">{error}<button onClick={() => setError(null)} aria-label="Dismiss error">×</button></div> : null}
       {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} /> : null}
-      {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} /> : null}
+      {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} initialLocation={{ country: selectedCountry, state: selectedState, city: selectedCity }} /> : null}
     </main>
   );
 }

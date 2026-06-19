@@ -1,7 +1,13 @@
 import type { AuthConfig } from "convex/server";
 
-const issuerDomain = process.env.CLERK_JWT_ISSUER_DOMAIN;
+const env = (globalThis as any).process?.env as Record<string, string> | undefined;
+const issuerDomain = env?.CLERK_JWT_ISSUER_DOMAIN?.trim();
+const issuerUrl = issuerDomain
+  ? issuerDomain.startsWith("http://") || issuerDomain.startsWith("https://")
+    ? issuerDomain.replace(/\/+$/, "")
+    : `https://${issuerDomain.replace(/\/+$/, "")}`
+  : undefined;
 
 export default {
-  providers: issuerDomain ? [{ domain: issuerDomain, applicationID: "convex" }] : [],
+  providers: issuerUrl ? [{ domain: issuerUrl, applicationID: "convex" }] : [],
 } satisfies AuthConfig;
