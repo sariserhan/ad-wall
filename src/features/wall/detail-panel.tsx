@@ -3,7 +3,7 @@
 import { Bookmark, MessageSquare, X } from "lucide-react";
 import type { WallCard } from "./types";
 
-export function DetailPanel({ card, onClose }: { card: WallCard; onClose: () => void }) {
+export function DetailPanel({ card, onClose, viewCount, onSendBehind }: { card: WallCard; onClose: () => void; viewCount: number; onSendBehind?: () => void }) {
   return (
     <aside className="detail-sheet" aria-label={`${card.name} details`}>
       <div className="sheet-pin" />
@@ -17,11 +17,12 @@ export function DetailPanel({ card, onClose }: { card: WallCard; onClose: () => 
           {card.images.map((image, index) => <img className="sheet-image" src={image} alt={`${card.name} service ${index + 1}`} key={image} />)}
         </div>
       ) : null}
-      <div className="note-copy">Friendly local help, made with care. Message us for availability, questions, and a quick quote.</div>
+      <div className="note-copy">{card.message ?? card.line}</div>
       {card.price ? <div className="sheet-price">Starting at <strong>{card.price}</strong></div> : null}
       <button className="primary wide"><MessageSquare /> Contact {card.name.split(" ").slice(0, 2).join(" ")}</button>
+      {onSendBehind ? <button className="secondary wide" onClick={onSendBehind}>Send behind</button> : null}
       <button className="secondary wide"><Bookmark /> Save card</button>
-      <div className="sheet-meta"><span>{card.clicks ? `${card.clicks} views` : "No views yet"}</span><span>CARD #{card.id.slice(-6).toUpperCase()}</span></div>
+      <div className="sheet-meta"><span>{viewCount > 0 ? `${viewCount} views` : "No views yet"}</span><span>CARD #{String(card.id).slice(-6).toUpperCase()}</span></div>
     </aside>
   );
 }

@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { WallApp } from "./wall-app";
-import type { CardDraft, Placement, WallCard, CardCategory, CardTheme } from "./types";
+import { getCardFormat, type CardDraft, type Placement, type WallCard, type CardCategory, type CardTheme } from "./types";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -52,6 +52,7 @@ export function ConnectedWallApp() {
           name: string;
           category: CardCategory;
           line: string;
+          message?: string;
           area: string;
           city?: string;
           state?: string;
@@ -71,6 +72,7 @@ export function ConnectedWallApp() {
           name: cardPayload.name,
           category: cardPayload.category,
           line: cardPayload.line,
+          message: cardPayload.message,
           area: cardPayload.area,
           city: cardPayload.city ?? "",
           state: cardPayload.state ?? "",
@@ -120,6 +122,7 @@ export function ConnectedWallApp() {
       name: draft.name,
       category: draft.category,
       line: draft.line,
+      message: draft.message,
       area: draft.area,
       city: draft.city,
       state: draft.state,
@@ -132,7 +135,7 @@ export function ConnectedWallApp() {
       x: placement.x,
       y: placement.y,
       rotation: -3 + Math.random() * 6,
-      width: 220,
+      width: getCardFormat(draft.theme).width,
     }) as WallCard;
     return card;
   };

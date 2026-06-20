@@ -3,7 +3,7 @@
 import { ArrowLeft, Check, ImagePlus, Sparkles, X } from "lucide-react";
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { Country, State, City } from "country-state-city";
-import { cardThemes, categories, type CardCategory, type CardDraft, type CardTheme } from "./types";
+import { categories, type CardCategory, type CardDraft, type CardTheme } from "./types";
 
 interface ComposerProps {
   onClose: () => void;
@@ -15,6 +15,7 @@ interface ComposerForm {
   name: string;
   category: CardCategory;
   line: string;
+  message: string;
   area: string;
   city: string;
   state: string;
@@ -36,6 +37,7 @@ const initialForm: ComposerForm = {
   name: "",
   category: "Services",
   line: "",
+  message: "",
   area: "",
   city: defaultCity,
   state: defaultState,
@@ -45,6 +47,19 @@ const initialForm: ComposerForm = {
   theme: "yellow",
   paymentOption: "free",
 };
+
+const themeOptions: ReadonlyArray<{ theme: CardTheme; label: string; description: string }> = [
+  { theme: "yellow", label: "Sticky note", description: "Handwritten yellow" },
+  { theme: "paper", label: "Flyer", description: "Classic white paper" },
+  { theme: "pink", label: "Neon flyer", description: "Bright and loud" },
+  { theme: "cyan", label: "Color card", description: "Crisp cyan stock" },
+  { theme: "dark", label: "Night card", description: "Bold black paper" },
+  { theme: "biz", label: "Business card", description: "Clean and professional" },
+  { theme: "photo", label: "Photo print", description: "Image-first Polaroid" },
+  { theme: "ticket", label: "Ticket", description: "Perforated coupon" },
+  { theme: "kraft", label: "Kraft note", description: "Warm recycled stock" },
+  { theme: "blueprint", label: "Blueprint", description: "Technical grid" },
+];
 
 export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
   const [form, setForm] = useState<ComposerForm>(() => {
@@ -84,7 +99,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
       setStep(2);
       return;
     }
-    onReady({ ...form, price: form.price || undefined, files, previews });
+    onReady({ ...form, message: form.message.trim() || undefined, price: form.price || undefined, files, previews });
   };
 
   return (
@@ -100,34 +115,14 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
             <label>Business or service<input required autoFocus value={form.name} onChange={(event) => setForm((value) => ({ ...value, name: event.target.value }))} placeholder="What should the wall call you?" /></label>
             <div className="form-grid">
               <label>Category<select value={form.category} onChange={(event) => setForm((value) => ({ ...value, category: event.target.value as CardCategory }))}>{categories.slice(1).map((category) => <option key={category}>{category}</option>)}</select></label>
+              <label>Posting on selected wall<input value={`${form.city}${form.state ? `, ${form.state}` : ""}${form.country ? `, ${form.country}` : ""}`} readOnly aria-readonly /></label>
+            </div>
+            <div className="form-grid">
               <label>Neighborhood<input value={form.area} onChange={(event) => setForm((value) => ({ ...value, area: event.target.value }))} placeholder="Optional" /></label>
-            </div>
-            <div className="form-grid">
-              <label>Country<select value={form.country} onChange={(event) => {
-                const countryCode = event.target.value;
-                const nextStates = State.getStatesOfCountry(countryCode);
-                const nextState = nextStates[0]?.isoCode ?? "";
-                const nextCities = nextState ? City.getCitiesOfState(countryCode, nextState) : [];
-                const nextCity = nextCities[0]?.name ?? "";
-                setForm((value) => ({ ...value, country: countryCode, state: nextState, city: nextCity }));
-              }}>
-                {countries.map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}
-              </select></label>
-              <label>State<select value={form.state} onChange={(event) => {
-                const stateCode = event.target.value;
-                const nextCities = City.getCitiesOfState(form.country, stateCode);
-                setForm((value) => ({ ...value, state: stateCode, city: nextCities[0]?.name ?? "" }));
-              }}>
-                {State.getStatesOfCountry(form.country).map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}
-              </select></label>
-            </div>
-            <div className="form-grid">
-              <label>City<select value={form.city} onChange={(event) => setForm((value) => ({ ...value, city: event.target.value }))}>
-                {City.getCitiesOfState(form.country, form.state).map((city) => <option key={`${city.name}-${city.latitude}-${city.longitude}`} value={city.name}>{city.name}</option>)}
-              </select></label>
               <label>Zip code<input value={form.zipcode} onChange={(event) => setForm((value) => ({ ...value, zipcode: event.target.value }))} placeholder="Optional" /></label>
             </div>
-            <label>What do you offer?<textarea required maxLength={90} value={form.line} onChange={(event) => setForm((value) => ({ ...value, line: event.target.value }))} placeholder="Keep it short. Walls are busy." /></label>
+            <label>Subtitle<textarea required maxLength={90} value={form.line} onChange={(event) => setForm((value) => ({ ...value, line: event.target.value }))} placeholder="Short line shown on the card." /></label>
+            <label>Message <span>(optional)</span><textarea maxLength={300} value={form.message} onChange={(event) => setForm((value) => ({ ...value, message: event.target.value }))} placeholder="Longer details shown when someone opens the card." /></label>
             <label>Price <span>(optional)</span><input value={form.price} onChange={(event) => setForm((value) => ({ ...value, price: event.target.value }))} placeholder="$25 / visit" /></label>
             <fieldset>
               <legend>Keep your card on the wall</legend>
@@ -147,7 +142,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
                     onClick={() => setForm((value) => ({ ...value, paymentOption: option.value as ComposerForm["paymentOption"] }))}
                   >
                     <span>{option.label}</span>
-                    <span className="payment-tag">{form.paymentOption === option.value ? "Selected" : "Select1"}</span>
+                    {/* <span className="payment-tag">{form.paymentOption === option.value ? "Selected" : "Select1"}</span> */}
                   </button>
                 ))}
               </div>
@@ -159,8 +154,35 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={onImages} />
               {previews.length ? <div className="preview-row">{previews.map((src) => <img src={src} key={src} alt="Upload preview" />)}</div> : <><ImagePlus /><strong>Add 1 or 2 pictures</strong><span>JPG, PNG or WEBP · 8MB each</span></>}
             </label>
-            <fieldset><legend>Paper</legend><div className="swatches">{cardThemes.filter((theme) => theme !== "cream").map((theme) => <button type="button" key={theme} className={`swatch ${theme} ${form.theme === theme ? "selected" : ""}`} onClick={() => setForm((value) => ({ ...value, theme }))} aria-label={`${theme} paper`}>{form.theme === theme ? <Check /> : null}</button>)}</div></fieldset>
-            <div className={`mini-preview theme-${form.theme}`}><span>{form.category}</span><strong>{form.name || "Your business"}</strong><p>{form.line || "Your offer goes here."}</p></div>
+            <fieldset>
+              <legend>Card style</legend>
+              <div className="style-options" role="radiogroup" aria-label="Choose a card style">
+                {themeOptions.map(({ theme, label, description }) => (
+                  <button
+                    type="button"
+                    key={theme}
+                    className={`style-option theme-${theme} ${form.theme === theme ? "selected" : ""}`}
+                    onClick={() => setForm((value) => ({ ...value, theme }))}
+                    role="radio"
+                    aria-checked={form.theme === theme}
+                  >
+                    <span className="style-option-sample" aria-hidden="true"><i /><b /></span>
+                    <span className="style-option-copy"><strong>{label}</strong><small>{description}</small></span>
+                    {form.theme === theme ? <Check className="style-option-check" /> : null}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <div className="preview-stage">
+              <span>Live preview</span>
+              <div className={`mini-preview theme-${form.theme}`}>
+                <i className="mini-preview-tape" aria-hidden="true" />
+                <span>{form.category}</span>
+                <strong>{form.name || "Your business"}</strong>
+                <p>{form.line || "Your offer goes here."}</p>
+                <small>{form.area || "Your neighborhood"}</small>
+              </div>
+            </div>
           </div>
         )}
         <footer><span>You’ll choose its spot next.</span><button className="primary" type="submit">{step === 1 ? "Design card" : "Choose a spot"} <Sparkles /></button></footer>

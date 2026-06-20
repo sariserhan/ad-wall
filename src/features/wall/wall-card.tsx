@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, KeyboardEvent } from "react";
-import type { WallCard as WallCardModel } from "./types";
+import { getCardFormat, type WallCard as WallCardModel } from "./types";
 
 interface WallCardProps {
   card: WallCardModel;
@@ -11,14 +11,33 @@ interface WallCardProps {
   zIndex: number;
 }
 
-type CardStyle = CSSProperties & Record<"--x" | "--y" | "--r" | "--w", string>;
+type CardStyle = CSSProperties & Record<"--x" | "--y" | "--r" | "--w" | "--h" | "--tape-w" | "--tape-r" | "--tape-l", string>;
+
+function hashString(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
 
 export function WallCard({ card, active, onOpen, onFront, zIndex }: WallCardProps) {
+  const seed = hashString(String(card.id));
+  const tapeWidth = 42 + (seed % 45); // 42px to 86px
+  const tapeRotate = -14 + ((seed >> 3) % 23); // -14deg to +8deg
+  const tapeLeft = 22 + ((seed >> 6) % 48); // 22% to 69%
+  const format = getCardFormat(card.theme);
+
   const style: CardStyle = {
     "--x": `${card.x}%`,
     "--y": `${card.y}px`,
     "--r": `${card.rotation}deg`,
-    "--w": `${card.width}px`,
+    "--w": `${format.width}px`,
+    "--h": `${format.minHeight}px`,
+    "--tape-w": `${tapeWidth}px`,
+    "--tape-r": `${tapeRotate}deg`,
+    "--tape-l": `${tapeLeft}%`,
     zIndex,
   };
 

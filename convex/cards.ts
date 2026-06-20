@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 
 const category = v.union(v.literal("Services"), v.literal("Food"), v.literal("Home"), v.literal("Classes"), v.literal("Pets"), v.literal("Repairs"), v.literal("Shops"));
-const theme = v.union(v.literal("yellow"), v.literal("paper"), v.literal("pink"), v.literal("cyan"), v.literal("dark"), v.literal("cream"));
+const theme = v.union(v.literal("yellow"), v.literal("paper"), v.literal("pink"), v.literal("cyan"), v.literal("dark"), v.literal("cream"), v.literal("biz"), v.literal("kraft"), v.literal("blueprint"), v.literal("photo"), v.literal("ticket"));
 
 async function requireIdentity(ctx: { auth: { getUserIdentity: () => Promise<{ tokenIdentifier: string; subject: string; name?: string; email?: string; pictureUrl?: string } | null> } }) {
   const identity = await ctx.auth.getUserIdentity();
@@ -43,6 +43,7 @@ export const listPublished = query({
         name: card.name,
         category: card.category,
         line: card.line,
+        message: card.message,
         area: card.area,
         price: card.price,
         theme: card.theme,
@@ -75,6 +76,7 @@ export const create = mutation({
     name: v.string(),
     category,
     line: v.string(),
+    message: v.optional(v.string()),
     area: v.string(),
     city: v.string(),
     state: v.string(),
@@ -94,6 +96,7 @@ export const create = mutation({
     if (args.imageIds.length > 2) throw new Error("A card can have at most two images.");
     if (!args.name.trim() || args.name.length > 60) throw new Error("Business name must be between 1 and 60 characters.");
     if (!args.line.trim() || args.line.length > 90) throw new Error("Service description must be between 1 and 90 characters.");
+    if (args.message && args.message.length > 300) throw new Error("Message must be 300 characters or fewer.");
     if (!args.area.trim() || args.area.length > 50) throw new Error("Neighborhood must be between 1 and 50 characters.");
     if (!args.city.trim() || args.city.length > 100) throw new Error("City must be specified.");
     if (!args.state.trim() || args.state.length > 100) throw new Error("State must be specified.");
@@ -133,6 +136,7 @@ export const create = mutation({
       name: args.name.trim(),
       category: args.category,
       line: args.line.trim(),
+      message: args.message?.trim() || undefined,
       area: args.area.trim(),
       city: args.city.trim(),
       state: args.state.trim(),
@@ -160,6 +164,7 @@ export const create = mutation({
       name: args.name.trim(),
       category: args.category,
       line: args.line.trim(),
+      message: args.message?.trim() || undefined,
       area: args.area.trim(),
       city: args.city.trim(),
       state: args.state.trim(),

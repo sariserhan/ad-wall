@@ -19,7 +19,7 @@ import { DetailPanel } from "./detail-panel";
 import { PlacementMode } from "./placement-mode";
 import { seedCards } from "./seed-cards";
 import { WallCard } from "./wall-card";
-import { categories, type CardDraft, type CreateCard, type Placement, type WallCard as WallCardModel } from "./types";
+import { categories, getCardFormat, type CardDraft, type CreateCard, type Placement, type WallCard as WallCardModel } from "./types";
 
 interface WallAppProps {
   mode: "demo" | "connected";
@@ -39,6 +39,7 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
     name: draft.name,
     category: draft.category,
     line: draft.line,
+    message: draft.message,
     area: draft.area,
     city: draft.city,
     state: draft.state,
@@ -50,7 +51,7 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
     x: placement.x,
     y: placement.y,
     rotation: -3 + Math.random() * 6,
-    width: 220,
+    width: getCardFormat(draft.theme).width,
     zIndex,
     positionLockedAt: Date.now(),
     createdAt: Date.now(),
@@ -75,6 +76,8 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [fresh, setFresh] = useState(false);
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
+  const [stackPickerCards, setStackPickerCards] = useState<WallCardModel[] | null>(null);
   const [layers, setLayers] = useState<string[]>(seedCards.map((card) => card.id));
   const [mobileMenu, setMobileMenu] = useState(false);
   const [pendingCard, setPendingCard] = useState<CardDraft | null>(null);
@@ -87,6 +90,7 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
   const searchParams = useSearchParams();
   const [locationDropdown, setLocationDropdown] = useState(false);
   const [locationNotice, setLocationNotice] = useState<string | null>(null);
+  const [locationReady, setLocationReady] = useState(false);
   const [mapPickerOpen, setMapPickerOpen] = useState(false);
   const [mapLoading, setMapLoading] = useState(false);
   const [mapMessage, setMapMessage] = useState("Click on the map to choose a location.");
@@ -320,18 +324,30 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
       }
     };
 
-    if (!setLocationFromUrl()) {
-      if (!loadLocalLocation()) {
-        fetchUserLocation().then((location) => {
-          if (!location) return;
-          setSelectedCountry(location.country);
-          setSelectedState(location.state);
-          setSelectedCity(location.city);
-          updateLocationQuery(location.country, location.state, location.city);
-          persistLocation(location.country, location.state, location.city);
-        });
-      }
+    if (setLocationFromUrl()) {
+      setLocationReady(true);
+      return;
     }
+
+    if (loadLocalLocation()) {
+      setLocationReady(true);
+      return;
+    }
+
+    fetchUserLocation().then((location) => {
+      if (!location) {
+        setLocationReady(true);
+        return;
+      }
+      setSelectedCountry(location.country);
+      setSelectedState(location.state);
+      setSelectedCity(location.city);
+      updateLocationQuery(location.country, location.state, location.city);
+      persistLocation(location.country, location.state, location.city);
+      setLocationReady(true);
+    }).catch(() => {
+      setLocationReady(true);
+    });
   }, [pathname, router, searchParams]);
 
   const availableStates = State.getStatesOfCountry(selectedCountry);
@@ -397,7 +413,19 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
     return () => window.removeEventListener("keydown", handleEscape);
   }, [mapPickerOpen]);
 
+  useEffect(() => {
+    if (!stackPickerCards) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setStackPickerCards(null);
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [stackPickerCards]);
+
   const visible = useMemo(() => {
+    if (!locationReady) return [];
     const needle = deferredQuery.toLowerCase();
     const result = cards.filter((card) => {
       if (category !== "All" && card.category !== category) return false;
@@ -408,9 +436,70 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
       return text.includes(needle);
     });
     return fresh ? result.toReversed() : result;
-  }, [cards, category, deferredQuery, fresh, selectedCountry, selectedState, selectedCity]);
+  }, [cards, category, deferredQuery, fresh, selectedCountry, selectedState, selectedCity, locationReady]);
 
   const front = (id: string) => setLayers((current) => [...current.filter((item) => item !== id), id]);
+
+  const sendBehind = (id: string) => {
+    setLayers((current) => [id, ...current.filter((item) => item !== id)]);
+  };
+
+  const estimateCardHeight = (card: WallCardModel) => {
+    if (card.images.length > 0) return 300;
+    return 220;
+  };
+
+  const getCardRect = (card: WallCardModel) => {
+    const wallWidth = wallRef.current?.getBoundingClientRect().width ?? window.innerWidth;
+    const left = (card.x / 100) * wallWidth;
+    const top = card.y;
+    const width = card.width;
+    const height = estimateCardHeight(card);
+    return { left, top, right: left + width, bottom: top + height, width, height };
+  };
+
+  const overlapRatio = (a: ReturnType<typeof getCardRect>, b: ReturnType<typeof getCardRect>) => {
+    const overlapWidth = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+    const overlapHeight = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+    const overlapArea = overlapWidth * overlapHeight;
+    if (!overlapArea) return 0;
+    const baseArea = Math.min(a.width * a.height, b.width * b.height);
+    return overlapArea / baseArea;
+  };
+
+  const visualZIndex = (card: WallCardModel) => Math.max(card.zIndex, layers.indexOf(card.id) + 1);
+
+  const getStackAtCard = (targetCard: WallCardModel) => {
+    const targetRect = getCardRect(targetCard);
+    const substantialOverlapThreshold = 0.9;
+    const stack = visible.filter((candidate) => {
+      const candidateRect = getCardRect(candidate);
+      return overlapRatio(targetRect, candidateRect) >= substantialOverlapThreshold;
+    });
+    return stack.sort((a, b) => visualZIndex(b) - visualZIndex(a));
+  };
+
+  const openCard = (cardToOpen: WallCardModel) => {
+    const isAlreadyOpen = selected?.id === cardToOpen.id;
+    if (isAlreadyOpen) {
+      return;
+    }
+    const openedId = String(cardToOpen.id);
+    const nextViews = (viewCounts[openedId] ?? cardToOpen.clicks ?? 0) + 1;
+    setViewCounts((current) => ({ ...current, [openedId]: nextViews }));
+    const openedWithViews = { ...cardToOpen, clicks: nextViews };
+    setSelected(openedWithViews);
+    onCardOpen?.(openedWithViews);
+  };
+
+  const handleCardClick = (cardToOpen: WallCardModel) => {
+    const stack = getStackAtCard(cardToOpen);
+    if (stack.length > 1) {
+      setStackPickerCards(stack);
+      return;
+    }
+    openCard(cardToOpen);
+  };
 
   const openComposer = () => {
     setError(null);
@@ -481,11 +570,11 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
     <main className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={resetFilters}>WALL<span>LOCAL ADS, STUCK HERE</span></button>
-        <button className="location" onClick={() => setLocationDropdown(!locationDropdown)}>
+        <button className="location" onClick={() => { if (locationReady) setLocationDropdown(!locationDropdown); }}>
           <MapPin />
           <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
-            <span aria-hidden>{countryFlagEmoji(selectedCountry)}</span>
-            <span>{locationLabel()}</span>
+            {locationReady ? <span aria-hidden>{countryFlagEmoji(selectedCountry)}</span> : null}
+            <span>{locationReady ? locationLabel() : "Locating..."}</span>
           </span>
           <ChevronDown />
         </button>
@@ -714,10 +803,21 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
         style={{ backgroundImage: "linear-gradient(#0001, #0001), url('/assets/wall-texture.png')" }}
       >
         <div className="wall-grain" />
-        {isLoading ? <div className="empty-note"><strong>Finding the fresh paste…</strong></div> : null}
-        {!isLoading ? (
+        {isLoading || !locationReady ? <div className="empty-note"><strong>Finding the fresh paste…</strong></div> : null}
+        {!isLoading && locationReady ? (
           visible.length ? (
-            visible.map((card) => <WallCard key={card.id} card={card} active={selected?.id === card.id} onOpen={(cardToOpen) => { setSelected(cardToOpen); onCardOpen?.(cardToOpen); }} onFront={front} zIndex={Math.max(card.zIndex, layers.indexOf(card.id) + 1)} />)
+            visible.map((card) => {
+              return (
+                <WallCard
+                  key={card.id}
+                  card={card}
+                  active={selected?.id === card.id}
+                  onOpen={handleCardClick}
+                  onFront={front}
+                  zIndex={Math.max(card.zIndex, layers.indexOf(card.id) + 1)}
+                />
+              );
+            })
           ) : (
             <div className="empty-note"><strong>Nothing stuck here yet.</strong><span>Try another corner of the wall.</span><button onClick={resetFilters}>Reset filters</button></div>
           )
@@ -727,13 +827,55 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
           <button aria-label="Reset wall" onClick={resetFilters}><RotateCcw /></button>
         </div>
         <div className="wall-count">
-          {visible.length} CARDS · {locationLabel()}{locationWeather ? ` · ${Math.round(locationWeather.tempC)}°C/${Math.round(locationWeather.tempC * 9 / 5 + 32)}°F` : ''}
+          {locationReady
+            ? `${visible.length} CARDS · ${locationLabel()}${locationWeather ? ` · ${Math.round(locationWeather.tempC)}°C/${Math.round(locationWeather.tempC * 9 / 5 + 32)}°F` : ""}`
+            : "LOCATING WALL..."}
         </div>
         {pendingCard ? <PlacementMode card={pendingCard} position={placement} dragging={dragging} onDragStart={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setDragging(true); }} onMove={movePlacement} onDragEnd={() => setDragging(false)} onCancel={() => { setPendingCard(null); setDragging(false); }} onRandom={() => setPlacement({ x: 8 + Math.random() * (window.innerWidth < 780 ? 35 : 68), y: Math.max(60, window.scrollY + 60 + Math.random() * 450) })} onConfirm={post} isSaving={isSaving} /> : null}
       </section>
       {notice ? <div className="notice-toast" role="status">{notice}</div> : null}
       {error ? <div className="error-toast" role="alert">{error}<button onClick={() => setError(null)} aria-label="Dismiss error">×</button></div> : null}
-      {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} /> : null}
+      {stackPickerCards ? (
+        <div className="stack-picker-backdrop" onClick={() => setStackPickerCards(null)}>
+          <div className="stack-picker" onClick={(event) => event.stopPropagation()}>
+            <div className="stack-picker-header">
+              <strong>Stacked cards at this spot</strong>
+              <button className="icon-btn" onClick={() => setStackPickerCards(null)} aria-label="Close"><X /></button>
+            </div>
+            <p className="stack-picker-subtitle">Pick which card you want to open.</p>
+            <div className="stack-picker-list">
+              {stackPickerCards.map((card) => {
+                const views = viewCounts[String(card.id)] ?? card.clicks ?? 0;
+                return (
+                  <button
+                    key={card.id}
+                    type="button"
+                    className={`stack-picker-card theme-${card.theme}`}
+                    onClick={() => {
+                      setStackPickerCards(null);
+                      openCard(card);
+                    }}
+                  >
+                    <span className="card-tape" aria-hidden="true" />
+                    <span className="card-view-counter" aria-label={`${views} views`}>{views} views</span>
+                    <div className="stack-picker-copy">
+                      <p className="card-category">{card.category}</p>
+                      <h2>{card.name}</h2>
+                      <p className="card-line">{card.line}</p>
+                    </div>
+                    {card.images[0] ? <img src={card.images[0]} alt="" draggable={false} /> : null}
+                    <footer>
+                      <span>{card.area}</span>
+                      {card.price ? <strong>{card.price}</strong> : null}
+                    </footer>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onSendBehind={() => sendBehind(String(selected.id))} /> : null}
       {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} initialLocation={{ country: selectedCountry, state: selectedState, city: selectedCity }} /> : null}
     </main>
   );

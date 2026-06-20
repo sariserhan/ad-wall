@@ -1,8 +1,26 @@
 export const categories = ["All", "Services", "Food", "Home", "Classes", "Pets", "Repairs", "Shops"] as const;
-export const cardThemes = ["yellow", "paper", "pink", "cyan", "dark", "cream"] as const;
+export const cardThemes = ["yellow", "paper", "pink", "cyan", "dark", "cream", "biz", "kraft", "blueprint", "photo", "ticket"] as const;
 
 export type CardCategory = Exclude<(typeof categories)[number], "All">;
 export type CardTheme = (typeof cardThemes)[number];
+
+export const cardFormats: Record<CardTheme, { width: number; minHeight: number }> = {
+  yellow: { width: 205, minHeight: 205 },
+  paper: { width: 220, minHeight: 245 },
+  pink: { width: 220, minHeight: 245 },
+  cyan: { width: 220, minHeight: 245 },
+  dark: { width: 220, minHeight: 245 },
+  cream: { width: 220, minHeight: 245 },
+  biz: { width: 300, minHeight: 180 },
+  kraft: { width: 215, minHeight: 255 },
+  blueprint: { width: 235, minHeight: 235 },
+  photo: { width: 205, minHeight: 285 },
+  ticket: { width: 300, minHeight: 180 },
+};
+
+export function getCardFormat(theme: CardTheme) {
+  return cardFormats[theme];
+}
 
 import type { Id } from "../../../convex/_generated/dataModel";
 
@@ -11,6 +29,7 @@ export interface WallCard {
   name: string;
   category: CardCategory;
   line: string;
+  message?: string;
   area: string;
   city?: string;
   state?: string;
@@ -36,6 +55,7 @@ export interface CardDraft {
   name: string;
   category: CardCategory;
   line: string;
+  message?: string;
   area: string;
   city: string;
   state: string;
