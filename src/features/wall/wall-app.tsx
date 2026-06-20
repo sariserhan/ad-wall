@@ -464,7 +464,7 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
   }, [stackPickerCards]);
 
   const visible = useMemo(() => {
-    if (!locationReady) return [];
+    if (!locationReady) return cards;
     const needle = deferredQuery.toLowerCase();
     const result = cards.filter((card) => {
       if (category !== "All" && card.category !== category) return false;
@@ -897,8 +897,7 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
         style={{ backgroundImage: "linear-gradient(#0001, #0001), url('/assets/wall-texture.png')" }}
       >
         <div className="wall-grain" />
-        {isLoading || !locationReady ? <div className="empty-note"><strong>Finding the fresh paste…</strong></div> : null}
-        {!isLoading && locationReady ? (
+        {!isLoading ? (
           visible.length ? (
             visible.map((sourceCard) => {
               const override = positionOverrides[String(sourceCard.id)];

@@ -52,6 +52,7 @@ export interface WallCard {
   width: number;
   zIndex: number;
   positionLockedAt?: number;
+  updatedAt?: number;
   createdAt: number;
   ownerId?: string;
   paidAmount?: number;

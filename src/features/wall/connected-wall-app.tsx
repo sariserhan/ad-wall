@@ -2,7 +2,7 @@
 
 import { UserButton, useAuth, useClerk } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -11,35 +11,21 @@ import { getCardFormat, type CardDraft, type CardUpdate, type OwnerCard, type Pl
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-const WALL_SNAPSHOT_KEY = "wall-card-snapshot-v1";
-
-function sameCardSnapshot(left: WallCard, right: WallCard) {
-  const { clicks: _leftClicks, ...leftSnapshot } = left;
-  const { clicks: _rightClicks, ...rightSnapshot } = right;
-  return JSON.stringify(leftSnapshot) === JSON.stringify(rightSnapshot);
-}
-
-function reconcileRefreshedCards(current: WallCard[], latest: WallCard[]) {
-  const currentById = new Map(current.map((card) => [String(card.id), card]));
-  return latest.map((card) => {
-    const cached = currentById.get(String(card.id));
-    return cached && sameCardSnapshot(cached, card) ? cached : card;
-  });
-}
 
 export function ConnectedWallApp() {
   const { isAuthenticated, isLoading: isConvexAuthLoading } = useConvexAuth();
   const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn } = useAuth();
   const [layoutCards, setLayoutCards] = useState<WallCard[] | null>(null);
-  const hasReconciledRefreshRef = useRef(false);
+  const hasAppliedInitialServerSnapshotRef = useRef(false);
   const publishedCards = useQuery(api.cards.listPublished) as WallCard[] | undefined;
-  const liveCardIds = useMemo(() => (layoutCards ?? []).map((card) => card.id as Id<"cards">), [layoutCards]);
-  const liveViewCounts = useQuery(api.cards.getLiveViewCounts, layoutCards === null ? "skip" : { cardIds: liveCardIds }) as Array<{ id: Id<"cards">; clicks: number }> | undefined;
+  const renderCards = useMemo(() => layoutCards ?? publishedCards ?? [], [layoutCards, publishedCards]);
+  const liveCardIds = useMemo(() => renderCards.map((card) => card.id as Id<"cards">), [renderCards]);
+  const liveViewCounts = useQuery(api.cards.getLiveViewCounts, liveCardIds.length === 0 ? "skip" : { cardIds: liveCardIds }) as Array<{ id: Id<"cards">; clicks: number }> | undefined;
   const cards = useMemo(() => {
-    if (layoutCards === null) return undefined;
+    if (renderCards.length === 0 && publishedCards === undefined && layoutCards === null) return undefined;
     const counts = new Map((liveViewCounts ?? []).map((item) => [String(item.id), item.clicks]));
-    return layoutCards.map((card) => ({ ...card, clicks: counts.get(String(card.id)) ?? card.clicks ?? 0 }));
-  }, [layoutCards, liveViewCounts]);
+    return renderCards.map((card) => ({ ...card, clicks: counts.get(String(card.id)) ?? card.clicks ?? 0 }));
+  }, [layoutCards, liveViewCounts, publishedCards, renderCards]);
   const ownerCards = useQuery(api.cards.listMine, isAuthenticated ? {} : "skip") as OwnerCard[] | undefined;
   const generateUploadUrl = useMutation(api.cards.generateUploadUrl);
   const createCard = useMutation(api.cards.create);
@@ -55,40 +41,13 @@ export function ConnectedWallApp() {
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const ownedCardIds = useMemo(() => new Set((ownerCards ?? []).map((card) => String(card.id))), [ownerCards]);
 
-  useLayoutEffect(() => {
-    try {
-      const cached = window.localStorage.getItem(WALL_SNAPSHOT_KEY);
-      if (!cached) return;
-      const parsed = JSON.parse(cached) as unknown;
-      if (Array.isArray(parsed)) setLayoutCards(parsed as WallCard[]);
-    } catch {
-      window.localStorage.removeItem(WALL_SNAPSHOT_KEY);
-    }
-  }, []);
-
   useEffect(() => {
     if (publishedCards === undefined) return;
-    setLayoutCards((current) => {
-      if (!hasReconciledRefreshRef.current) {
-        hasReconciledRefreshRef.current = true;
-        return reconcileRefreshedCards(current ?? [], publishedCards);
-      }
+    if (hasAppliedInitialServerSnapshotRef.current) return;
 
-      if (current === null) return publishedCards;
-      const publishedIds = new Set(publishedCards.map((card) => String(card.id)));
-      const remaining = current.filter((card) => publishedIds.has(String(card.id)));
-      return remaining.length === current.length ? current : remaining;
-    });
+    setLayoutCards(publishedCards);
+    hasAppliedInitialServerSnapshotRef.current = true;
   }, [publishedCards]);
-
-  useEffect(() => {
-    if (layoutCards === null) return;
-    try {
-      window.localStorage.setItem(WALL_SNAPSHOT_KEY, JSON.stringify(layoutCards));
-    } catch {
-      // The wall still works normally when browser storage is unavailable.
-    }
-  }, [layoutCards]);
 
   const addCardToLocalWall = useCallback((card: WallCard) => {
     setLayoutCards((current) => {
@@ -292,7 +251,7 @@ export function ConnectedWallApp() {
     <WallApp
       mode="connected"
       cards={cards}
-      isLoading={cards === undefined}
+      isLoading={cards === undefined && layoutCards === null}
       isSignedIn={isAuthenticated}
       onRequestSignIn={() => {
         if (!isClerkLoaded || isConvexAuthLoading) {

@@ -41,6 +41,7 @@ export default defineSchema({
     paidAmount: v.number(),
     expiresAt: v.number(),
     positionLockedAt: v.number(),
+    updatedAt: v.optional(v.number()),
     createdAt: v.number(),
     country: v.string(),
     state: v.string(),

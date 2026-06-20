@@ -88,6 +88,7 @@ export const listPublished = query({
         width: card.width,
         zIndex: card.zIndex,
         positionLockedAt: card.positionLockedAt,
+        updatedAt: card.updatedAt,
         createdAt: card.createdAt,
         paidAmount: card.paidAmount,
         expiresAt: card.expiresAt,
@@ -156,6 +157,7 @@ export const listMine = query({
         zIndex: card.zIndex,
         status: effectiveStatus,
         positionLockedAt: card.positionLockedAt,
+        updatedAt: card.updatedAt,
         createdAt: card.createdAt,
         paidAmount: card.paidAmount,
         expiresAt: card.expiresAt,
@@ -175,7 +177,7 @@ export const setVisibility = mutation({
     const card = await ctx.db.get(args.cardId);
     if (!card || card.ownerId !== user._id) throw new Error("You can only manage your own cards.");
     if (args.status === "published" && card.expiresAt <= Date.now()) throw new Error("Expired cards must be renewed before publishing.");
-    await ctx.db.patch(card._id, { status: args.status });
+    await ctx.db.patch(card._id, { status: args.status, updatedAt: Date.now() });
     return { success: true };
   },
 });
@@ -198,6 +200,7 @@ export const renew = mutation({
       status,
       paidAmount: args.paidAmount,
       expiresAt,
+      updatedAt: now,
     });
     return { success: true, status, expiresAt };
   },
@@ -287,6 +290,7 @@ export const update = mutation({
       tiktok: args.tiktok?.trim() || undefined,
       linkedin: args.linkedin?.trim() || undefined,
       theme: args.theme,
+      updatedAt: Date.now(),
     });
     return { success: true };
   },
@@ -307,7 +311,7 @@ export const updatePosition = mutation({
     }
 
     const positionLockedAt = Date.now();
-    await ctx.db.patch(card._id, { x: args.x, y: args.y, positionLockedAt });
+    await ctx.db.patch(card._id, { x: args.x, y: args.y, positionLockedAt, updatedAt: positionLockedAt });
     return { success: true, x: args.x, y: args.y, positionLockedAt };
   },
 });
@@ -428,6 +432,7 @@ export const create = mutation({
       paidAmount: args.paidAmount,
       expiresAt,
       positionLockedAt: createdAt,
+      updatedAt: createdAt,
       createdAt,
       clicks: 0,
     });
@@ -461,6 +466,7 @@ export const create = mutation({
       width: args.width,
       zIndex,
       positionLockedAt: createdAt,
+      updatedAt: createdAt,
       createdAt,
       paidAmount: args.paidAmount,
       expiresAt,
