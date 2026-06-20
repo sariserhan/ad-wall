@@ -1,9 +1,39 @@
 "use client";
 
-import { Bookmark, MessageSquare, X } from "lucide-react";
+import { Bookmark, Contact, ExternalLink, Mail, Phone, X } from "lucide-react";
+import { useState } from "react";
 import type { WallCard } from "./types";
+import { SocialLinks } from "./social-links";
+
+function websiteHref(website: string) {
+  return /^https?:\/\//i.test(website) ? website : `https://${website}`;
+}
 
 export function DetailPanel({ card, onClose, viewCount, onSendBehind }: { card: WallCard; onClose: () => void; viewCount: number; onSendBehind?: () => void }) {
+  const [saved, setSaved] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const savedCards = JSON.parse(window.localStorage.getItem("savedWallCards") ?? "[]") as string[];
+      return savedCards.includes(String(card.id));
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSaved = () => {
+    const cardId = String(card.id);
+    try {
+      const savedCards = JSON.parse(window.localStorage.getItem("savedWallCards") ?? "[]") as string[];
+      const next = savedCards.includes(cardId) ? savedCards.filter((id) => id !== cardId) : [...savedCards, cardId];
+      window.localStorage.setItem("savedWallCards", JSON.stringify(next));
+      setSaved(next.includes(cardId));
+    } catch {
+      setSaved((value) => !value);
+    }
+  };
+
+  const hasContact = Boolean(card.phone || card.email || card.website);
+
   return (
     <aside className="detail-sheet" aria-label={`${card.name} details`}>
       <div className="sheet-pin" />
@@ -19,9 +49,16 @@ export function DetailPanel({ card, onClose, viewCount, onSendBehind }: { card: 
       ) : null}
       <div className="note-copy">{card.message ?? card.line}</div>
       {card.price ? <div className="sheet-price">Starting at <strong>{card.price}</strong></div> : null}
-      <button className="primary wide"><MessageSquare /> Contact {card.name.split(" ").slice(0, 2).join(" ")}</button>
-      {onSendBehind ? <button className="secondary wide" onClick={onSendBehind}>Send behind</button> : null}
-      <button className="secondary wide"><Bookmark /> Save card</button>
+      {hasContact ? (
+        <div className="contact-actions" aria-label={`Contact ${card.name}`}>
+          {card.phone ? <a className="primary contact-action" href={`tel:${card.phone}`}><Phone /> Call</a> : null}
+          {card.email ? <a className="secondary contact-action" href={`mailto:${card.email}?subject=${encodeURIComponent(`Saw your card on WALL`)}`}><Mail /> Email</a> : null}
+          {card.website ? <a className="secondary contact-action" href={websiteHref(card.website)} target="_blank" rel="noreferrer"><ExternalLink /> Website</a> : null}
+        </div>
+      ) : <p className="contact-unavailable">This poster has not added public contact details yet.</p>}
+      <SocialLinks card={card} />
+      {onSendBehind ? <button className="secondary wide" onClick={onSendBehind}><Contact></Contact>Contact {card.name}</button> : null}
+      <button className={`secondary wide ${saved ? "is-saved" : ""}`} onClick={toggleSaved} aria-pressed={saved}><Bookmark fill={saved ? "currentColor" : "none"} /> {saved ? "Saved" : "Save card"}</button>
       <div className="sheet-meta"><span>{viewCount > 0 ? `${viewCount} views` : "No views yet"}</span><span>CARD #{String(card.id).slice(-6).toUpperCase()}</span></div>
     </aside>
   );

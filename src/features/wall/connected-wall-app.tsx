@@ -7,16 +7,18 @@ import { useSearchParams } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { WallApp } from "./wall-app";
-import { getCardFormat, type CardDraft, type Placement, type WallCard, type CardCategory, type CardTheme } from "./types";
+import { getCardFormat, type CardDraft, type OwnerCard, type Placement, type WallCard, type CardCategory, type CardTheme } from "./types";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export function ConnectedWallApp() {
   const cards = useQuery(api.cards.listPublished) as WallCard[] | undefined;
+  const ownerCards = useQuery(api.cards.listMine) as OwnerCard[] | undefined;
   const generateUploadUrl = useMutation(api.cards.generateUploadUrl);
   const createCard = useMutation(api.cards.create);
   const incrementCardClicks = useMutation(api.cards.incrementClicks);
+  const setCardVisibility = useMutation(api.cards.setVisibility);
   const { isAuthenticated } = useConvexAuth();
   const { openSignIn } = useClerk();
   const searchParams = useSearchParams();
@@ -59,6 +61,13 @@ export function ConnectedWallApp() {
           country?: string;
           zipcode?: string;
           price?: string;
+          phone?: string;
+          email?: string;
+          website?: string;
+          instagram?: string;
+          facebook?: string;
+          tiktok?: string;
+          linkedin?: string;
           paidAmount: number;
           theme: CardTheme;
           imageIds: Id<"_storage">[];
@@ -79,6 +88,13 @@ export function ConnectedWallApp() {
           country: cardPayload.country ?? "",
           zipcode: cardPayload.zipcode,
           price: cardPayload.price,
+          phone: cardPayload.phone,
+          email: cardPayload.email,
+          website: cardPayload.website,
+          instagram: cardPayload.instagram,
+          facebook: cardPayload.facebook,
+          tiktok: cardPayload.tiktok,
+          linkedin: cardPayload.linkedin,
           paidAmount: cardPayload.paidAmount,
           theme: cardPayload.theme,
           imageIds: cardPayload.imageIds,
@@ -129,6 +145,13 @@ export function ConnectedWallApp() {
       country: draft.country,
       zipcode: draft.zipcode,
       price: draft.price,
+      phone: draft.phone,
+      email: draft.email,
+      website: draft.website,
+      instagram: draft.instagram,
+      facebook: draft.facebook,
+      tiktok: draft.tiktok,
+      linkedin: draft.linkedin,
       paidAmount,
       theme: draft.theme,
       imageIds,
@@ -155,6 +178,11 @@ export function ConnectedWallApp() {
       }}
       authControl={isAuthenticated ? <UserButton /> : null}
       notice={checkoutMessage}
+      ownerCards={isAuthenticated ? (ownerCards ?? []) : undefined}
+      ownerCardsLoading={isAuthenticated && ownerCards === undefined}
+      onSetCardStatus={async (card, status) => {
+        await setCardVisibility({ cardId: card.id as Id<"cards">, status });
+      }}
     />
   );
 }

@@ -4,6 +4,7 @@ import {
   ChevronDown,
   Globe,
   Layers3,
+  LayoutDashboard,
   MapPin,
   Menu,
   Plus,
@@ -17,9 +18,10 @@ import { Country, State, City } from "country-state-city";
 import { Composer } from "./composer";
 import { DetailPanel } from "./detail-panel";
 import { PlacementMode } from "./placement-mode";
+import { OwnerDashboard } from "./owner-dashboard";
 import { seedCards } from "./seed-cards";
 import { WallCard } from "./wall-card";
-import { categories, getCardFormat, type CardDraft, type CreateCard, type Placement, type WallCard as WallCardModel } from "./types";
+import { categories, getCardFormat, type CardDraft, type CreateCard, type OwnerCard, type Placement, type WallCard as WallCardModel } from "./types";
 
 interface WallAppProps {
   mode: "demo" | "connected";
@@ -31,6 +33,9 @@ interface WallAppProps {
   isLoading?: boolean;
   authControl?: ReactNode;
   notice?: string | null;
+  ownerCards?: OwnerCard[];
+  ownerCardsLoading?: boolean;
+  onSetCardStatus?: (card: OwnerCard, status: "published" | "hidden") => Promise<void>;
 }
 
 function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): WallCardModel {
@@ -46,6 +51,13 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
     country: draft.country,
     zipcode: draft.zipcode,
     price: draft.price,
+    phone: draft.phone,
+    email: draft.email,
+    website: draft.website,
+    instagram: draft.instagram,
+    facebook: draft.facebook,
+    tiktok: draft.tiktok,
+    linkedin: draft.linkedin,
     theme: draft.theme,
     images: draft.previews,
     x: placement.x,
@@ -67,11 +79,12 @@ const defaultSeedLocation = (() => {
   };
 })();
 
-export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice }: WallAppProps) {
+export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus }: WallAppProps) {
   const [demoCards, setDemoCards] = useState<WallCardModel[]>(seedCards);
   const cards = mode === "connected" ? (remoteCards ?? []) : demoCards;
   const [selected, setSelected] = useState<WallCardModel | null>(null);
   const [composer, setComposer] = useState(false);
+  const [dashboard, setDashboard] = useState(false);
   const [category, setCategory] = useState<(typeof categories)[number]>("All");
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
@@ -510,6 +523,11 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
     setComposer(true);
   };
 
+  const createFromDashboard = () => {
+    setDashboard(false);
+    openComposer();
+  };
+
   const beginPlacement = (draft: CardDraft) => {
     setComposer(false);
     setSelected(null);
@@ -583,6 +601,7 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
           <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by card" aria-label="Search advertisements" /></div>
           <label className="filter-select">Browse<select value={category} onChange={(event) => setCategory(event.target.value as (typeof categories)[number])}>{categories.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown /></label>
           <button className={fresh ? "nav-active" : ""} onClick={() => setFresh((value) => !value)}>Fresh <span className="fresh-dot" /></button>
+          {ownerCards ? <button onClick={() => { setDashboard(true); setMobileMenu(false); }}><LayoutDashboard /> My cards</button> : null}
           <button className="mobile-nav-post" onClick={openComposer}><Plus /> Post your card</button>
         </nav>
         {authControl ? <div className="auth-control">{authControl}</div> : null}
@@ -876,6 +895,16 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
         </div>
       ) : null}
       {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onSendBehind={() => sendBehind(String(selected.id))} /> : null}
+      {dashboard && ownerCards && onSetCardStatus ? (
+        <OwnerDashboard
+          cards={ownerCards}
+          loading={ownerCardsLoading}
+          onClose={() => setDashboard(false)}
+          onCreate={createFromDashboard}
+          onView={(card) => { setDashboard(false); setSelected(card); }}
+          onSetVisibility={onSetCardStatus}
+        />
+      ) : null}
       {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} initialLocation={{ country: selectedCountry, state: selectedState, city: selectedCity }} /> : null}
     </main>
   );

@@ -2,6 +2,7 @@
 
 import type { CSSProperties, KeyboardEvent } from "react";
 import { getCardFormat, type WallCard as WallCardModel } from "./types";
+import { SocialLinks } from "./social-links";
 
 interface WallCardProps {
   card: WallCardModel;
@@ -66,6 +67,7 @@ export function WallCard({ card, active, onOpen, onFront, zIndex }: WallCardProp
         <p className="card-line">{card.line}</p>
       </div>
       {card.images[0] ? <img src={card.images[0]} alt="" draggable="false" /> : null}
+      <SocialLinks card={card} compact />
       <footer>
         <span>{card.area}</span>
         {card.price ? <strong>{card.price}</strong> : null}

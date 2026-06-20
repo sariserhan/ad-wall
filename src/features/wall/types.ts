@@ -36,6 +36,13 @@ export interface WallCard {
   country?: string;
   zipcode?: string;
   price?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+  linkedin?: string;
   theme: CardTheme;
   images: string[];
   x: number;
@@ -51,6 +58,13 @@ export interface WallCard {
   clicks?: number;
 }
 
+export interface OwnerCard extends WallCard {
+  status: "published" | "hidden" | "expired";
+  expiresAt: number;
+  paidAmount: number;
+  clicks: number;
+}
+
 export interface CardDraft {
   name: string;
   category: CardCategory;
@@ -62,6 +76,13 @@ export interface CardDraft {
   country: string;
   zipcode?: string;
   price?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+  linkedin?: string;
   theme: CardTheme;
   paymentOption: "free" | "1" | "3" | "10" | "20";
   files: File[];
