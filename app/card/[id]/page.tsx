@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
   const { id } = await params;
   const card = await getPublicCard(id);
   if (!card) return { title: "Card not found | WALL" };
-  const title = `${card.name} | WALL`;
+  const title = `CARD-${card.name}`;
   const description = card.message?.slice(0, 160) || card.line.slice(0, 160);
   const image = card.images[0];
   return {
