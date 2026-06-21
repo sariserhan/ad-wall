@@ -1,7 +1,9 @@
 import Stripe from "stripe";
 import type { NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { rateLimit } from "../../_rate-limit";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", { apiVersion: "2022-11-15" });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
 const paidAmounts = new Set([1, 3, 10, 20]);
 
@@ -10,9 +12,13 @@ function json(body: unknown, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request, "checkout", 20, 60 * 60 * 1000);
+  if (limited) return limited;
   if (!process.env.STRIPE_SECRET_KEY) {
     return json({ error: "Stripe is not configured. Add STRIPE_SECRET_KEY to .env.local and restart the server." }, 503);
   }
+  const { userId } = await auth();
+  if (!userId) return json({ error: "Sign in before starting checkout." }, 401);
 
   try {
     const body = await request.json().catch(() => null);
@@ -42,16 +48,16 @@ export async function POST(request: NextRequest) {
           cardId: renewalPayload.cardId,
           paidAmount: String(paidAmount),
         },
-        success_url: `${origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${origin}/?checkout=success&kind=renewal&card_id=${encodeURIComponent(renewalPayload.cardId)}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/?checkout=canceled&session_id={CHECKOUT_SESSION_ID}`,
       });
 
       return json({ url: session.url, sessionId: session.id });
     }
 
-    const cardPayload = body?.cardPayload;
-    const paidAmount = Number(cardPayload?.paidAmount);
-    if (!cardPayload || !paidAmounts.has(paidAmount)) {
+    const pendingCardId = body?.pendingCardId;
+    const paidAmount = Number(body?.paidAmount);
+    if (typeof pendingCardId !== "string" || !paidAmounts.has(paidAmount)) {
       return json({ error: "Invalid paid card request." }, 400);
     }
 
@@ -62,7 +68,7 @@ export async function POST(request: NextRequest) {
         price_data: {
           currency: "usd",
           product_data: {
-            name: `Post ${String(cardPayload.name || "wall card").slice(0, 80)}`,
+          name: `Post ${String(body?.cardName || "wall card").slice(0, 80)}`,
             description: "Publish this card on the local wall",
           },
           unit_amount: paidAmount * 100,
@@ -71,9 +77,10 @@ export async function POST(request: NextRequest) {
       }],
       metadata: {
         kind: "posting",
+        pendingCardId,
         paidAmount: String(paidAmount),
       },
-      success_url: `${origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/?checkout=success&kind=posting&pending_card_id=${encodeURIComponent(pendingCardId)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?checkout=canceled&session_id={CHECKOUT_SESSION_ID}`,
     });
 

@@ -49,14 +49,12 @@ function isValidWebUrl(value: string) {
 }
 
 export const listPublished = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { country: v.optional(v.string()), state: v.optional(v.string()), city: v.optional(v.string()) },
+  handler: async (ctx, args) => {
     const now = Date.now();
-    const cards = await ctx.db
-      .query("cards")
-      .withIndex("by_status_created", (q) => q.eq("status", "published"))
-      .order("asc")
-      .take(200);
+    const cards = args.country && args.state && args.city
+      ? await ctx.db.query("cards").withIndex("by_status_and_country_and_state_and_city_and_createdAt", (q) => q.eq("status", "published").eq("country", args.country!).eq("state", args.state!).eq("city", args.city!)).order("desc").take(100)
+      : await ctx.db.query("cards").withIndex("by_status_created", (q) => q.eq("status", "published")).order("desc").take(100);
 
     const visibleCards = cards.filter((card) => card.expiresAt > now);
 
@@ -105,8 +103,12 @@ export const getLiveViewCounts = query({
   args: { cardIds: v.array(v.id("cards")) },
   handler: async (ctx, args) => {
     if (args.cardIds.length > 200) throw new Error("Too many cards requested.");
-    const cards = await Promise.all(args.cardIds.map((cardId) => ctx.db.get(cardId)));
-    return cards.flatMap((card) => card ? [{ id: card._id, clicks: card.clicks ?? 0 }] : []);
+    return await Promise.all(args.cardIds.map(async (cardId) => {
+      const stats = await ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", cardId)).unique();
+      if (stats) return { id: cardId, clicks: stats.clicks };
+      const card = await ctx.db.get(cardId);
+      return { id: cardId, clicks: card?.clicks ?? 0 };
+    }));
   },
 });
 
@@ -128,7 +130,10 @@ export const listMine = query({
 
     const cards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", user._id)).order("desc").take(100);
     return Promise.all(cards.map(async (card) => {
-      const urls = await Promise.all(card.imageIds.map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId)));
+      const [urls, stats] = await Promise.all([
+        Promise.all(card.imageIds.map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
+        ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", card._id)).unique(),
+      ]);
       const effectiveStatus = card.status === "published" && card.expiresAt <= Date.now() ? "expired" : card.status;
       return {
         id: card._id,
@@ -165,7 +170,13 @@ export const listMine = query({
         createdAt: card.createdAt,
         paidAmount: card.paidAmount,
         expiresAt: card.expiresAt,
-        clicks: card.clicks,
+        clicks: stats?.clicks ?? card.clicks,
+        websiteClicks: stats?.websiteClicks ?? 0,
+        phoneClicks: stats?.phoneClicks ?? 0,
+        emailClicks: stats?.emailClicks ?? 0,
+        socialClicks: stats?.socialClicks ?? 0,
+        saves: stats?.saves ?? 0,
+        shares: stats?.shares ?? 0,
       };
     }));
   },
@@ -192,6 +203,7 @@ export const renew = mutation({
     paidAmount: paymentAmount,
   },
   handler: async (ctx, args) => {
+    if (args.paidAmount !== 0) throw new Error("Paid renewals must be completed through verified checkout.");
     const user = await requireUser(ctx);
     const card = await ctx.db.get(args.cardId);
     if (!card || card.ownerId !== user._id) throw new Error("You can only renew your own cards.");
@@ -406,10 +418,41 @@ export const create = mutation({
     if (!user) throw new Error("Your profile could not be created.");
 
     const createdAt = Date.now();
-    const expiresAt = createdAt + getExpiryDuration(args.paidAmount);
     const cardWidth = args.imageMode === "business-card" ? 300 : args.width;
-    const existingCards = await ctx.db.query("cards").withIndex("by_status_created", (q) => q.eq("status", "published")).collect();
-    const zIndex = existingCards.reduce((highest, card) => Math.max(highest, card.zIndex), 0) + 1;
+    const normalizedPayload = {
+      ...args,
+      name: args.name.trim(),
+      line: args.line.trim(),
+      message: args.message?.trim() || undefined,
+      area: args.area.trim(),
+      city: args.city.trim(),
+      state: args.state.trim(),
+      country: args.country.trim(),
+      zipcode: args.zipcode?.trim() || undefined,
+      price: args.price?.trim() || undefined,
+      phone: phone || undefined,
+      email: email || undefined,
+      website: args.website?.trim() || undefined,
+      location: args.location?.trim() || undefined,
+      instagram: args.instagram?.trim() || undefined,
+      facebook: args.facebook?.trim() || undefined,
+      tiktok: args.tiktok?.trim() || undefined,
+      linkedin: args.linkedin?.trim() || undefined,
+      width: cardWidth,
+    };
+    if (args.paidAmount > 0) {
+      const pendingCardId = await ctx.db.insert("pendingCards", {
+        ownerId: user._id,
+        payload: normalizedPayload,
+        paidAmount: args.paidAmount,
+        status: "pending",
+        createdAt,
+        expiresAt: createdAt + 2 * 60 * 60 * 1000,
+      });
+      return { pendingCardId };
+    }
+    const expiresAt = createdAt + getExpiryDuration(args.paidAmount);
+    const zIndex = createdAt;
     const cardId = await ctx.db.insert("cards", {
       ownerId: user._id,
       name: args.name.trim(),
@@ -446,6 +489,7 @@ export const create = mutation({
       createdAt,
       clicks: 0,
     });
+    await ctx.db.insert("cardStats", { cardId, clicks: 0, websiteClicks: 0, phoneClicks: 0, emailClicks: 0, socialClicks: 0, saves: 0, shares: 0, updatedAt: createdAt });
     const urls = await Promise.all(args.imageIds.map((imageId) => ctx.storage.getUrl(imageId)));
     return {
       id: cardId,
@@ -498,10 +542,40 @@ export const incrementClicks = mutation({
       const viewer = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
       if (viewer?._id === card.ownerId) return { success: true, incremented: false, clicks: card.clicks ?? 0 };
     }
-    const clicks = (card.clicks ?? 0) + 1;
-    await ctx.db.patch(args.cardId, {
-      clicks,
-    });
+    const stats = await ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", args.cardId)).unique();
+    const clicks = (stats?.clicks ?? card.clicks ?? 0) + 1;
+    if (stats) await ctx.db.patch(stats._id, { clicks, updatedAt: Date.now() });
+    else await ctx.db.insert("cardStats", { cardId: card._id, clicks, websiteClicks: 0, phoneClicks: 0, emailClicks: 0, socialClicks: 0, saves: 0, shares: 0, updatedAt: Date.now() });
     return { success: true, incremented: true, clicks };
+  },
+});
+
+export const recordEvent = mutation({
+  args: { cardId: v.id("cards"), event: v.union(v.literal("website"), v.literal("phone"), v.literal("email"), v.literal("social"), v.literal("save"), v.literal("share")) },
+  handler: async (ctx, args) => {
+    const card = await ctx.db.get(args.cardId);
+    if (!card) throw new Error("Card not found.");
+    let stats = await ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", args.cardId)).unique();
+    if (!stats) {
+      const id = await ctx.db.insert("cardStats", { cardId: card._id, clicks: card.clicks ?? 0, websiteClicks: 0, phoneClicks: 0, emailClicks: 0, socialClicks: 0, saves: 0, shares: 0, updatedAt: Date.now() });
+      stats = await ctx.db.get(id);
+    }
+    if (!stats) return null;
+    const field = args.event === "website" ? "websiteClicks" : args.event === "phone" ? "phoneClicks" : args.event === "email" ? "emailClicks" : args.event === "social" ? "socialClicks" : args.event === "save" ? "saves" : "shares";
+    await ctx.db.patch(stats._id, { [field]: stats[field] + 1, updatedAt: Date.now() });
+    return { success: true };
+  },
+});
+
+export const report = mutation({
+  args: { cardId: v.id("cards"), reason: v.union(v.literal("spam"), v.literal("scam"), v.literal("inappropriate"), v.literal("expired"), v.literal("other")), details: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    if (args.details && args.details.length > 500) throw new Error("Report details must be 500 characters or fewer.");
+    const card = await ctx.db.get(args.cardId);
+    if (!card) throw new Error("Card not found.");
+    const identity = await ctx.auth.getUserIdentity();
+    const reporter = identity ? await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique() : null;
+    await ctx.db.insert("reports", { cardId: card._id, reporterId: reporter?._id, reason: args.reason, details: args.details?.trim() || undefined, status: "open", createdAt: Date.now() });
+    return { success: true };
   },
 });

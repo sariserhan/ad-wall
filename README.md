@@ -28,6 +28,16 @@ The schema stores users, cards, up to two image storage IDs, normalized wall pla
 
 Without both public Convex and Clerk values, the application stays in demo mode. With both configured, browsing remains public while posting requires authentication and persists cards and images through Convex.
 
+## Enable the admin panel
+
+Admin access is enforced by Convex using verified Clerk email addresses. Add one or more comma-separated emails to the Convex deployment environment:
+
+```bash
+npx convex env set ADMIN_EMAILS "owner@example.com,moderator@example.com"
+```
+
+After an allowlisted user signs in, an **Admin** button appears in the navigation. Admins can review recent cards and users, search records, hide or restore active cards, and permanently delete cards and their uploaded images.
+
 ## Commands
 
 ```bash

@@ -3,6 +3,7 @@ import path from "node:path";
 import * as ort from "onnxruntime-node";
 import sharp from "sharp";
 import { createWorker, type Worker } from "tesseract.js";
+import { rateLimit } from "../_rate-limit";
 
 export const runtime = "nodejs";
 
@@ -78,6 +79,8 @@ async function moderateImage(image: File, imageIndex: number) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request, "moderate", 12, 5 * 60 * 1000);
+  if (limited) return limited;
   const formData = await request.formData().catch(() => null);
   if (!formData) return Response.json({ safe: false, error: "Invalid moderation request." }, { status: 400 });
 

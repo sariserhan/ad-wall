@@ -43,6 +43,7 @@ export function OwnerDashboard({ cards, loading, onClose, onCreate, onView, onSe
   const stats = useMemo(() => ({
     totalViews: cards.reduce((sum, card) => sum + card.clicks, 0),
     live: cards.filter((card) => card.status === "published").length,
+    actions: cards.reduce((sum, card) => sum + (card.websiteClicks ?? 0) + (card.phoneClicks ?? 0) + (card.emailClicks ?? 0) + (card.socialClicks ?? 0), 0),
   }), [cards]);
 
   const changeVisibility = async (card: OwnerCard) => {
@@ -97,7 +98,7 @@ export function OwnerDashboard({ cards, loading, onClose, onCreate, onView, onSe
         <div className="dashboard-stats">
           <div><BarChart3 /><span>Total card opens</span><strong>{stats.totalViews}</strong></div>
           <div><Eye /><span>Live cards</span><strong>{stats.live}</strong></div>
-          <div><MousePointerClick /><span>Cards created</span><strong>{cards.length}</strong></div>
+          <div><MousePointerClick /><span>Contact actions</span><strong>{stats.actions}</strong></div>
         </div>
 
         <div className="dashboard-toolbar">
@@ -122,7 +123,7 @@ export function OwnerDashboard({ cards, loading, onClose, onCreate, onView, onSe
                   <div><span className={`status-dot status-${card.status}`} />{card.status}</div>
                   <h3>{card.name}</h3>
                   <p>{card.line}</p>
-                  <small><Eye /> {card.clicks} opens <Clock3 /> {expiryLabel(card.expiresAt)}</small>
+                  <small><Eye /> {card.clicks} opens · {(card.websiteClicks ?? 0) + (card.phoneClicks ?? 0) + (card.emailClicks ?? 0) + (card.socialClicks ?? 0)} contacts · {card.saves ?? 0} saves · {card.shares ?? 0} shares <Clock3 /> {expiryLabel(card.expiresAt)}</small>
                 </div>
                 <div className="dashboard-card-actions">
                   <button className="secondary" onClick={() => onView(card)}>View</button>

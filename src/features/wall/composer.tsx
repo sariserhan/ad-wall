@@ -88,6 +88,7 @@ const paymentOptions: ReadonlyArray<{ value: ComposerForm["paymentOption"]; pric
 ];
 
 const stepLabels = ["Design", "Details", "Duration"] as const;
+const DRAFT_STORAGE_KEY = "wall-card-draft-v1";
 type ModerationMatch = { field: "name" | "line" | "message"; term: string; start: number; end: number };
 type DetailField = "name" | "line" | "message" | "area" | "zipcode" | "price" | "phone" | "email" | "website" | "location" | "instagram" | "facebook" | "tiktok" | "linkedin";
 
@@ -133,7 +134,13 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
     const state = states.some((s) => s.isoCode === baseState) ? baseState : states[0]?.isoCode ?? "";
     const cities = state ? City.getCitiesOfState(baseCountry, state) : [];
     const city = cities.some((c) => c.name === baseCity) ? baseCity : cities[0]?.name ?? "";
-    return { ...initialForm, country: baseCountry, state, city };
+    if (typeof window === "undefined") return { ...initialForm, country: baseCountry, state, city };
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(DRAFT_STORAGE_KEY) ?? "null") as Partial<ComposerForm> | null;
+      return { ...initialForm, ...saved, country: baseCountry, state, city };
+    } catch {
+      return { ...initialForm, country: baseCountry, state, city };
+    }
   });
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -273,6 +280,13 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
   useEffect(() => () => moderationRequestRef.current?.abort(), []);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try { window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form)); } catch { /* storage unavailable */ }
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [form]);
+
+  useEffect(() => {
     if (!form.phone.trim() && !form.email.trim()) return;
     const phoneInput = formRef.current?.elements.namedItem("phone") as HTMLInputElement | null;
     const emailInput = formRef.current?.elements.namedItem("email") as HTMLInputElement | null;
@@ -327,6 +341,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
       files,
       previews,
     });
+    try { window.localStorage.removeItem(DRAFT_STORAGE_KEY); } catch { /* storage unavailable */ }
   };
 
   return (

@@ -67,6 +67,12 @@ export interface OwnerCard extends WallCard {
   expiresAt: number;
   paidAmount: number;
   clicks: number;
+  websiteClicks?: number;
+  phoneClicks?: number;
+  emailClicks?: number;
+  socialClicks?: number;
+  saves?: number;
+  shares?: number;
 }
 
 export type RenewalAmount = 0 | 1 | 3 | 10 | 20;

@@ -11,8 +11,10 @@ import {
   RefreshCw,
   RotateCcw,
   Search,
+  ShieldCheck,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { startTransition, useDeferredValue, useMemo, useRef, useState, useEffect, type PointerEvent, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Country, State, City } from "country-state-city";
@@ -44,6 +46,10 @@ interface WallAppProps {
   onRenewCard?: (card: OwnerCard, paidAmount: RenewalAmount) => Promise<void>;
   onMoveCard?: (card: WallCardModel, placement: Placement) => Promise<void>;
   ownedCardIds?: ReadonlySet<string>;
+  isAdmin?: boolean;
+  onOpenAdmin?: () => void;
+  onCardEvent?: (card: WallCardModel, event: "website" | "phone" | "email" | "social" | "save" | "share") => void;
+  onReportCard?: (card: WallCardModel, reason: "spam" | "scam" | "inappropriate" | "expired" | "other", details?: string) => Promise<void>;
 }
 
 const MAX_CARD_Y = 1500;
@@ -91,7 +97,7 @@ const defaultSeedLocation = (() => {
   };
 })();
 
-export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds }: WallAppProps) {
+export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds, isAdmin = false, onOpenAdmin, onCardEvent, onReportCard }: WallAppProps) {
   const [demoCards, setDemoCards] = useState<WallCardModel[]>(seedCards);
   const cards = mode === "connected" ? (remoteCards ?? []) : demoCards;
   const [selected, setSelected] = useState<WallCardModel | null>(null);
@@ -138,6 +144,18 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const wallRef = useRef<HTMLElement>(null);
   const moveOffsetRef = useRef<{ x: number; y: number } | null>(null);
   const movePositionRef = useRef<Placement | null>(null);
+  const openedSharedCardRef = useRef(false);
+
+  useEffect(() => {
+    if (openedSharedCardRef.current || cards.length === 0) return;
+    const sharedCardId = searchParams.get("card");
+    if (!sharedCardId) return;
+    const sharedCard = cards.find((card) => String(card.id) === sharedCardId);
+    if (sharedCard) {
+      setSelected(sharedCard);
+      openedSharedCardRef.current = true;
+    }
+  }, [cards, searchParams]);
 
   useEffect(() => {
     setViewCounts((current) => {
@@ -198,8 +216,12 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
 
   const fetchUserLocation = async () => {
     try {
-      const response = await fetch("https://ipapi.co/json/");
-      const data = await response.json();
+      const cached = window.sessionStorage.getItem("wall-ip-location-v1");
+      const cachedEntry = cached ? JSON.parse(cached) as { expiresAt: number; data: Record<string, unknown> } : null;
+      const data = cachedEntry && cachedEntry.expiresAt > Date.now()
+        ? cachedEntry.data
+        : await fetch("https://ipapi.co/json/").then((response) => response.json());
+      if (!cachedEntry || cachedEntry.expiresAt <= Date.now()) window.sessionStorage.setItem("wall-ip-location-v1", JSON.stringify({ expiresAt: Date.now() + 30 * 60 * 1000, data }));
       const countryCode = String(data.country_code || "US").toUpperCase();
       const allCountries = Country.getAllCountries();
       if (!allCountries.some((country) => country.isoCode === countryCode)) return null;
@@ -277,6 +299,10 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     let cancelled = false;
     const fetchWeather = async (lat: number, lon: number) => {
       try {
+        const cacheKey = `wall-weather:${lat.toFixed(2)}:${lon.toFixed(2)}`;
+        const cached = window.sessionStorage.getItem(cacheKey);
+        const cachedEntry = cached ? JSON.parse(cached) as { expiresAt: number; value: { tempC: number; time: string; timezone?: string } } : null;
+        if (cachedEntry && cachedEntry.expiresAt > Date.now()) { setLocationWeather(cachedEntry.value); return; }
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current_weather=true&timezone=auto`;
         const res = await fetch(url);
         const data = await res.json();
@@ -286,7 +312,9 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           setLocationWeather(null);
           return;
         }
-        setLocationWeather({ tempC: Number(cw.temperature), time: String(cw.time || ""), timezone: data.timezone });
+        const value = { tempC: Number(cw.temperature), time: String(cw.time || ""), timezone: data.timezone as string | undefined };
+        setLocationWeather(value);
+        window.sessionStorage.setItem(cacheKey, JSON.stringify({ expiresAt: Date.now() + 15 * 60 * 1000, value }));
       } catch (err) {
         console.debug(err);
         if (!cancelled) setLocationWeather(null);
@@ -696,6 +724,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by card" aria-label="Search advertisements" /></div>
           <label className="filter-select">Browse<select value={category} onChange={(event) => setCategory(event.target.value as (typeof categories)[number])}>{categories.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown /></label>
           {ownerCards ? <button onClick={() => { setDashboard(true); setMobileMenu(false); }}><LayoutDashboard /> My cards</button> : null}
+          {isAdmin && onOpenAdmin ? <button className="admin-nav-button" onClick={() => { onOpenAdmin(); setMobileMenu(false); }}><ShieldCheck /> Admin</button> : null}
           <button className="mobile-nav-post" onClick={openComposer}><Plus />Post your card</button>
         </nav>
         {authControl ? <div className="auth-control">{authControl}</div> : null}
@@ -954,6 +983,12 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         {pendingCard ? <PlacementMode card={pendingCard} position={placement} dragging={dragging} onDragStart={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setDragging(true); }} onMove={movePlacement} onDragEnd={() => setDragging(false)} onCancel={() => { setPendingCard(null); setDragging(false); }} onRandom={() => setPlacement({ x: 8 + Math.random() * (window.innerWidth < 780 ? 35 : 68), y: Math.max(60, window.scrollY + 60 + Math.random() * 450) })} onConfirm={post} isSaving={isSaving} /> : null}
       </section>
       {notice ? <div className="notice-toast" role="status">{notice}</div> : null}
+      <footer className={`app-footer${mode === "connected" && pendingCardsOnSelectedWall > 0 && onRefreshWall ? " has-refresh-notice" : ""}`}>
+        <nav className="legal-links" aria-label="Legal links">
+          <Link href="/terms-and-conditions">Terms & Conditions</Link>
+          <Link href="/privacy-policy">Privacy Policy</Link>
+        </nav>
+      </footer>
       {mode === "connected" && pendingCardsOnSelectedWall > 0 && onRefreshWall ? (
         <button className="wall-refresh-notice" type="button" onClick={onRefreshWall}>
           <RefreshCw />
@@ -1001,7 +1036,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           </div>
         </div>
       ) : null}
-      {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} /> : null}
+      {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} /> : null}
       {dashboard && ownerCards && onSetCardStatus && onUpdateCard && onDeleteCard && onRenewCard ? (
         <OwnerDashboard
           cards={ownerCards}

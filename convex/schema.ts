@@ -51,6 +51,54 @@ export default defineSchema({
     clicks: v.number(),
   })
     .index("by_status_created", ["status", "createdAt"])
+    .index("by_status_and_country_and_state_and_city_and_createdAt", ["status", "country", "state", "city", "createdAt"])
     .index("by_status_and_expiresAt", ["status", "expiresAt"])
     .index("by_owner", ["ownerId"]),
+
+  pendingCards: defineTable({
+    ownerId: v.id("users"),
+    payload: v.any(),
+    paidAmount: v.number(),
+    status: v.union(v.literal("pending"), v.literal("completed")),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  }).index("by_owner", ["ownerId"]),
+
+  paymentReceipts: defineTable({
+    sessionId: v.string(),
+    pendingCardId: v.id("pendingCards"),
+    cardId: v.id("cards"),
+    paidAmount: v.number(),
+    usedAt: v.number(),
+  }).index("by_session", ["sessionId"]),
+
+  renewalReceipts: defineTable({
+    sessionId: v.string(),
+    cardId: v.id("cards"),
+    paidAmount: v.number(),
+    usedAt: v.number(),
+  }).index("by_session", ["sessionId"]),
+
+  cardStats: defineTable({
+    cardId: v.id("cards"),
+    clicks: v.number(),
+    websiteClicks: v.number(),
+    phoneClicks: v.number(),
+    emailClicks: v.number(),
+    socialClicks: v.number(),
+    saves: v.number(),
+    shares: v.number(),
+    updatedAt: v.number(),
+  }).index("by_card", ["cardId"]),
+
+  reports: defineTable({
+    cardId: v.id("cards"),
+    reporterId: v.optional(v.id("users")),
+    reason: v.union(v.literal("spam"), v.literal("scam"), v.literal("inappropriate"), v.literal("expired"), v.literal("other")),
+    details: v.optional(v.string()),
+    status: v.union(v.literal("open"), v.literal("resolved")),
+    createdAt: v.number(),
+  })
+    .index("by_card", ["cardId"])
+    .index("by_status_and_createdAt", ["status", "createdAt"]),
 });

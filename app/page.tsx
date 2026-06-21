@@ -1,6 +1,7 @@
 import { AppProviders } from "@/components/app-providers";
 import { ConnectedWallApp } from "@/features/wall/connected-wall-app";
 import { WallApp } from "@/features/wall/wall-app";
+import { Suspense } from "react";
 
 export default function HomePage() {
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -9,7 +10,7 @@ export default function HomePage() {
 
   return (
     <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
-      {isConnected ? <ConnectedWallApp /> : <WallApp mode="demo" isSignedIn={false} notice="Posting is unavailable until Clerk sign-in is configured." />}
+      {isConnected ? <Suspense fallback={<div className="app-loading"><strong>WALL</strong><span>Loading your local wall…</span></div>}><ConnectedWallApp /></Suspense> : <WallApp mode="demo" isSignedIn={false} notice="Posting is unavailable until Clerk sign-in is configured." />}
     </AppProviders>
   );
 }

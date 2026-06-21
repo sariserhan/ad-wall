@@ -1,9 +1,12 @@
 import Stripe from "stripe";
 import type { NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", { apiVersion: "2022-11-15" });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
 export async function GET(request: NextRequest) {
+  const { userId } = await auth();
+  if (!userId) return Response.json({ success: false, error: "Sign in to verify checkout." }, { status: 401 });
   if (!process.env.STRIPE_SECRET_KEY) {
     return Response.json({ success: false, error: "Stripe is not configured. Add STRIPE_SECRET_KEY to .env.local and restart the server." }, { status: 503 });
   }

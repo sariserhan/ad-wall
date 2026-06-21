@@ -33,7 +33,7 @@ function mapsHref(location: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trimmed)}`;
 }
 
-export function SocialLinks({ card }: { card: SocialCard }) {
+export function SocialLinks({ card, onVisit }: { card: SocialCard; onVisit?: () => void }) {
   const profiles = socialConfig.flatMap(({ key, ...config }) => card[key] ? [{ ...config, key, value: card[key] }] : []);
   if (profiles.length === 0 && !card.location) return null;
 
@@ -51,13 +51,13 @@ export function SocialLinks({ card }: { card: SocialCard }) {
           aria-label={`${card.name} on ${label}`}
           title={label}
           onPointerDown={stopPointer}
-          onClick={stopClick}
+          onClick={(event) => { stopClick(event); onVisit?.(); }}
         >
           <Icon aria-hidden="true" />
         </a>
       ))}
       {card.location ? (
-        <a href={mapsHref(card.location)} target="_blank" rel="noreferrer" aria-label={`View ${card.name} location in Google Maps`} title="Google Maps" onPointerDown={stopPointer} onClick={stopClick}>
+        <a href={mapsHref(card.location)} target="_blank" rel="noreferrer" aria-label={`View ${card.name} location in Google Maps`} title="Google Maps" onPointerDown={stopPointer} onClick={(event) => { stopClick(event); onVisit?.(); }}>
           <MapPin aria-hidden="true" />
         </a>
       ) : null}

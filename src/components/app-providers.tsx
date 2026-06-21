@@ -24,6 +24,12 @@ export function AppProviders({ children, clerkPublishableKey, convexUrl }: AppPr
             subtitle: "Sign in to post and manage your local card",
           },
         },
+        signUp: {
+          start: {
+            title: "Create your WALL account",
+            subtitle: "Create an account to post cards and access your authorized tools",
+          },
+        },
       }}
     >
       <ConnectedProviders convexUrl={convexUrl}>{children}</ConnectedProviders>
