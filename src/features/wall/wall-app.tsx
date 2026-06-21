@@ -144,18 +144,24 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const wallRef = useRef<HTMLElement>(null);
   const moveOffsetRef = useRef<{ x: number; y: number } | null>(null);
   const movePositionRef = useRef<Placement | null>(null);
-  const openedSharedCardRef = useRef(false);
+  const currentCardParam = searchParams.get("card");
 
   useEffect(() => {
-    if (openedSharedCardRef.current || cards.length === 0) return;
-    const sharedCardId = searchParams.get("card");
+    if (cards.length === 0) return;
+    const sharedCardId = currentCardParam;
     if (!sharedCardId) return;
     const sharedCard = cards.find((card) => String(card.id) === sharedCardId);
-    if (sharedCard) {
+    if (sharedCard && String(selected?.id) !== sharedCardId) {
       setSelected(sharedCard);
-      openedSharedCardRef.current = true;
     }
-  }, [cards, searchParams]);
+  }, [cards, currentCardParam, selected?.id]);
+
+  const syncCardParam = (cardId: string | null) => {
+    const next = new URLSearchParams(searchParams.toString());
+    if (cardId) next.set("card", cardId);
+    else next.delete("card");
+    router.replace(`${pathname}?${next.toString()}`);
+  };
 
   useEffect(() => {
     setViewCounts((current) => {
@@ -570,6 +576,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     setViewCounts((current) => ({ ...current, [openedId]: nextViews }));
     const openedWithViews = { ...cardToOpen, clicks: nextViews };
     setSelected(openedWithViews);
+    syncCardParam(openedId);
     if (!isOwnerView) onCardOpen?.(openedWithViews);
   };
 
@@ -1036,7 +1043,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           </div>
         </div>
       ) : null}
-      {selected ? <DetailPanel card={selected} onClose={() => setSelected(null)} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} /> : null}
+      {selected ? <DetailPanel card={selected} onClose={() => { setSelected(null); syncCardParam(null); }} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} /> : null}
       {dashboard && ownerCards && onSetCardStatus && onUpdateCard && onDeleteCard && onRenewCard ? (
         <OwnerDashboard
           cards={ownerCards}
