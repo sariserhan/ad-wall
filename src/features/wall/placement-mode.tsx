@@ -18,7 +18,8 @@ interface PlacementModeProps {
 }
 
 export function PlacementMode({ card, position, dragging, onDragStart, onMove, onDragEnd, onCancel, onRandom, onConfirm, isSaving }: PlacementModeProps) {
-  const format = getCardFormat(card.theme);
+  const displayTheme = card.imageMode === "business-card" ? "biz" : card.theme;
+  const format = getCardFormat(displayTheme);
 
   return (
     <div className="placement-mode" onPointerMove={onMove} onPointerUp={onDragEnd} onPointerCancel={onDragEnd}>
@@ -29,7 +30,7 @@ export function PlacementMode({ card, position, dragging, onDragStart, onMove, o
         <button className="icon-btn" onClick={onCancel} disabled={isSaving} aria-label="Cancel placement"><X /></button>
       </div>
       <article
-        className={`wall-card placement-card theme-${card.theme} ${dragging ? "is-dragging" : ""}`}
+        className={`wall-card placement-card theme-${displayTheme} ${card.imageMode === "business-card" && card.previews[0] ? "image-business-card" : ""} ${dragging ? "is-dragging" : ""}`}
         style={{ left: `${position.x}%`, top: `${position.y}px`, "--w": `${format.width}px`, "--h": `${format.minHeight}px` } as CSSProperties}
         onPointerDown={onDragStart}
       >

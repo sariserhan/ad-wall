@@ -8,6 +8,7 @@ import {
   MapPin,
   Menu,
   Plus,
+  RefreshCw,
   RotateCcw,
   Search,
   X,
@@ -26,6 +27,8 @@ import { categories, getCardFormat, type CardDraft, type CardUpdate, type Create
 interface WallAppProps {
   mode: "demo" | "connected";
   cards?: WallCardModel[];
+  pendingCreatedCards?: WallCardModel[];
+  onRefreshWall?: () => void;
   onCreateCard?: CreateCard;
   onCardOpen?: (card: WallCardModel) => void;
   onRequestSignIn?: () => void;
@@ -42,6 +45,8 @@ interface WallAppProps {
   onMoveCard?: (card: WallCardModel, placement: Placement) => Promise<void>;
   ownedCardIds?: ReadonlySet<string>;
 }
+
+const MAX_CARD_Y = 1500;
 
 function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): WallCardModel {
   return {
@@ -65,11 +70,12 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
     tiktok: draft.tiktok,
     linkedin: draft.linkedin,
     theme: draft.theme,
+    imageMode: draft.imageMode,
     images: draft.previews,
     x: placement.x,
     y: placement.y,
     rotation: -3 + Math.random() * 6,
-    width: getCardFormat(draft.theme).width,
+    width: getCardFormat(draft.imageMode === "business-card" ? "biz" : draft.theme).width,
     zIndex,
     positionLockedAt: Date.now(),
     createdAt: Date.now(),
@@ -85,7 +91,7 @@ const defaultSeedLocation = (() => {
   };
 })();
 
-export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds }: WallAppProps) {
+export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds }: WallAppProps) {
   const [demoCards, setDemoCards] = useState<WallCardModel[]>(seedCards);
   const cards = mode === "connected" ? (remoteCards ?? []) : demoCards;
   const [selected, setSelected] = useState<WallCardModel | null>(null);
@@ -477,9 +483,20 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
     return fresh ? result.toReversed() : result;
   }, [cards, category, deferredQuery, fresh, selectedCountry, selectedState, selectedCity, locationReady]);
 
+  const pendingCardsOnSelectedWall = useMemo(() => {
+    if (!locationReady) return 0;
+    return pendingCreatedCards.filter((card) => {
+      if (selectedCountry && card.country !== selectedCountry) return false;
+      if (selectedState && card.state !== selectedState) return false;
+      if (selectedCity && card.city !== selectedCity) return false;
+      return true;
+    }).length;
+  }, [locationReady, pendingCreatedCards, selectedCity, selectedCountry, selectedState]);
+
   const front = (id: string) => setLayers((current) => [...current.filter((item) => item !== id), id]);
 
   const estimateCardHeight = (card: WallCardModel) => {
+    if (card.imageMode === "business-card") return getCardFormat("biz").minHeight;
     if (card.images.length > 0) return 300;
     return 220;
   };
@@ -553,9 +570,12 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
     const wall = wallRef.current;
     if (!ownedCardIds?.has(String(card.id)) || !offset || !wall) return;
     const wallRect = wall.getBoundingClientRect();
-    const format = getCardFormat(card.theme);
+    const format = getCardFormat(card.imageMode === "business-card" ? "biz" : card.theme);
     const left = Math.min(Math.max(0, event.clientX - wallRect.left - offset.x), Math.max(0, wallRect.width - format.width));
-    const top = Math.min(Math.max(0, event.clientY - wallRect.top - offset.y), Math.max(0, wallRect.height - format.minHeight));
+    const top = Math.min(
+      Math.max(0, event.clientY - wallRect.top - offset.y),
+      Math.min(MAX_CARD_Y, Math.max(0, wallRect.height - format.minHeight)),
+    );
     const next = { x: (left / wallRect.width) * 100, y: top };
     movePositionRef.current = next;
     setPositionOverrides((current) => ({ ...current, [String(card.id)]: next }));
@@ -662,7 +682,7 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
   return (
     <main className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={resetFilters}>WALL<span>LOCAL ADS, STUCK HERE</span></button>
+        <button className="brand" onClick={resetFilters}><center>WALL</center><span>LOCAL ADS, STUCK HERE</span></button>
         <button className="location" onClick={() => { if (locationReady) setLocationDropdown(!locationDropdown); }}>
           <MapPin />
           <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
@@ -675,13 +695,12 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
         <nav className={mobileMenu ? "open" : ""}>
           <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by card" aria-label="Search advertisements" /></div>
           <label className="filter-select">Browse<select value={category} onChange={(event) => setCategory(event.target.value as (typeof categories)[number])}>{categories.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown /></label>
-          <button className={fresh ? "nav-active" : ""} onClick={() => setFresh((value) => !value)}>Fresh <span className="fresh-dot" /></button>
           {ownerCards ? <button onClick={() => { setDashboard(true); setMobileMenu(false); }}><LayoutDashboard /> My cards</button> : null}
           <button className="mobile-nav-post" onClick={openComposer}><Plus />Post your card</button>
         </nav>
         {authControl ? <div className="auth-control">{authControl}</div> : null}
         <button className="primary post-button" onClick={openComposer}><Plus />Post your card</button>
-        <button className="icon-btn mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label="Open menu"><Menu /></button>
+        <button className="icon-btn mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label={mobileMenu ? "Close menu" : "Open menu"} aria-expanded={mobileMenu}><Menu /></button>
       </header>
       {locationDropdown ? (
         <div className="location-dropdown-backdrop" onClick={() => setLocationDropdown(false)}>
@@ -935,6 +954,12 @@ export function WallApp({ mode, cards: remoteCards, onCreateCard, onCardOpen, on
         {pendingCard ? <PlacementMode card={pendingCard} position={placement} dragging={dragging} onDragStart={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setDragging(true); }} onMove={movePlacement} onDragEnd={() => setDragging(false)} onCancel={() => { setPendingCard(null); setDragging(false); }} onRandom={() => setPlacement({ x: 8 + Math.random() * (window.innerWidth < 780 ? 35 : 68), y: Math.max(60, window.scrollY + 60 + Math.random() * 450) })} onConfirm={post} isSaving={isSaving} /> : null}
       </section>
       {notice ? <div className="notice-toast" role="status">{notice}</div> : null}
+      {mode === "connected" && pendingCardsOnSelectedWall > 0 && onRefreshWall ? (
+        <button className="wall-refresh-notice" type="button" onClick={onRefreshWall}>
+          <RefreshCw />
+          <span>{pendingCardsOnSelectedWall === 1 ? "1 new card on this wall" : `${pendingCardsOnSelectedWall} new cards on this wall`}</span>
+        </button>
+      ) : null}
       {error ? <div className="error-toast" role="alert">{error}<button onClick={() => setError(null)} aria-label="Dismiss error">×</button></div> : null}
       {stackPickerCards ? (
         <div className="stack-picker-backdrop" onClick={() => setStackPickerCards(null)}>

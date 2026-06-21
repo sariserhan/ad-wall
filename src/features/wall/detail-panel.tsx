@@ -1,7 +1,8 @@
 "use client";
 
 import { Bookmark, ExternalLink, Mail, Phone, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { WallCard } from "./types";
 import { SocialLinks } from "./social-links";
 
@@ -20,7 +21,17 @@ export function DetailPanel({ card, onClose, viewCount }: { card: WallCard; onCl
     }
   });
   const [revealedPhoneFor, setRevealedPhoneFor] = useState<string | null>(null);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const phoneRevealed = revealedPhoneFor === String(card.id);
+
+  useEffect(() => {
+    if (!expandedImage) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExpandedImage(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [expandedImage]);
 
   const toggleSaved = () => {
     const cardId = String(card.id);
@@ -46,7 +57,12 @@ export function DetailPanel({ card, onClose, viewCount }: { card: WallCard; onCl
       <p className="sheet-service">{card.line}</p>
       {card.images.length ? (
         <div className={card.images.length > 1 ? "sheet-images sheet-images-double" : "sheet-images"}>
-          {card.images.map((image, index) => <img className="sheet-image" src={image} alt={`${card.name} service ${index + 1}`} key={image} />)}
+          {card.images.map((image, index) => (
+            <button className="sheet-image-button" type="button" onClick={() => setExpandedImage(image)} aria-label={`View ${card.name} image ${index + 1} full screen`} key={image}>
+              <img className="sheet-image" src={image} alt={`${card.name} service ${index + 1}`} />
+              <span>View full screen</span>
+            </button>
+          ))}
         </div>
       ) : null}
       <div className="note-copy">{card.message ?? card.line}</div>
@@ -62,6 +78,13 @@ export function DetailPanel({ card, onClose, viewCount }: { card: WallCard; onCl
       <SocialLinks card={card} />
       <button className={`secondary wide ${saved ? "is-saved" : ""}`} onClick={toggleSaved} aria-pressed={saved}><Bookmark fill={saved ? "currentColor" : "none"} /> {saved ? "Saved" : "Save card"}</button>
       <div className="sheet-meta"><span>{viewCount > 0 ? `${viewCount} views` : "No views yet"}</span><span>CARD #{String(card.id).slice(-6).toUpperCase()}</span></div>
+      {expandedImage ? createPortal(
+        <div className="image-lightbox" role="dialog" aria-modal="true" aria-label={`${card.name} image preview`} onMouseDown={(event) => event.target === event.currentTarget && setExpandedImage(null)}>
+          <button className="image-lightbox-close" type="button" onClick={() => setExpandedImage(null)} aria-label="Close full-screen image" autoFocus><X /></button>
+          <img src={expandedImage} alt={`${card.name} full-screen preview`} />
+        </div>,
+        document.body,
+      ) : null}
     </aside>
   );
 }

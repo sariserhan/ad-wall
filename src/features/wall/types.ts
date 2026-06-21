@@ -3,6 +3,7 @@ export const cardThemes = ["yellow", "paper", "pink", "cyan", "dark", "cream", "
 
 export type CardCategory = Exclude<(typeof categories)[number], "All">;
 export type CardTheme = (typeof cardThemes)[number];
+export type CardImageMode = "photo" | "business-card";
 
 export const cardFormats: Record<CardTheme, { width: number; minHeight: number }> = {
   yellow: { width: 205, minHeight: 205 },
@@ -45,6 +46,7 @@ export interface WallCard {
   tiktok?: string;
   linkedin?: string;
   theme: CardTheme;
+  imageMode?: CardImageMode;
   images: string[];
   x: number;
   y: number;
@@ -91,6 +93,7 @@ export interface CardDraft {
   tiktok?: string;
   linkedin?: string;
   theme: CardTheme;
+  imageMode: CardImageMode;
   paymentOption: "free" | "1" | "3" | "10" | "20";
   files: File[];
   previews: string[];

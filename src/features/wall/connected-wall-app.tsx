@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { WallApp } from "./wall-app";
-import { getCardFormat, type CardDraft, type CardUpdate, type OwnerCard, type Placement, type RenewalAmount, type WallCard, type CardCategory, type CardTheme } from "./types";
+import { getCardFormat, type CardDraft, type CardUpdate, type OwnerCard, type Placement, type RenewalAmount, type WallCard, type CardCategory, type CardImageMode, type CardTheme } from "./types";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -19,6 +19,11 @@ export function ConnectedWallApp() {
   const hasAppliedInitialServerSnapshotRef = useRef(false);
   const publishedCards = useQuery(api.cards.listPublished) as WallCard[] | undefined;
   const renderCards = useMemo(() => layoutCards ?? publishedCards ?? [], [layoutCards, publishedCards]);
+  const pendingCreatedCards = useMemo(() => {
+    if (publishedCards === undefined || !hasAppliedInitialServerSnapshotRef.current) return [];
+    const layoutIds = new Set((layoutCards ?? []).map((card) => String(card.id)));
+    return publishedCards.filter((card) => !layoutIds.has(String(card.id)));
+  }, [layoutCards, publishedCards]);
   const liveCardIds = useMemo(() => renderCards.map((card) => card.id as Id<"cards">), [renderCards]);
   const liveViewCounts = useQuery(api.cards.getLiveViewCounts, liveCardIds.length === 0 ? "skip" : { cardIds: liveCardIds }) as Array<{ id: Id<"cards">; clicks: number }> | undefined;
   const cards = useMemo(() => {
@@ -57,6 +62,11 @@ export function ConnectedWallApp() {
         : [...cardsOnWall, card];
     });
   }, []);
+
+  const refreshWallFromServer = useCallback(() => {
+    if (publishedCards === undefined) return;
+    setLayoutCards(publishedCards);
+  }, [publishedCards]);
 
   useEffect(() => {
     if (isAuthenticated) setCheckoutMessage((message) => message?.startsWith("Finishing sign-in") ? null : message);
@@ -116,6 +126,7 @@ export function ConnectedWallApp() {
           linkedin?: string;
           paidAmount: number;
           theme: CardTheme;
+          imageMode?: CardImageMode;
           imageIds: Id<"_storage">[];
           x: number;
           y: number;
@@ -146,6 +157,7 @@ export function ConnectedWallApp() {
           linkedin: cardPayload.linkedin,
           paidAmount,
           theme: cardPayload.theme,
+          imageMode: cardPayload.imageMode,
           imageIds: cardPayload.imageIds,
           x: cardPayload.x,
           y: cardPayload.y,
@@ -206,11 +218,12 @@ export function ConnectedWallApp() {
       linkedin: draft.linkedin,
       paidAmount,
       theme: draft.theme,
+      imageMode: draft.imageMode,
       imageIds,
       x: placement.x,
       y: placement.y,
       rotation: -3 + Math.random() * 6,
-      width: getCardFormat(draft.theme).width,
+      width: getCardFormat(draft.imageMode === "business-card" ? "biz" : draft.theme).width,
     };
     if (paidAmount > 0) {
       const response = await fetch("/api/stripe/checkout", {
@@ -251,6 +264,8 @@ export function ConnectedWallApp() {
     <WallApp
       mode="connected"
       cards={cards}
+      pendingCreatedCards={pendingCreatedCards}
+      onRefreshWall={refreshWallFromServer}
       isLoading={cards === undefined && layoutCards === null}
       isSignedIn={isAuthenticated}
       onRequestSignIn={() => {

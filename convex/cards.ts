@@ -5,6 +5,8 @@ import { internalMutation, mutation, query, type MutationCtx, type QueryCtx } fr
 
 const category = v.union(v.literal("Services"), v.literal("Food"), v.literal("Home"), v.literal("Classes"), v.literal("Pets"), v.literal("Repairs"), v.literal("Shops"));
 const theme = v.union(v.literal("yellow"), v.literal("paper"), v.literal("pink"), v.literal("cyan"), v.literal("dark"), v.literal("cream"), v.literal("biz"), v.literal("kraft"), v.literal("blueprint"), v.literal("photo"), v.literal("ticket"));
+const imageMode = v.union(v.literal("photo"), v.literal("business-card"));
+const MAX_CARD_Y = 1500;
 
 async function requireIdentity(ctx: { auth: { getUserIdentity: () => Promise<{ tokenIdentifier: string; subject: string; name?: string; email?: string; pictureUrl?: string } | null> } }) {
   const identity = await ctx.auth.getUserIdentity();
@@ -81,6 +83,7 @@ export const listPublished = query({
         tiktok: card.tiktok,
         linkedin: card.linkedin,
         theme: card.theme,
+        imageMode: card.imageMode,
         images: urls.filter((url): url is string => url !== null),
         x: card.x,
         y: card.y,
@@ -149,6 +152,7 @@ export const listMine = query({
         tiktok: card.tiktok,
         linkedin: card.linkedin,
         theme: card.theme,
+        imageMode: card.imageMode,
         images: urls.filter((url): url is string => url !== null),
         x: card.x,
         y: card.y,
@@ -306,13 +310,15 @@ export const updatePosition = mutation({
     const user = await requireUser(ctx);
     const card = await ctx.db.get(args.cardId);
     if (!card || card.ownerId !== user._id) throw new Error("You can only move your own cards.");
-    if (!Number.isFinite(args.x) || args.x < 0 || args.x > 100 || !Number.isFinite(args.y) || args.y < 0 || args.y > 1500) {
+    if (!Number.isFinite(args.x) || !Number.isFinite(args.y)) {
       throw new Error("That position is outside the wall.");
     }
 
+    const x = Math.min(100, Math.max(0, args.x));
+    const y = Math.min(MAX_CARD_Y, Math.max(0, args.y));
     const positionLockedAt = Date.now();
-    await ctx.db.patch(card._id, { x: args.x, y: args.y, positionLockedAt, updatedAt: positionLockedAt });
-    return { success: true, x: args.x, y: args.y, positionLockedAt };
+    await ctx.db.patch(card._id, { x, y, positionLockedAt, updatedAt: positionLockedAt });
+    return { success: true, x, y, positionLockedAt };
   },
 });
 
@@ -350,6 +356,7 @@ export const create = mutation({
     linkedin: v.optional(v.string()),
     paidAmount: v.number(),
     theme,
+    imageMode: v.optional(imageMode),
     imageIds: v.array(v.id("_storage")),
     x: v.number(),
     y: v.number(),
@@ -361,6 +368,7 @@ export const create = mutation({
     const phone = args.phone?.trim() ?? "";
     const email = args.email?.trim() ?? "";
     if (args.imageIds.length > 2) throw new Error("A card can have at most two images.");
+    if (args.imageMode === "business-card" && args.imageIds.length !== 1) throw new Error("A finished business card needs exactly one image.");
     if (args.name.trim().length < 2 || args.name.length > 60) throw new Error("Business name must be between 2 and 60 characters.");
     if (args.line.trim().length < 5 || args.line.length > 90) throw new Error("Service description must be between 5 and 90 characters.");
     if (args.message && args.message.length > 300) throw new Error("Message must be 300 characters or fewer.");
@@ -399,6 +407,7 @@ export const create = mutation({
 
     const createdAt = Date.now();
     const expiresAt = createdAt + getExpiryDuration(args.paidAmount);
+    const cardWidth = args.imageMode === "business-card" ? 300 : args.width;
     const existingCards = await ctx.db.query("cards").withIndex("by_status_created", (q) => q.eq("status", "published")).collect();
     const zIndex = existingCards.reduce((highest, card) => Math.max(highest, card.zIndex), 0) + 1;
     const cardId = await ctx.db.insert("cards", {
@@ -422,11 +431,12 @@ export const create = mutation({
       tiktok: args.tiktok?.trim() || undefined,
       linkedin: args.linkedin?.trim() || undefined,
       theme: args.theme,
+      imageMode: args.imageMode,
       imageIds: args.imageIds,
       x: args.x,
       y: args.y,
       rotation: args.rotation,
-      width: args.width,
+      width: cardWidth,
       zIndex,
       status: "published",
       paidAmount: args.paidAmount,
@@ -459,11 +469,12 @@ export const create = mutation({
       tiktok: args.tiktok?.trim() || undefined,
       linkedin: args.linkedin?.trim() || undefined,
       theme: args.theme,
+      imageMode: args.imageMode,
       images: urls.filter((url): url is string => url !== null),
       x: args.x,
       y: args.y,
       rotation: args.rotation,
-      width: args.width,
+      width: cardWidth,
       zIndex,
       positionLockedAt: createdAt,
       updatedAt: createdAt,

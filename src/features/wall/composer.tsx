@@ -3,7 +3,7 @@
 import { ArrowLeft, ArrowRight, Check, Clock3, ImagePlus, Sparkles, X } from "lucide-react";
 import { useState, useEffect, useRef, type ChangeEvent, type CSSProperties, type FormEvent } from "react";
 import { Country, State, City } from "country-state-city";
-import { categories, getCardFormat, type CardCategory, type CardDraft, type CardTheme } from "./types";
+import { categories, getCardFormat, type CardCategory, type CardDraft, type CardImageMode, type CardTheme } from "./types";
 
 interface ComposerProps {
   onClose: () => void;
@@ -31,6 +31,7 @@ interface ComposerForm {
   tiktok: string;
   linkedin: string;
   theme: CardTheme;
+  imageMode: CardImageMode;
   paymentOption: "free" | "1" | "3" | "10" | "20";
 }
 
@@ -61,6 +62,7 @@ const initialForm: ComposerForm = {
   tiktok: "",
   linkedin: "",
   theme: "yellow",
+  imageMode: "photo",
   paymentOption: "free",
 };
 
@@ -108,11 +110,12 @@ function validSocialProfile(value: string) {
 }
 
 function LiveCardPreview({ form, image }: { form: ComposerForm; image?: string }) {
-  const format = getCardFormat(form.theme);
+  const displayTheme = form.imageMode === "business-card" ? "biz" : form.theme;
+  const format = getCardFormat(displayTheme);
   const location = form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall";
   const style = { "--w": `${format.width}px`, "--h": `${format.minHeight}px`, "--r": "-1deg", "--x": "0", "--y": "0" } as CSSProperties;
   return (
-    <article className={`wall-card composer-live-card theme-${form.theme}`} style={style} aria-label="Live card preview">
+    <article className={`wall-card composer-live-card theme-${displayTheme} ${form.imageMode === "business-card" && image ? "image-business-card" : ""}`} style={style} aria-label="Live card preview">
       <span className="card-tape" aria-hidden="true" />
       <div className="card-copy"><p className="card-category">{form.category}</p><h2>{form.name || "Your business"}</h2><p className="card-line">{form.line || "Your offer goes here."}</p>{form.message.trim() ? <p className="composer-preview-message">{form.message}</p> : null}</div>
       {image ? <img src={image} alt="" draggable={false} /> : null}
@@ -290,6 +293,16 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
     previews.forEach(URL.revokeObjectURL);
     setFiles(nextFiles);
     setPreviews(nextFiles.map((file) => URL.createObjectURL(file)));
+    if (!nextFiles.length) setForm((value) => ({ ...value, imageMode: "photo" }));
+  };
+
+  const chooseImageMode = (imageMode: CardImageMode) => {
+    if (imageMode === "business-card" && files.length > 1) {
+      previews.slice(1).forEach(URL.revokeObjectURL);
+      setFiles((current) => current.slice(0, 1));
+      setPreviews((current) => current.slice(0, 1));
+    }
+    setForm((value) => ({ ...value, imageMode }));
   };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -396,11 +409,25 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
           <div className="composer-body design-step">
             <label className="upload-zone">
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={onImages} />
-              {previews.length ? <div className="preview-row">{previews.map((src) => <img src={src} key={src} alt="Upload preview" />)}</div> : <><ImagePlus /><strong>Add 1 or 2 pictures</strong><span>JPG, PNG or WEBP · 8MB each</span></>}
+              {previews.length ? <div className="preview-row">{previews.map((src) => <img src={src} key={src} alt="Upload preview" />)}</div> : <><ImagePlus /><strong>Upload pictures or your finished card</strong><span>JPG, PNG or WEBP · 8MB each</span></>}
             </label>
+            {previews.length ? (
+              <fieldset className="image-use-picker">
+                <legend>How should we use your upload?</legend>
+                <div role="radiogroup" aria-label="Choose how to display the uploaded image">
+                  <button type="button" role="radio" aria-checked={form.imageMode === "photo"} className={form.imageMode === "photo" ? "selected" : ""} onClick={() => chooseImageMode("photo")}>
+                    <ImagePlus /><span><strong>Picture in a WALL style</strong><small>Place the picture inside any card style below.</small></span>{form.imageMode === "photo" ? <Check /> : null}
+                  </button>
+                  <button type="button" role="radio" aria-checked={form.imageMode === "business-card"} className={form.imageMode === "business-card" ? "selected" : ""} onClick={() => chooseImageMode("business-card")}>
+                    <span className="business-card-icon" aria-hidden="true" /><span><strong>My finished business card</strong><small>Use the whole image at our standard 300 × 180 size.</small></span>{form.imageMode === "business-card" ? <Check /> : null}
+                  </button>
+                </div>
+              </fieldset>
+            ) : null}
             <div className="safety-status" data-status={moderationStatus}>{moderationStatus === "checking" ? "Checking images and text for unsafe content…" : moderationError ?? "Images are checked for nudity and adult content before publishing."}</div>
-            <fieldset>
+            <fieldset className={form.imageMode === "business-card" ? "styles-disabled" : ""}>
               <legend>Card style</legend>
+              {form.imageMode === "business-card" ? <p className="style-lock-note">Your finished design will be shown as the full card. Switch to “Picture in a WALL style” to choose a style.</p> : null}
               <div className="style-options" role="radiogroup" aria-label="Choose a card style">
                 {themeOptions.map(({ theme, label, description }) => (
                   <button
@@ -408,6 +435,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
                     key={theme}
                     className={`style-option style-${theme} ${form.theme === theme ? "selected" : ""}`}
                     onClick={() => setForm((value) => ({ ...value, theme }))}
+                    disabled={form.imageMode === "business-card"}
                     role="radio"
                     aria-checked={form.theme === theme}
                   >
@@ -431,7 +459,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
               <div>
                 <span>Ready to post</span>
                 <h3>{form.name || "Your card"}</h3>
-                <p>{themeOptions.find((option) => option.theme === form.theme)?.label} · {form.city}{form.state ? `, ${form.state}` : ""}</p>
+                <p>{form.imageMode === "business-card" ? "Your business card" : themeOptions.find((option) => option.theme === form.theme)?.label} · {form.city}{form.state ? `, ${form.state}` : ""}</p>
               </div>
               <div className={`checkout-card-mark card-mark-${form.theme}`} aria-hidden="true"><i /><b /></div>
             </section>

@@ -34,7 +34,8 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
   const tapeWidth = 42 + (seed % 45); // 42px to 86px
   const tapeRotate = -14 + ((seed >> 3) % 23); // -14deg to +8deg
   const tapeLeft = 22 + ((seed >> 6) % 48); // 22% to 69%
-  const format = getCardFormat(card.theme);
+  const displayTheme = card.imageMode === "business-card" ? "biz" : card.theme;
+  const format = getCardFormat(displayTheme);
 
   const style: CardStyle = {
     "--x": `${card.x}%`,
@@ -81,7 +82,7 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
 
   return (
     <article
-      className={`wall-card theme-${card.theme} ${active ? "is-active" : ""} ${ownerDraggable ? "is-owner-card" : ""} ${dragging ? "is-owner-dragging" : ""}`}
+      className={`wall-card theme-${displayTheme} ${card.imageMode === "business-card" && card.images[0] ? "image-business-card" : ""} ${active ? "is-active" : ""} ${ownerDraggable ? "is-owner-card" : ""} ${dragging ? "is-owner-dragging" : ""}`}
       style={style}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
