@@ -161,11 +161,14 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   }, [cards, currentCardParam, selected?.id]);
 
   const syncCardRoute = (cardId: string | null) => {
-    const next = new URLSearchParams(searchParams.toString());
-    next.delete("card");
+    const next = new URLSearchParams(window.location.search);
+    if (cardId) {
+      next.set("card", cardId);
+    } else {
+      next.delete("card");
+    }
     const queryString = next.toString();
-    const nextPath = cardId ? `/card/${encodeURIComponent(cardId)}` : "/";
-    router.push(`${nextPath}${queryString ? `?${queryString}` : ""}`);
+    window.history.replaceState(null, "", `${window.location.pathname}${queryString ? `?${queryString}` : ""}`);
   };
 
   useEffect(() => {
