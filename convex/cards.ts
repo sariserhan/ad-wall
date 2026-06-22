@@ -55,6 +55,32 @@ function isValidWebUrl(value: string) {
   }
 }
 
+export const getMyProfile = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
+    if (!user) return null;
+    return { displayName: user.displayName ?? null, username: user.username ?? null, businessName: user.businessName ?? null };
+  },
+});
+
+export const updateProfile = mutation({
+  args: { username: v.optional(v.string()), businessName: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+    const username = args.username?.trim() || undefined;
+    const businessName = args.businessName?.trim() || undefined;
+    if (username && username.length > 40) throw new Error("Username must be 40 characters or fewer.");
+    if (businessName && businessName.length > 60) throw new Error("Business name must be 60 characters or fewer.");
+    await ctx.db.patch(user._id, { username, businessName });
+    const ownerName = businessName || username || undefined;
+    const myCards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", user._id)).collect();
+    await Promise.all(myCards.map((card) => ctx.db.patch(card._id, { ownerName })));
+  },
+});
+
 export const listPublished = query({
   args: { country: v.optional(v.string()), state: v.optional(v.string()), city: v.optional(v.string()) },
   handler: async (ctx, args) => {
@@ -83,6 +109,7 @@ export const listPublished = query({
         country: card.country,
         zipcode: card.zipcode,
         neighborhood: card.neighborhood,
+        ownerName: card.ownerName,
         price: card.price,
         phone: card.phone,
         email: card.email,
@@ -135,6 +162,7 @@ export const getPublishedById = query({
       country: card.country,
       zipcode: card.zipcode,
       neighborhood: card.neighborhood,
+      ownerName: card.ownerName,
       price: card.price,
       phone: card.phone,
       email: card.email,
@@ -213,6 +241,7 @@ export const listMine = query({
         country: card.country,
         zipcode: card.zipcode,
         neighborhood: card.neighborhood,
+        ownerName: card.ownerName,
         price: card.price,
         phone: card.phone,
         email: card.email,
@@ -540,6 +569,7 @@ export const create = mutation({
       country: args.country.trim(),
       zipcode: args.zipcode?.trim() || undefined,
       neighborhood: args.neighborhood?.trim() || undefined,
+      ownerName: user.businessName || user.username || undefined,
       price: args.price?.trim() || undefined,
       phone: phone || undefined,
       email: email || undefined,
@@ -584,6 +614,7 @@ export const create = mutation({
       country: args.country.trim(),
       zipcode: args.zipcode?.trim() || undefined,
       neighborhood: args.neighborhood?.trim() || undefined,
+      ownerName: user.businessName || user.username || undefined,
       price: args.price?.trim() || undefined,
       phone: phone || undefined,
       email: email || undefined,

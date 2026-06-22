@@ -114,6 +114,7 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
         <span>{card.area}</span>
         {card.price ? <strong>{card.price}</strong> : null}
       </footer>
+      {card.ownerName ? <span className="card-owner" aria-label={`Posted by ${card.ownerName}`}>{card.ownerName}</span> : null}
     </article>
   );
 }

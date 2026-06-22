@@ -37,6 +37,7 @@ export interface WallCard {
   country?: string;
   zipcode?: string;
   neighborhood?: string;
+  ownerName?: string;
   price?: string;
   phone?: string;
   email?: string;

@@ -83,6 +83,8 @@ export function ConnectedWallApp({ initialCardId }: { initialCardId?: string }) 
   const adminAccess = useQuery(api.admin.getAccess, isAuthenticated ? {} : "skip") as { isAdmin: boolean } | undefined;
   const [adminOpen, setAdminOpen] = useState(false);
   const adminDashboard = useQuery(api.admin.getDashboard, adminOpen && adminAccess?.isAdmin ? {} : "skip") as AdminDashboardData | undefined;
+  const profile = useQuery(api.cards.getMyProfile, isAuthenticated ? {} : "skip") as { displayName: string | null; username: string | null; businessName: string | null } | null | undefined;
+  const updateProfileMutation = useMutation(api.cards.updateProfile);
   const generateUploadUrl = useMutation(api.cards.generateUploadUrl);
   const createCard = useMutation(api.cards.create);
   const incrementCardClicks = useMutation(api.cards.incrementClicks);
@@ -337,6 +339,8 @@ export function ConnectedWallApp({ initialCardId }: { initialCardId?: string }) 
       ownedCardIds={ownedCardIds}
       isAdmin={adminAccess?.isAdmin ?? false}
       onOpenAdmin={() => setAdminOpen(true)}
+      profile={profile ?? null}
+      onUpdateProfile={async (username, businessName) => { await updateProfileMutation({ username, businessName }); }}
       ownerCardsLoading={isAuthenticated && ownerCards === undefined}
       onSetCardStatus={async (card, status) => {
         await setCardVisibility({ cardId: card.id as Id<"cards">, status });

@@ -54,6 +54,8 @@ interface WallAppProps {
   initialCardId?: string;
   savedCards?: WallCardModel[];
   onSetSavedCard?: (card: WallCardModel, saved: boolean) => Promise<void>;
+  profile?: { displayName: string | null; username: string | null; businessName: string | null } | null;
+  onUpdateProfile?: (username: string | undefined, businessName: string | undefined) => Promise<void>;
 }
 
 const MAX_CARD_Y = 1500;
@@ -101,7 +103,7 @@ const defaultSeedLocation = (() => {
   };
 })();
 
-export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds, isAdmin = false, onOpenAdmin, onCardEvent, onReportCard, initialCardId, savedCards = [], onSetSavedCard }: WallAppProps) {
+export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds, isAdmin = false, onOpenAdmin, onCardEvent, onReportCard, initialCardId, savedCards = [], onSetSavedCard, profile, onUpdateProfile }: WallAppProps) {
   const [demoCards, setDemoCards] = useState<WallCardModel[]>(seedCards);
   const cards = mode === "connected" ? (remoteCards ?? []) : demoCards;
   const [selected, setSelected] = useState<WallCardModel | null>(null);
@@ -1107,7 +1109,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           </div>
         </div>
       ) : null}
-      {selected ? <DetailPanel key={String(selected.id)} card={selected} onClose={closeCard} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} canSaveCard={isSignedIn} saved={savedCardIds.has(String(selected.id))} onSetSaved={onSetSavedCard ? (saved) => onSetSavedCard(selected, saved) : undefined} /> : null}
+      {selected ? <DetailPanel key={String(selected.id)} card={selected} onClose={closeCard} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} canSaveCard={isSignedIn} saved={savedCardIds.has(String(selected.id))} onSetSaved={onSetSavedCard ? (saved) => onSetSavedCard(selected, saved) : undefined} onRequestSignIn={onRequestSignIn} /> : null}
       {dashboard && ownerCards && onSetCardStatus && onUpdateCard && onDeleteCard && onRenewCard ? (
         <OwnerDashboard
           cards={ownerCards}
@@ -1127,6 +1129,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
             setSelected((current) => current && String(current.id) === String(card.id) ? null : current);
           }}
           onRenew={onRenewCard}
+          profile={profile ?? null}
+          onUpdateProfile={onUpdateProfile}
         />
       ) : null}
       {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} initialLocation={{ country: selectedCountry, state: selectedState, city: selectedCity }} /> : null}

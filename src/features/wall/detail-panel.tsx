@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { WallCard } from "./types";
 import { SocialLinks } from "./social-links";
+import { ReviewsSection } from "./reviews-section";
 
 function websiteHref(website: string) {
   return /^https?:\/\//i.test(website) ? website : `https://${website}`;
@@ -12,7 +13,7 @@ function websiteHref(website: string) {
 
 type CardEvent = "website" | "phone" | "email" | "social" | "save" | "share";
 
-export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSaveCard = true, saved = false, onSetSaved }: {
+export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSaveCard = true, saved = false, onSetSaved, onRequestSignIn }: {
   card: WallCard;
   onClose: () => void;
   viewCount: number;
@@ -21,6 +22,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
   canSaveCard?: boolean;
   saved?: boolean;
   onSetSaved?: (saved: boolean) => Promise<void>;
+  onRequestSignIn?: () => void;
 }) {
   const [optimisticSaved, setOptimisticSaved] = useState(saved);
   const [saving, setSaving] = useState(false);
@@ -90,6 +92,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
       <div className="sheet-pin" />
       <button className="icon-btn sheet-close" onClick={onClose} aria-label="Close details"><X /></button>
       <p className="sheet-category">{card.category} · {card.area}</p>
+      {card.ownerName ? <p className="sheet-byline">by {card.ownerName}</p> : null}
       <h2>{card.name}</h2>
       <div className="rule" />
       <p className="sheet-service">{card.line}</p>
@@ -120,6 +123,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
         {onReport ? <button type="button" className="secondary" onClick={() => void report()}><Flag /> Report</button> : null}
       </div>
       <div className="sheet-meta"><span>{viewCount > 0 ? `${viewCount} views` : "No views yet"}</span><span>CARD #{String(card.id).slice(-6).toUpperCase()}</span></div>
+      <ReviewsSection cardId={card.id} onRequestSignIn={onRequestSignIn} />
       {expandedImage ? createPortal(
         <div className="image-lightbox" role="dialog" aria-modal="true" aria-label={`${card.name} image preview`} onMouseDown={(event) => event.target === event.currentTarget && setExpandedImage(null)}>
           <button className="image-lightbox-close" type="button" onClick={() => setExpandedImage(null)} aria-label="Close full-screen image" autoFocus><X /></button>

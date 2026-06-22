@@ -7,6 +7,8 @@ export default defineSchema({
     externalUserId: v.string(),
     tokenIdentifier: v.string(),
     displayName: v.optional(v.string()),
+    username: v.optional(v.string()),
+    businessName: v.optional(v.string()),
     email: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
     blockedAt: v.optional(v.number()),
@@ -52,6 +54,7 @@ export default defineSchema({
     city: v.string(),
     zipcode: v.optional(v.string()),
     neighborhood: v.optional(v.string()),
+    ownerName: v.optional(v.string()),
     clicks: v.number(),
     reminder3dSentAt: v.optional(v.number()),
     reminder1dSentAt: v.optional(v.number()),
@@ -84,6 +87,18 @@ export default defineSchema({
     paidAmount: v.number(),
     usedAt: v.number(),
   }).index("by_session", ["sessionId"]),
+
+  reviews: defineTable({
+    cardId: v.id("cards"),
+    userId: v.id("users"),
+    rating: v.number(),
+    text: v.optional(v.string()),
+    reviewerName: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_card_and_createdAt", ["cardId", "createdAt"])
+    .index("by_user_and_card", ["userId", "cardId"]),
 
   rateLimits: defineTable({
     key: v.string(),

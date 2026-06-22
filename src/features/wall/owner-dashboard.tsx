@@ -1,7 +1,7 @@
 "use client";
 
-import { AlertTriangle, BarChart3, Bookmark, Check, Clock3, Eye, EyeOff, MousePointerClick, Pencil, Plus, RefreshCw, Trash2, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { AlertTriangle, BarChart3, Bookmark, Check, Clock3, Eye, EyeOff, MousePointerClick, Pencil, Plus, RefreshCw, Trash2, User, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { EditCardModal } from "./edit-card-modal";
 import type { CardUpdate, OwnerCard, RenewalAmount, WallCard } from "./types";
 
@@ -17,6 +17,8 @@ interface OwnerDashboardProps {
   onUpdate: (card: OwnerCard, update: CardUpdate) => Promise<void>;
   onDelete: (card: OwnerCard) => Promise<void>;
   onRenew: (card: OwnerCard, paidAmount: RenewalAmount) => Promise<void>;
+  profile: { displayName: string | null; username: string | null; businessName: string | null } | null;
+  onUpdateProfile?: (username: string | undefined, businessName: string | undefined) => Promise<void>;
 }
 
 const renewalOptions: ReadonlyArray<{ amount: RenewalAmount; name: string; price: string; duration: string }> = [
@@ -34,13 +36,36 @@ function expiryLabel(expiresAt: number) {
   return `${days} days left`;
 }
 
-export function OwnerDashboard({ cards, savedCards, loading, onClose, onCreate, onView, onRemoveSaved, onSetVisibility, onUpdate, onDelete, onRenew }: OwnerDashboardProps) {
+export function OwnerDashboard({ cards, savedCards, loading, onClose, onCreate, onView, onRemoveSaved, onSetVisibility, onUpdate, onDelete, onRenew, profile, onUpdateProfile }: OwnerDashboardProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<OwnerCard | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<OwnerCard | null>(null);
   const [renewTarget, setRenewTarget] = useState<OwnerCard | null>(null);
   const [renewalAmount, setRenewalAmount] = useState<RenewalAmount>(7.99);
+  const [usernameInput, setUsernameInput] = useState(profile?.username ?? "");
+  const [businessNameInput, setBusinessNameInput] = useState(profile?.businessName ?? "");
+  useEffect(() => { setUsernameInput(profile?.username ?? ""); }, [profile?.username]);
+  useEffect(() => { setBusinessNameInput(profile?.businessName ?? ""); }, [profile?.businessName]);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  const saveProfile = async () => {
+    if (!onUpdateProfile) return;
+    setProfileSaving(true);
+    setProfileError(null);
+    setProfileSaved(false);
+    try {
+      await onUpdateProfile(usernameInput.trim() || undefined, businessNameInput.trim() || undefined);
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2500);
+    } catch (cause) {
+      setProfileError(cause instanceof Error ? cause.message : "Profile could not be saved.");
+    } finally {
+      setProfileSaving(false);
+    }
+  };
   const stats = useMemo(() => ({
     totalViews: cards.reduce((sum, card) => sum + card.clicks, 0),
     live: cards.filter((card) => card.status === "published").length,
@@ -96,6 +121,47 @@ export function OwnerDashboard({ cards, savedCards, loading, onClose, onCreate, 
           <div><span>YOUR WALL</span><h2>Card dashboard</h2></div>
           <button className="icon-btn" onClick={onClose} aria-label="Close dashboard"><X /></button>
         </header>
+
+        <div className="dashboard-profile">
+          <div className="dashboard-profile-header"><User size={14} /><strong>Profile</strong></div>
+          <div className="dashboard-profile-body">
+            {profile?.displayName ? (
+              <div className="dashboard-profile-row">
+                <span>Display name</span>
+                <p>{profile.displayName}</p>
+              </div>
+            ) : null}
+            <div className="dashboard-profile-row">
+              <label htmlFor="dashboard-username">Username <span>(optional)</span></label>
+              <input
+                id="dashboard-username"
+                type="text"
+                maxLength={40}
+                placeholder={profile?.displayName ?? "Your name or handle"}
+                value={usernameInput}
+                onChange={(e) => { setUsernameInput(e.target.value); setProfileSaved(false); }}
+              />
+            </div>
+            <div className="dashboard-profile-row">
+              <label htmlFor="dashboard-biz-name">Business name <span>(optional)</span></label>
+              <input
+                id="dashboard-biz-name"
+                type="text"
+                maxLength={60}
+                placeholder="e.g. Serhan's Plumbing LLC"
+                value={businessNameInput}
+                onChange={(e) => { setBusinessNameInput(e.target.value); setProfileSaved(false); }}
+              />
+            </div>
+            <div className="dashboard-profile-save-row">
+              <p className="dashboard-profile-hint">Cards show your business name if set, otherwise username, otherwise display name.</p>
+              <button className="primary" onClick={() => void saveProfile()} disabled={profileSaving}>
+                {profileSaved ? <><Check size={14} /> Saved</> : profileSaving ? "Saving…" : "Save profile"}
+              </button>
+            </div>
+            {profileError ? <p className="dashboard-profile-error">{profileError}</p> : null}
+          </div>
+        </div>
 
         <div className="dashboard-stats">
           <div><BarChart3 /><span>Total card opens</span><strong>{stats.totalViews}</strong></div>
