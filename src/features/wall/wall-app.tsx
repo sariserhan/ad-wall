@@ -2,9 +2,10 @@
 
 import {
   ChevronDown,
-  Globe,
-  Layers3,
   LayoutDashboard,
+  LayoutGrid,
+  LayoutList,
+  Layers3,
   MapPin,
   Menu,
   Plus,
@@ -115,6 +116,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const [movingCardId, setMovingCardId] = useState<string | null>(null);
   const [stackPickerCards, setStackPickerCards] = useState<WallCardModel[] | null>(null);
   const [layers, setLayers] = useState<string[]>(seedCards.map((card) => card.id));
+  const [listView, setListView] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [pendingCard, setPendingCard] = useState<CardDraft | null>(null);
   const [placement, setPlacement] = useState<Placement>({ x: 40, y: 170 });
@@ -147,6 +149,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const wallRef = useRef<HTMLElement>(null);
   const moveOffsetRef = useRef<{ x: number; y: number } | null>(null);
   const movePositionRef = useRef<Placement | null>(null);
+  const closingCardRef = useRef<string | null>(null);
   const currentCardParam = initialCardId ?? searchParams.get("card");
   const savedCardIds = useMemo(() => new Set(savedCards.map((card) => String(card.id))), [savedCards]);
 
@@ -154,7 +157,11 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     if (cards.length === 0) return;
     const sharedCardId = currentCardParam;
     if (!sharedCardId) return;
-    const sharedCard = cards.find((card) => String(card.id) === sharedCardId);
+    if (closingCardRef.current === sharedCardId) return;
+    const sharedCard = cards.find((card) => {
+      const fullId = String(card.id);
+      return fullId === sharedCardId || fullId.startsWith(sharedCardId);
+    });
     if (sharedCard && String(selected?.id) !== sharedCardId) {
       setSelected(sharedCard);
     }
@@ -163,12 +170,24 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const syncCardRoute = (cardId: string | null) => {
     const next = new URLSearchParams(window.location.search);
     if (cardId) {
-      next.set("card", cardId);
+      // Strip Convex table discriminant (last 8 chars) to keep URLs clean
+      const cleanId = cardId.length > 32 ? cardId.slice(0, 32) : cardId;
+      next.set("card", cleanId);
     } else {
       next.delete("card");
     }
     const queryString = next.toString();
     window.history.replaceState(null, "", `${window.location.pathname}${queryString ? `?${queryString}` : ""}`);
+  };
+
+  const closeCard = () => {
+    closingCardRef.current = currentCardParam;
+    setSelected(null);
+    const next = new URLSearchParams(window.location.search);
+    next.delete("card");
+    const qs = next.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    router.replace(`${pathname}${qs ? `?${qs}` : ""}`);
   };
 
   useEffect(() => {
@@ -364,10 +383,11 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   }, [selectedCountry, selectedState, selectedCity]);
 
   const updateLocationQuery = (country: string, state: string, city: string) => {
-    const query: Record<string, string> = { country };
-    if (state) query.state = state;
-    if (city) query.city = city;
-    router.replace(`${pathname}?${new URLSearchParams(query).toString()}`);
+    const next = new URLSearchParams(window.location.search);
+    next.set("country", country);
+    if (state) next.set("state", state); else next.delete("state");
+    if (city) next.set("city", city); else next.delete("city");
+    router.replace(`${pathname}?${next.toString()}`);
   };
 
   useEffect(() => {
@@ -393,11 +413,11 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     const loadLocalLocation = () => {
       try {
         const raw = window.localStorage.getItem("wallLocation");
-        if (!raw) return false;
+        if (!raw) return null;
         const saved = JSON.parse(raw) as { country: string; state: string; city: string };
-        if (!saved?.country) return false;
+        if (!saved?.country) return null;
         const allCountries = Country.getAllCountries();
-        if (!allCountries.some((country) => country.isoCode === saved.country)) return false;
+        if (!allCountries.some((country) => country.isoCode === saved.country)) return null;
         const states = State.getStatesOfCountry(saved.country);
         const stateCode = states.some((state) => state.isoCode === saved.state) ? saved.state : states[0]?.isoCode ?? "";
         const cities = stateCode ? City.getCitiesOfState(saved.country, stateCode) : [];
@@ -405,9 +425,9 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         setSelectedCountry(saved.country);
         setSelectedState(stateCode);
         setSelectedCity(cityName);
-        return true;
+        return { country: saved.country, state: stateCode, city: cityName };
       } catch {
-        return false;
+        return null;
       }
     };
 
@@ -416,7 +436,9 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       return;
     }
 
-    if (loadLocalLocation()) {
+    const loaded = loadLocalLocation();
+    if (loaded) {
+      updateLocationQuery(loaded.country, loaded.state, loaded.city);
       setLocationReady(true);
       return;
     }
@@ -583,6 +605,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   };
 
   const openCard = (cardToOpen: WallCardModel) => {
+    closingCardRef.current = null;
     const isAlreadyOpen = selected?.id === cardToOpen.id;
     if (isAlreadyOpen) {
       return;
@@ -737,9 +760,9 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         <button className="brand" onClick={resetFilters}><center>WALL</center><span>LOCAL ADS, STUCK HERE</span></button>
         <button className="location" onClick={() => { if (locationReady) setLocationDropdown(!locationDropdown); }}>
           <MapPin />
-          <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
+          <span className="location-inner">
             {locationReady ? <span aria-hidden>{countryFlagEmoji(selectedCountry)}</span> : null}
-            <span>{locationReady ? locationLabel() : "Locating..."}</span>
+            <span className="location-label">{locationReady ? locationLabel() : "Locating..."}</span>
           </span>
           <ChevronDown />
         </button>
@@ -963,41 +986,65 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         </div>
       ) : null}
       <section
-        className={`wall ${pendingCard ? "is-placing" : ""}`}
+        className={`wall${pendingCard ? " is-placing" : ""}${listView ? " is-list-view" : ""}`}
         ref={wallRef}
         aria-label="Community advertisement wall"
         style={{ backgroundImage: "linear-gradient(#0001, #0001), url('/assets/wall-texture.png')" }}
+        onClick={(e) => { if (e.target === e.currentTarget && selected) closeCard(); }}
       >
         <div className="wall-grain" />
         {!isLoading ? (
-          visible.length ? (
-            visible.map((sourceCard) => {
-              const override = positionOverrides[String(sourceCard.id)];
-              const card = override ? { ...sourceCard, ...override } : sourceCard;
-              const ownerDraggable = Boolean(onMoveCard && ownedCardIds?.has(String(card.id)));
-              return (
-                <WallCard
-                  key={card.id}
-                  card={card}
-                  active={selected?.id === card.id}
-                  onOpen={handleCardClick}
-                  onFront={front}
-                  ownerDraggable={ownerDraggable}
-                  dragging={movingCardId === String(card.id)}
-                  onDragStart={startCardMove}
-                  onDragMove={moveOwnedCard}
-                  onDragEnd={finishCardMove}
-                  zIndex={Math.max(card.zIndex, layers.indexOf(card.id) + 1)}
-                />
-              );
-            })
+          listView ? (
+            visible.length ? (
+              <div className="list-card-list">
+                {visible.map((card, index) => (
+                  <WallCard
+                    key={card.id}
+                    card={card}
+                    active={selected?.id === card.id}
+                    onOpen={openCard}
+                    onFront={front}
+                    zIndex={index + 1}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="empty-note"><strong>Nothing stuck here yet.</strong><span>Try another corner of the wall.</span><button onClick={resetFilters}>Reset filters</button></div>
+            )
           ) : (
-            <div className="empty-note"><strong>Nothing stuck here yet.</strong><span>Try another corner of the wall.</span><button onClick={resetFilters}>Reset filters</button></div>
+            visible.length ? (
+              visible.map((sourceCard) => {
+                const override = positionOverrides[String(sourceCard.id)];
+                const card = override ? { ...sourceCard, ...override } : sourceCard;
+                const ownerDraggable = Boolean(onMoveCard && ownedCardIds?.has(String(card.id)));
+                return (
+                  <WallCard
+                    key={card.id}
+                    card={card}
+                    active={selected?.id === card.id}
+                    onOpen={handleCardClick}
+                    onFront={front}
+                    ownerDraggable={ownerDraggable}
+                    dragging={movingCardId === String(card.id)}
+                    onDragStart={startCardMove}
+                    onDragMove={moveOwnedCard}
+                    onDragEnd={finishCardMove}
+                    zIndex={Math.max(card.zIndex, layers.indexOf(card.id) + 1)}
+                  />
+                );
+              })
+            ) : (
+              <div className="empty-note"><strong>Nothing stuck here yet.</strong><span>Try another corner of the wall.</span><button onClick={resetFilters}>Reset filters</button></div>
+            )
           )
         ) : null}
         <div className="wall-tools">
-          <button aria-label="Show newest cards" onClick={() => setFresh(true)}><Layers3 /></button>
-          <button aria-label="Reset wall" onClick={resetFilters}><RotateCcw /></button>
+          <button aria-label={listView ? "Switch to wall view" : "Switch to list view"} onClick={() => setListView((v) => !v)}>
+            {listView ? <LayoutGrid /> : <LayoutList />}
+            <span>{listView ? "Wall" : "List"}</span>
+          </button>
+          <button aria-label="Show newest cards" onClick={() => setFresh(true)}><Layers3 /><span>Newest</span></button>
+          <button aria-label="Reset wall" onClick={resetFilters}><RotateCcw /><span>Reset</span></button>
         </div>
         <div className="wall-count">
           {locationReady
@@ -1060,7 +1107,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           </div>
         </div>
       ) : null}
-      {selected ? <DetailPanel key={String(selected.id)} card={selected} onClose={() => { setSelected(null); syncCardRoute(null); }} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} canSaveCard={isSignedIn} saved={savedCardIds.has(String(selected.id))} onSetSaved={onSetSavedCard ? (saved) => onSetSavedCard(selected, saved) : undefined} /> : null}
+      {selected ? <DetailPanel key={String(selected.id)} card={selected} onClose={closeCard} viewCount={viewCounts[String(selected.id)] ?? selected.clicks ?? 0} onEvent={(event) => onCardEvent?.(selected, event)} onReport={onReportCard ? (reason, details) => onReportCard(selected, reason, details) : undefined} canSaveCard={isSignedIn} saved={savedCardIds.has(String(selected.id))} onSetSaved={onSetSavedCard ? (saved) => onSetSavedCard(selected, saved) : undefined} /> : null}
       {dashboard && ownerCards && onSetCardStatus && onUpdateCard && onDeleteCard && onRenewCard ? (
         <OwnerDashboard
           cards={ownerCards}

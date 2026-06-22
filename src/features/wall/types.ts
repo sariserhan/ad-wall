@@ -36,6 +36,7 @@ export interface WallCard {
   state?: string;
   country?: string;
   zipcode?: string;
+  neighborhood?: string;
   price?: string;
   phone?: string;
   email?: string;
@@ -78,7 +79,7 @@ export interface OwnerCard extends WallCard {
 
 export type RenewalAmount = 0 | 2.99 | 7.99 | 24.99;
 
-export type CardUpdate = Pick<OwnerCard, "name" | "category" | "line" | "message" | "area" | "zipcode" | "price" | "phone" | "email" | "website" | "location" | "instagram" | "facebook" | "tiktok" | "linkedin" | "theme">;
+export type CardUpdate = Pick<OwnerCard, "name" | "category" | "line" | "message" | "area" | "zipcode" | "neighborhood" | "price" | "phone" | "email" | "website" | "location" | "instagram" | "facebook" | "tiktok" | "linkedin" | "theme">;
 
 export interface CardDraft {
   name: string;
@@ -90,6 +91,7 @@ export interface CardDraft {
   state: string;
   country: string;
   zipcode?: string;
+  neighborhood?: string;
   price?: string;
   phone?: string;
   email?: string;

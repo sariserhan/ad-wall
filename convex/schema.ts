@@ -51,6 +51,7 @@ export default defineSchema({
     state: v.string(),
     city: v.string(),
     zipcode: v.optional(v.string()),
+    neighborhood: v.optional(v.string()),
     clicks: v.number(),
     reminder3dSentAt: v.optional(v.number()),
     reminder1dSentAt: v.optional(v.number()),

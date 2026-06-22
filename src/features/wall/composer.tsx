@@ -21,6 +21,7 @@ interface ComposerForm {
   state: string;
   country: string;
   zipcode: string;
+  neighborhood: string;
   price: string;
   phone: string;
   email: string;
@@ -52,6 +53,7 @@ const initialForm: ComposerForm = {
   state: defaultState,
   country: defaultCountry,
   zipcode: "",
+  neighborhood: "",
   price: "",
   phone: "",
   email: "",
@@ -328,6 +330,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
       ...form,
       area: form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall",
       message: form.message.trim() || undefined,
+      neighborhood: form.neighborhood.trim() || undefined,
       price: form.price.trim() || undefined,
       phone: form.phone.trim() || undefined,
       email: form.email.trim() || undefined,
@@ -393,6 +396,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
             <div className="form-grid">
               <label>Neighborhood<input name="area" maxLength={50} value={form.area} onChange={(event) => setForm((value) => ({ ...value, area: event.target.value }))} placeholder="Optional" />{fieldError("area")}</label>
               <label>Zip code<input name="zipcode" maxLength={20} value={form.zipcode} onChange={(event) => setForm((value) => ({ ...value, zipcode: event.target.value }))} placeholder="Optional" />{fieldError("zipcode")}</label>
+              <label>Sub-neighborhood <span>(optional)</span><input name="neighborhood" maxLength={50} value={form.neighborhood} onChange={(event) => setForm((value) => ({ ...value, neighborhood: event.target.value }))} placeholder="District, quarter, etc." /></label>
             </div>
             <label>Subtitle<textarea name="line" required maxLength={90} value={form.line} onChange={(event) => setForm((value) => ({ ...value, line: event.target.value }))} placeholder="Short line shown on the card." />{fieldError("line")}</label>
             <label>Message <span>(optional)</span><textarea name="message" maxLength={300} aria-describedby="message-safety" value={form.message} onChange={(event) => setForm((value) => ({ ...value, message: event.target.value }))} placeholder="Longer details shown when someone opens the card." />{fieldError("message")}<small id="message-safety" className="safety-hint">Messages are checked for adult and unsafe content before publishing.</small>{step === 2 && moderationError ? <small className="field-error" role="alert">{moderationError}</small> : null}{moderationMatches.length ? <span className="flagged-terms">Flagged: {moderationMatches.map((match) => <mark key={`${match.field}-${match.start}`}>{match.field}: {match.term}</mark>)}</span> : null}</label>

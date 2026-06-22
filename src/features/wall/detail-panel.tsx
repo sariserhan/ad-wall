@@ -55,11 +55,25 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
   };
 
   const shareCard = async () => {
-    const url = new URL(`/card/${encodeURIComponent(String(card.id))}`, window.location.origin);
-    const shareData = { title: card.name, text: card.line, url: url.toString() };
-    if (navigator.share) await navigator.share(shareData);
-    else await navigator.clipboard.writeText(url.toString());
-    onEvent?.("share");
+    const url = new URL("/", window.location.origin);
+    if (card.country) url.searchParams.set("country", card.country);
+    if (card.state) url.searchParams.set("state", card.state);
+    if (card.city) url.searchParams.set("city", card.city);
+    const rawId = String(card.id);
+    const cleanId = rawId.length > 32 ? rawId.slice(0, 32) : rawId;
+    url.searchParams.set("card", cleanId);
+    const shareData = { title: card.name, url: url.toString() };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url.toString());
+      }
+      onEvent?.("share");
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      throw err;
+    }
   };
 
   const report = async () => {
@@ -89,7 +103,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
           ))}
         </div>
       ) : null}
-      <div className="note-copy">{card.message ?? card.line}</div>
+      {card.message ? <div className="note-copy">{card.message}</div> : null}
       {card.price ? <div className="sheet-price">Starting at <strong>{card.price}</strong></div> : null}
       {hasContact ? (
         <div className="contact-actions" aria-label={`Contact ${card.name}`}>

@@ -45,6 +45,7 @@ export const completePaidCard = internalMutation({
       state: payload.state,
       country: payload.country,
       zipcode: payload.zipcode,
+      neighborhood: payload.neighborhood,
       price: payload.price,
       phone: payload.phone,
       email: payload.email,

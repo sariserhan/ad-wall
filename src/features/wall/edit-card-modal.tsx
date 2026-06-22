@@ -16,6 +16,7 @@ export function EditCardModal({ card, onClose, onSave }: { card: OwnerCard; onCl
     message: card.message,
     area: card.area,
     zipcode: card.zipcode,
+    neighborhood: card.neighborhood,
     price: card.price,
     phone: card.phone,
     email: card.email,
@@ -72,6 +73,7 @@ export function EditCardModal({ card, onClose, onSave }: { card: OwnerCard; onCl
           <div className="form-grid">
             <label>Neighborhood<input required minLength={1} maxLength={50} value={form.area} onChange={(event) => setField("area", event.target.value)} /></label>
             <label>Zip code <span>(optional)</span><input maxLength={20} value={form.zipcode ?? ""} onChange={(event) => setField("zipcode", event.target.value || undefined)} /></label>
+            <label>Sub-neighborhood <span>(optional)</span><input maxLength={50} value={form.neighborhood ?? ""} onChange={(event) => setField("neighborhood", event.target.value || undefined)} /></label>
           </div>
           <div className="form-grid">
             <label>Price <span>(optional)</span><input maxLength={50} value={form.price ?? ""} onChange={(event) => setField("price", event.target.value || undefined)} /></label>
