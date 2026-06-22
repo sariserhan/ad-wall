@@ -1,9 +1,60 @@
+import { Country, State, City } from "country-state-city";
+
 const US_STATE_CODES = new Set([
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
   "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
   "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
   "VA","WA","WV","WI","WY","DC",
 ]);
+
+// ─── Path slug builders ───────────────────────────────────────────────────────
+
+export function toCountrySlug(isoCode: string): string {
+  return isoCode.toLowerCase();
+}
+
+export function toStateSlug(isoCode: string): string {
+  return isoCode.toLowerCase();
+}
+
+export function toCitySlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function buildWallPath(
+  country: string,
+  state?: string,
+  city?: string,
+  category?: string,
+): string {
+  const parts = [toCountrySlug(country)];
+  if (state) parts.push(toStateSlug(state));
+  if (city) parts.push(toCitySlug(city));
+  if (category && category !== "All") parts.push(toCategorySlug(category));
+  return `/${parts.join("/")}`;
+}
+
+// ─── Path slug parsers ────────────────────────────────────────────────────────
+
+export function parseCountrySlug(slug: string): string | null {
+  const code = slug.toUpperCase();
+  return Country.getAllCountries().some((c) => c.isoCode === code) ? code : null;
+}
+
+export function parseStateSlug(country: string, slug: string): string | null {
+  const code = slug.toUpperCase();
+  return State.getStatesOfCountry(country).some((s) => s.isoCode === code) ? code : null;
+}
+
+export function parseCityFromSlug(country: string, state: string, slug: string): string | null {
+  const cities = City.getCitiesOfState(country, state);
+  return cities.find((c) => toCitySlug(c.name) === slug)?.name ?? null;
+}
 
 const CATEGORY_SLUGS: Record<string, string> = {
   "services": "Services",

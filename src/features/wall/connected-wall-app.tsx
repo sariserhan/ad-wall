@@ -54,20 +54,22 @@ export function ConnectedWallApp({
   initialLocation,
   initialKeyword,
   initialCategory,
+  initialCards,
 }: {
   initialCardId?: string;
   initialLocation?: { country: string; state: string; city: string };
   initialKeyword?: string;
   initialCategory?: string;
+  initialCards?: WallCard[];
 }) {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: isConvexAuthLoading } = useConvexAuth();
   const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn } = useAuth();
   const [layoutCards, setLayoutCards] = useState<WallCard[] | null>(null);
   const hasAppliedInitialServerSnapshotRef = useRef(false);
-  const queryCountry = initialLocation?.country || searchParams.get("country") || undefined;
-  const queryState = initialLocation?.state || searchParams.get("state") || undefined;
-  const queryCity = initialLocation?.city || searchParams.get("city") || undefined;
+  const queryCountry = initialLocation?.country || undefined;
+  const queryState = initialLocation?.state || undefined;
+  const queryCity = initialLocation?.city || undefined;
   const publishedCards = useQuery(api.cards.listPublished, {
     country: queryCountry,
     state: queryState,
@@ -75,10 +77,10 @@ export function ConnectedWallApp({
   }) as WallCard[] | undefined;
   const directCard = useQuery(api.cards.getPublishedById, initialCardId ? { cardId: initialCardId as Id<"cards"> } : "skip") as WallCard | null | undefined;
   const renderCards = useMemo(() => {
-    const baseCards = layoutCards ?? publishedCards ?? [];
+    const baseCards = layoutCards ?? publishedCards ?? initialCards ?? [];
     if (!directCard || baseCards.some((card) => String(card.id) === String(directCard.id))) return baseCards;
     return [...baseCards, directCard];
-  }, [directCard, layoutCards, publishedCards]);
+  }, [directCard, layoutCards, publishedCards, initialCards]);
   const pendingCreatedCards = useMemo(() => {
     if (publishedCards === undefined || !hasAppliedInitialServerSnapshotRef.current) return [];
     const layoutIds = new Set((layoutCards ?? []).map((card) => String(card.id)));
@@ -87,7 +89,7 @@ export function ConnectedWallApp({
   const liveCardIds = useMemo(() => renderCards.map((card) => card.id as Id<"cards">), [renderCards]);
   const liveViewCounts = useQuery(api.cards.getLiveViewCounts, liveCardIds.length === 0 ? "skip" : { cardIds: liveCardIds }) as Array<{ id: Id<"cards">; clicks: number }> | undefined;
   const cards = useMemo(() => {
-    if (renderCards.length === 0 && publishedCards === undefined && layoutCards === null) return undefined;
+    if (renderCards.length === 0 && publishedCards === undefined && layoutCards === null && !initialCards?.length) return undefined;
     const counts = new Map((liveViewCounts ?? []).map((item) => [String(item.id), item.clicks]));
     return renderCards.map((card) => ({ ...card, clicks: counts.get(String(card.id)) ?? card.clicks ?? 0 }));
   }, [layoutCards, liveViewCounts, publishedCards, renderCards]);
@@ -249,9 +251,9 @@ export function ConnectedWallApp({
       line: draft.line,
       message: draft.message,
       area: draft.area,
-      city: draft.city || searchParams.get("city") || "",
-      state: draft.state || searchParams.get("state") || "",
-      country: draft.country || searchParams.get("country") || "",
+      city: draft.city || initialLocation?.city || "",
+      state: draft.state || initialLocation?.state || "",
+      country: draft.country || initialLocation?.country || "",
       zipcode: draft.zipcode,
       neighborhood: draft.neighborhood,
       price: draft.price,
