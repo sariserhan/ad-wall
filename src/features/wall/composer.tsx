@@ -101,6 +101,59 @@ const featuredTierOptions: ReadonlyArray<{ value: ComposerForm["featuredTier"]; 
 
 const stepLabels = ["Design", "Details", "Duration"] as const;
 const DRAFT_STORAGE_KEY = "wall-card-draft-v1";
+const DRAFT_IMAGES_DB = "wall-draft-images-v1";
+const DRAFT_IMAGES_STORE = "blobs";
+const DRAFT_IMAGES_KEY = "draft";
+
+function openImagesDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DRAFT_IMAGES_DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(DRAFT_IMAGES_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveImagesToIDB(blobs: Blob[]): Promise<void> {
+  try {
+    const db = await openImagesDB();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(DRAFT_IMAGES_STORE, "readwrite");
+      tx.objectStore(DRAFT_IMAGES_STORE).put(blobs, DRAFT_IMAGES_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+  } catch { /* storage unavailable */ }
+}
+
+async function loadImagesFromIDB(): Promise<Blob[] | null> {
+  try {
+    const db = await openImagesDB();
+    const blobs = await new Promise<Blob[] | null>((resolve, reject) => {
+      const tx = db.transaction(DRAFT_IMAGES_STORE, "readonly");
+      const req = tx.objectStore(DRAFT_IMAGES_STORE).get(DRAFT_IMAGES_KEY);
+      req.onsuccess = () => resolve((req.result as Blob[]) ?? null);
+      req.onerror = () => reject(req.error);
+    });
+    db.close();
+    return blobs;
+  } catch { return null; }
+}
+
+async function clearImagesFromIDB(): Promise<void> {
+  try {
+    const db = await openImagesDB();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(DRAFT_IMAGES_STORE, "readwrite");
+      tx.objectStore(DRAFT_IMAGES_STORE).delete(DRAFT_IMAGES_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+  } catch { /* storage unavailable */ }
+}
+
 type ModerationMatch = { field: "name" | "line" | "message"; term: string; start: number; end: number };
 type DetailField = "name" | "line" | "message" | "area" | "zipcode" | "price" | "phone" | "email" | "website" | "location" | "instagram" | "facebook" | "tiktok" | "linkedin";
 
@@ -149,7 +202,10 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
     if (typeof window === "undefined") return { ...initialForm, country: baseCountry, state, city };
     try {
       const saved = JSON.parse(window.localStorage.getItem(DRAFT_STORAGE_KEY) ?? "null") as Partial<ComposerForm> | null;
-      return { ...initialForm, ...saved, category: "", subcategory: "", country: baseCountry, state, city };
+      if (!saved) return { ...initialForm, country: baseCountry, state, city };
+      const cat = (categories as readonly string[]).includes(saved.category ?? "") ? (saved.category as CardCategory) : "";
+      const sub = cat && saved.subcategory && (SUBCATEGORY_OPTIONS[cat] ?? []).includes(saved.subcategory) ? saved.subcategory : "";
+      return { ...initialForm, ...saved, category: cat, subcategory: sub, country: baseCountry, state, city };
     } catch {
       return { ...initialForm, country: baseCountry, state, city };
     }
@@ -157,6 +213,13 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [step, setStep] = useState(1);
+  const [draftBanner, setDraftBanner] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(DRAFT_STORAGE_KEY) ?? "null") as Partial<ComposerForm> | null;
+      return !!(saved?.name?.trim() || saved?.line?.trim());
+    } catch { return false; }
+  });
   const [contactError, setContactError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<DetailField, string>>>({});
   const [moderationStatus, setModerationStatus] = useState<"idle" | "checking" | "passed" | "blocked">("idle");
@@ -299,6 +362,20 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
   }, [form]);
 
   useEffect(() => {
+    void loadImagesFromIDB().then((blobs) => {
+      if (!blobs?.length) return;
+      const restored = blobs.map((blob, i) => new File([blob], `draft-${i}.${blob.type.split("/")[1] ?? "jpg"}`, { type: blob.type }));
+      setFiles(restored);
+      setPreviews(restored.map((f) => URL.createObjectURL(f)));
+    });
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void saveImagesToIDB(files); }, 500);
+    return () => window.clearTimeout(timer);
+  }, [files]);
+
+  useEffect(() => {
     if (!form.phone.trim() && !form.email.trim()) return;
     const phoneInput = formRef.current?.elements.namedItem("phone") as HTMLInputElement | null;
     const emailInput = formRef.current?.elements.namedItem("email") as HTMLInputElement | null;
@@ -358,6 +435,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
       previews,
     });
     try { window.localStorage.removeItem(DRAFT_STORAGE_KEY); } catch { /* storage unavailable */ }
+    void clearImagesFromIDB();
   };
 
   return (
@@ -398,6 +476,12 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
             );
           })}
         </div>
+        {draftBanner ? (
+          <div className="composer-draft-banner" role="status">
+            <span>Draft restored — pick up where you left off.</span>
+            <button type="button" className="icon-btn" onClick={() => setDraftBanner(false)} aria-label="Dismiss draft notice"><X size={14} /></button>
+          </div>
+        ) : null}
         {step === 2 ? (
           <div className="composer-body details-step">
             <div className="details-fields">

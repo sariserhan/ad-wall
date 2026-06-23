@@ -318,6 +318,9 @@ button { color: inherit; }
 .composer-progress button.complete { color: #5f5b55; }
 .composer-progress button.current { color: #111; text-decoration: underline; text-decoration-color: #f43d38; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .composer-progress button:hover { color: #f43d38; }
+.composer-draft-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 16px 9px 22px; background: #e8f5e9; border-bottom: 1px solid #c8e6c9; font: 500 12px var(--font-inter); color: #2e7d32; }
+.composer-draft-banner .icon-btn { color: #2e7d32; opacity: .7; }
+.composer-draft-banner .icon-btn:hover { opacity: 1; background: rgba(0,0,0,.06); }
 .composer-body { display: grid; gap: 18px; padding: 28px; }
 .details-step { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; gap: 28px; }
 .details-fields { min-width: 0; display: grid; gap: 18px; }
@@ -598,7 +601,11 @@ button { color: inherit; }
 .dashboard-profile-row > span, .dashboard-profile-row > label { font: 700 10px var(--font-inter); text-transform: uppercase; letter-spacing: .7px; color: #666; }
 .dashboard-profile-row > label span { font-weight: 500; text-transform: none; color: #999; }
 .dashboard-profile-row > p { margin: 0; font: 600 14px var(--font-inter); }
-.dashboard-profile-row > input { height: 40px; width: 200px; padding: 0 10px; border: 1px solid #bbb; background: #f8f6f1; font: 500 13px var(--font-inter); }
+.dashboard-profile-row > input, .dashboard-profile-input-wrap input { height: 40px; width: 200px; padding: 0 32px 0 10px; border: 1px solid #bbb; background: #f8f6f1; font: 500 13px var(--font-inter); box-sizing: border-box; }
+.dashboard-profile-input-wrap { position: relative; width: 200px; }
+.dashboard-profile-input-wrap input { width: 100%; }
+.dashboard-input-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 0; background: transparent; color: #999; cursor: pointer; padding: 0; border-radius: 50%; }
+.dashboard-input-clear:hover { background: #e0ddd6; color: #444; }
 .dashboard-profile-save-row { display: grid; gap: 8px; }
 .dashboard-profile-save-row .primary { min-height: 40px; padding: 0 16px; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
 .dashboard-profile-hint { margin: 0; font: 500 10px var(--font-inter); color: #888; line-height: 1.4; max-width: 280px; }

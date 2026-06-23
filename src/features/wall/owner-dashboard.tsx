@@ -61,6 +61,8 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
     setProfileSaved(false);
     try {
       await onUpdateProfile(usernameInput.trim() || undefined, businessNameInput.trim() || undefined);
+      setUsernameInput("");
+      setBusinessNameInput("");
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 2500);
     } catch (cause) {
@@ -136,25 +138,35 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
             ) : null}
             <div className="dashboard-profile-row">
               <label htmlFor="dashboard-username">Username <span>(optional)</span></label>
-              <input
-                id="dashboard-username"
-                type="text"
-                maxLength={40}
-                placeholder={profile?.displayName ?? "Your name or handle"}
-                value={usernameInput}
-                onChange={(e) => { setUsernameInput(e.target.value); setProfileSaved(false); }}
-              />
+              <div className="dashboard-profile-input-wrap">
+                <input
+                  id="dashboard-username"
+                  type="text"
+                  maxLength={40}
+                  placeholder={profile?.displayName ?? "Your name or handle"}
+                  value={usernameInput}
+                  onChange={(e) => { setUsernameInput(e.target.value); setProfileSaved(false); }}
+                />
+                {usernameInput ? (
+                  <button type="button" className="dashboard-input-clear" onClick={() => { setUsernameInput(""); setProfileSaved(false); }} aria-label="Clear username"><X size={12} /></button>
+                ) : null}
+              </div>
             </div>
             <div className="dashboard-profile-row">
               <label htmlFor="dashboard-biz-name">Business name <span>(optional)</span></label>
-              <input
-                id="dashboard-biz-name"
-                type="text"
-                maxLength={60}
-                placeholder="e.g. Serhan's Plumbing LLC"
-                value={businessNameInput}
-                onChange={(e) => { setBusinessNameInput(e.target.value); setProfileSaved(false); }}
-              />
+              <div className="dashboard-profile-input-wrap">
+                <input
+                  id="dashboard-biz-name"
+                  type="text"
+                  maxLength={60}
+                  placeholder="e.g. Serhan's Plumbing LLC"
+                  value={businessNameInput}
+                  onChange={(e) => { setBusinessNameInput(e.target.value); setProfileSaved(false); }}
+                />
+                {businessNameInput ? (
+                  <button type="button" className="dashboard-input-clear" onClick={() => { setBusinessNameInput(""); setProfileSaved(false); }} aria-label="Clear business name"><X size={12} /></button>
+                ) : null}
+              </div>
             </div>
             <div className="dashboard-profile-save-row">
               <p className="dashboard-profile-hint">Cards show your business name if set, otherwise username, otherwise display name.</p>
