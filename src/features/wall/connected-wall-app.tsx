@@ -243,7 +243,11 @@ export function ConnectedWallApp({
     const uploadedImages = await Promise.all(draft.files.slice(0, 2).map(uploadImageVariants));
     const imageIds = uploadedImages.map((image) => image.imageId);
     const thumbnailImageIds = uploadedImages.map((image) => image.thumbnailImageId);
-    const paidAmount = draft.paymentOption === "free" ? 0 : Number(draft.paymentOption);
+    const basePaidAmount = draft.paymentOption === "free" ? 0 : Number(draft.paymentOption);
+    const featuredPrices: Record<string, number> = { bronze: 2.99, silver: 4.99, gold: 9.99 };
+    const featuredPaidAmount = draft.featuredTier && draft.featuredTier !== "none" ? (featuredPrices[draft.featuredTier] ?? 0) : 0;
+    const totalPaidAmount = basePaidAmount + featuredPaidAmount;
+    const featuredTierArg = draft.featuredTier && draft.featuredTier !== "none" ? draft.featuredTier : undefined;
     const cardPayload = {
       name: draft.name,
       category: draft.category,
@@ -265,7 +269,8 @@ export function ConnectedWallApp({
       facebook: draft.facebook,
       tiktok: draft.tiktok,
       linkedin: draft.linkedin,
-      paidAmount,
+      paidAmount: basePaidAmount,
+      featuredTier: featuredTierArg,
       theme: draft.theme,
       imageMode: draft.imageMode,
       imageIds,
@@ -276,12 +281,12 @@ export function ConnectedWallApp({
       width: getCardFormat(draft.imageMode === "business-card" ? "biz" : draft.theme).width,
     };
     const result = await createCard(cardPayload) as WallCard | { pendingCardId: Id<"pendingCards"> };
-    if (paidAmount > 0) {
+    if (totalPaidAmount > 0) {
       if (!("pendingCardId" in result)) throw new Error("The paid card could not be prepared.");
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pendingCardId: result.pendingCardId, paidAmount, cardName: draft.name }),
+        body: JSON.stringify({ pendingCardId: result.pendingCardId, paidAmount: totalPaidAmount, cardName: draft.name }),
       });
       const checkoutResult = await response.json() as { url?: string; sessionId?: string; error?: string };
       if (!response.ok || !checkoutResult.url || !checkoutResult.sessionId) throw new Error(checkoutResult.error || "Could not start card checkout.");

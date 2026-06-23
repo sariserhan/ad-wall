@@ -78,6 +78,8 @@ export default defineSchema({
     subcategory: v.optional(v.string()),
     ownerName: v.optional(v.string()),
     clicks: v.number(),
+    featuredTier: v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold"))),
+    reviewCount: v.optional(v.number()),
     reminder3dSentAt: v.optional(v.number()),
     reminder1dSentAt: v.optional(v.number()),
   })

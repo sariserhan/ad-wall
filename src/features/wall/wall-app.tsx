@@ -15,6 +15,7 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
+  SlidersHorizontal,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -28,7 +29,7 @@ import { OwnerDashboard } from "./owner-dashboard";
 import { seedCards } from "./seed-cards";
 import { WallCard } from "./wall-card";
 import { categories, SUBCATEGORY_OPTIONS, getCardFormat, type CardCategory, type CardDraft, type CardUpdate, type CreateCard, type OwnerCard, type Placement, type RenewalAmount, type WallCard as WallCardModel } from "./types";
-import { parseSmartQuery, buildWallPath, toCitySlug, toCategorySlug } from "@/lib/wall-slug";
+import { buildWallPath, toCategorySlug } from "@/lib/wall-slug";
 
 interface WallAppProps {
   mode: "demo" | "connected";
@@ -100,41 +101,6 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
   };
 }
 
-// Module-level US city index — built once, reused across renders
-let usCityIndex: Map<string, Array<{ state: string; city: string; lat: number; lon: number }>> | null = null;
-
-function getUsCityIndex(): Map<string, Array<{ state: string; city: string; lat: number; lon: number }>> {
-  if (!usCityIndex) {
-    usCityIndex = new Map();
-    for (const st of State.getStatesOfCountry("US")) {
-      for (const c of City.getCitiesOfState("US", st.isoCode)) {
-        const key = c.name.toLowerCase();
-        const arr = usCityIndex.get(key) ?? [];
-        arr.push({ state: st.isoCode, city: c.name, lat: Number(c.latitude ?? 0), lon: Number(c.longitude ?? 0) });
-        usCityIndex.set(key, arr);
-      }
-    }
-  }
-  return usCityIndex;
-}
-
-const CATEGORY_ALIASES: Record<string, string> = {
-  services: "Services", repairs: "Repairs", pets: "Pets",
-  automotive: "Automotive", technology: "Technology",
-  community: "Community", jobs: "Jobs", dating: "Dating", vehicles: "Vehicles",
-  food: "Food & Catering", "food catering": "Food & Catering",
-  home: "Home & Garden", "home garden": "Home & Garden",
-  classes: "Classes & Education", "classes education": "Classes & Education",
-  shops: "Shops & Retail", "shops retail": "Shops & Retail",
-  health: "Health & Fitness", "health fitness": "Health & Fitness",
-  beauty: "Beauty & Personal Care", "beauty personal care": "Beauty & Personal Care",
-  professional: "Professional Services", "professional services": "Professional Services",
-  events: "Events & Entertainment", "events entertainment": "Events & Entertainment",
-  "real estate": "Real Estate",
-  child: "Child & Family", "child family": "Child & Family",
-  marketplace: "Buy & Sell Marketplace", "buy sell": "Buy & Sell Marketplace",
-};
-
 const defaultSeedLocation = (() => {
   const seedDefault = seedCards.find((card) => card.country && card.state && card.city) ?? seedCards[0];
   return {
@@ -196,6 +162,18 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const [selectedState, setSelectedState] = useState(defaultSeedLocation.state);
   const [selectedCity, setSelectedCity] = useState(defaultSeedLocation.city);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState(searchParams.get("neighborhood") ?? "");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [pendingCategory, setPendingCategory] = useState<(typeof categories)[number]>("All");
+  const [pendingSubcategory, setPendingSubcategory] = useState("");
+  const [pendingFresh, setPendingFresh] = useState(false);
+  const [sortBy, setSortBy] = useState<"default" | "most-viewed" | "most-reviews">("default");
+  const [filterHasWebsite, setFilterHasWebsite] = useState(false);
+  const [filterHasPhotos, setFilterHasPhotos] = useState(false);
+  const [filterFeaturedOnly, setFilterFeaturedOnly] = useState(false);
+  const [pendingSortBy, setPendingSortBy] = useState<"default" | "most-viewed" | "most-reviews">("default");
+  const [pendingHasWebsite, setPendingHasWebsite] = useState(false);
+  const [pendingHasPhotos, setPendingHasPhotos] = useState(false);
+  const [pendingFeaturedOnly, setPendingFeaturedOnly] = useState(false);
   const wallRef = useRef<HTMLElement>(null);
   const moveOffsetRef = useRef<{ x: number; y: number } | null>(null);
   const movePositionRef = useRef<Placement | null>(null);
@@ -505,11 +483,19 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialLocation?.country, initialLocation?.state, initialLocation?.city]);
 
-  // Pre-warm the US city index in the background so the first search is instant
+  // Sync pending filter state from applied state whenever the panel opens
   useEffect(() => {
-    const id = window.setTimeout(() => getUsCityIndex(), 1500);
-    return () => window.clearTimeout(id);
-  }, []);
+    if (filterOpen) {
+      setPendingCategory(category);
+      setPendingSubcategory(subcategory);
+      setPendingFresh(fresh);
+      setPendingSortBy(sortBy);
+      setPendingHasWebsite(filterHasWebsite);
+      setPendingHasPhotos(filterHasPhotos);
+      setPendingFeaturedOnly(filterFeaturedOnly);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterOpen]);
 
   const availableStates = State.getStatesOfCountry(selectedCountry);
   const availableCities = selectedState ? City.getCitiesOfState(selectedCountry, selectedState) : [];
@@ -599,18 +585,32 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const visible = useMemo(() => {
     if (!locationReady) return cards;
     const needle = deferredQuery.toLowerCase();
-    const result = cards.filter((card) => {
+    const filtered = cards.filter((card) => {
       if (category !== "All" && card.category !== category) return false;
       if (subcategory && card.subcategory !== subcategory) return false;
       if (selectedCountry && card.country !== selectedCountry) return false;
       if (selectedState && card.state !== selectedState) return false;
       if (selectedCity && card.city !== selectedCity) return false;
       if (selectedNeighborhood && card.neighborhood !== selectedNeighborhood) return false;
-      const text = `${card.name} ${card.line ?? ""} ${card.category} ${card.subcategory ?? ""} ${card.area}`.toLowerCase();
+      if (filterHasWebsite && !card.website) return false;
+      if (filterHasPhotos && (!card.images || card.images.length === 0)) return false;
+      if (filterFeaturedOnly && !card.featuredTier) return false;
+      const text = `${card.name} ${card.line ?? ""} ${card.ownerName ?? ""} ${card.category} ${card.subcategory ?? ""} ${card.area}`.toLowerCase();
       return text.includes(needle);
     });
-    return fresh ? result.toReversed() : result;
-  }, [cards, category, subcategory, deferredQuery, fresh, selectedCountry, selectedState, selectedCity, selectedNeighborhood, locationReady]);
+    if (sortBy === "most-viewed") {
+      return [...filtered].sort((a, b) => (b.clicks ?? 0) - (a.clicks ?? 0));
+    }
+    if (sortBy === "most-reviews") {
+      return [...filtered].sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
+    }
+    const tierWeight = (t?: string) => t === "gold" ? 3 : t === "silver" ? 2 : t === "bronze" ? 1 : 0;
+    return [...filtered].sort((a, b) => {
+      const tierDiff = tierWeight(b.featuredTier) - tierWeight(a.featuredTier);
+      if (tierDiff !== 0) return tierDiff;
+      return fresh ? a.createdAt - b.createdAt : b.createdAt - a.createdAt;
+    });
+  }, [cards, category, subcategory, deferredQuery, fresh, sortBy, filterHasWebsite, filterHasPhotos, filterFeaturedOnly, selectedCountry, selectedState, selectedCity, selectedNeighborhood, locationReady]);
 
   const pendingCardsOnSelectedWall = useMemo(() => {
     if (!locationReady) return 0;
@@ -825,6 +825,10 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       setQuery("");
       setFresh(false);
       setSelectedNeighborhood("");
+      setSortBy("default");
+      setFilterHasWebsite(false);
+      setFilterHasPhotos(false);
+      setFilterFeaturedOnly(false);
       router.push("/");
     });
   };
@@ -833,155 +837,160 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     <main className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={resetFilters}><center>WALL</center><span>LOCAL ADS, STUCK HERE</span></button>
-        <button className="location" onClick={() => { if (locationReady) setLocationDropdown(!locationDropdown); }}>
-          <MapPin />
-          <span className="location-inner">
-            {locationReady ? <span aria-hidden>{countryFlagEmoji(selectedCountry)}</span> : null}
-            <span className="location-label">{locationReady ? locationLabel() : "Locating..."}</span>
-          </span>
-          <ChevronDown />
-        </button>
+        <div className="location-wrap">
+          <button className="location" onClick={() => { if (locationReady) setLocationDropdown(!locationDropdown); }} aria-expanded={locationDropdown}>
+            <MapPin />
+            <span className="location-inner">
+              {locationReady ? <span aria-hidden>{countryFlagEmoji(selectedCountry)}</span> : null}
+              <span className="location-label">{locationReady ? locationLabel() : "Locating..."}</span>
+            </span>
+            <ChevronDown />
+          </button>
+          {locationDropdown ? (
+            <>
+              <div className="filter-backdrop" onClick={() => setLocationDropdown(false)} />
+              <div className="location-panel" onClick={(e) => e.stopPropagation()}>
+                <div className="filter-panel-header">
+                  <strong>Choose location</strong>
+                  <button className="icon-btn" onClick={() => setLocationDropdown(false)} aria-label="Close"><X /></button>
+                </div>
+                <div className="location-panel-body">
+                  <label className="filter-panel-label">Country<select value={selectedCountry} onChange={(event) => {
+                    setSelectedCountry(event.target.value);
+                    setSelectedState("");
+                    setSelectedCity("");
+                  }}>
+                    {Country.getAllCountries().map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}
+                  </select></label>
+                  {hasStateOptions ? (
+                    <label className="filter-panel-label">State<select value={selectedState} onChange={(event) => {
+                      setSelectedState(event.target.value);
+                      setSelectedCity("");
+                      setSelectedNeighborhood("");
+                    }}>
+                      <option value="">— All states —</option>
+                      {availableStates.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}
+                    </select></label>
+                  ) : null}
+                  {hasCityOptions ? (
+                    <label className="filter-panel-label">City<select value={selectedCity} onChange={(event) => { setSelectedCity(event.target.value); setSelectedNeighborhood(""); }}>
+                      <option value="">— All cities —</option>
+                      {availableCities.map((city) => <option key={`${city.name}-${city.latitude}-${city.longitude}`} value={city.name}>{city.name}</option>)}
+                    </select></label>
+                  ) : null}
+                  {selectedCity ? (
+                    <label className="filter-panel-label">Neighborhood (optional)<input type="text" value={selectedNeighborhood} onChange={(event) => setSelectedNeighborhood(event.target.value)} placeholder="e.g. Downtown, Williamsburg" /></label>
+                  ) : null}
+                </div>
+                {locationNotice ? <div className="location-panel-notice">{locationNotice}</div> : null}
+                <div className="filter-panel-footer">
+                  <button type="button" className="primary" onClick={() => applyLocation(selectedCountry, selectedState, selectedCity)}>Apply</button>
+                  <button type="button" className="filter-clear-btn" onClick={useMyLocation}>My location</button>
+                  <button type="button" className="filter-clear-btn" onClick={resetToDefault}>Reset</button>
+                </div>
+              </div>
+            </>
+          ) : null}
+        </div>
         <button className="locate-btn" onClick={useMyLocation} disabled={locating} title="Use my location" aria-label="Use my location">
           <LocateFixed className={locating ? "locate-spin" : ""} />
           <span>Locate</span>
         </button>
         {/* Map picker temporarily hidden */}
         <nav className={mobileMenu ? "open" : ""}>
-          <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => {
-              if (event.key !== "Enter" || !query.trim()) return;
-              const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-
-              // 1. Detect category at the start (try longest match first)
-              let detectedCategory = "";
-              let remainingTokens = [...tokens];
-              for (let len = Math.min(3, tokens.length); len >= 1; len--) {
-                const candidate = tokens.slice(0, len).join(" ");
-                if (CATEGORY_ALIASES[candidate]) {
-                  detectedCategory = CATEGORY_ALIASES[candidate];
-                  remainingTokens = tokens.slice(len);
-                  break;
-                }
-              }
-
-              // 2. Try US location parse on remaining tokens
-              const remainingQuery = remainingTokens.join(" ");
-              const parsed = parseSmartQuery(remainingQuery, (state) => City.getCitiesOfState("US", state).map((c) => c.name));
-
-              // 3. If no US location, check if last token(s) are a country name
-              let detectedCountryCode = "";
-              let finalKeyword = parsed.keyword;
-              if (!parsed.state && remainingTokens.length > 0) {
-                const allCountries = Country.getAllCountries();
-                for (let len = Math.min(3, remainingTokens.length); len >= 1; len--) {
-                  const candidate = remainingTokens.slice(-len).join(" ");
-                  const match = allCountries.find((c) => c.name.toLowerCase() === candidate);
-                  if (match) {
-                    detectedCountryCode = match.isoCode;
-                    finalKeyword = remainingTokens.slice(0, -len).join(" ");
-                    break;
-                  }
-                }
-              }
-
-              // 3.5. If still no location detected, try matching remaining tokens as a city name
-              let foundCityCountry = "";
-              let foundCityState = "";
-              let foundCityName = "";
-              if (!parsed.state && !detectedCountryCode && remainingTokens.length > 0) {
-                const cityQuery = remainingTokens.join(" ").toLowerCase();
-                const cityMatches: Array<{ country: string; state: string; city: string; lat: number; lon: number }> = [];
-
-                // Search US cities first via pre-built index (O(1) lookup)
-                for (const m of getUsCityIndex().get(cityQuery) ?? []) {
-                  cityMatches.push({ country: "US", ...m });
-                }
-
-                // If no US match, search the user's current country, then all others
-                if (cityMatches.length === 0) {
-                  const searchOrder = [
-                    selectedCountry !== "US" ? selectedCountry : "",
-                    ...Country.getAllCountries().map((co) => co.isoCode).filter((code) => code !== "US" && code !== selectedCountry),
-                  ].filter(Boolean);
-                  outer: for (const countryCode of searchOrder) {
-                    for (const st of State.getStatesOfCountry(countryCode)) {
-                      for (const c of City.getCitiesOfState(countryCode, st.isoCode)) {
-                        if (c.name.toLowerCase() === cityQuery) {
-                          cityMatches.push({ country: countryCode, state: st.isoCode, city: c.name, lat: Number(c.latitude ?? 0), lon: Number(c.longitude ?? 0) });
-                          if (cityMatches.length >= 50) break outer;
-                        }
+          <div className="search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, business or creator" aria-label="Search advertisements" /></div>
+          <div className="filter-wrap">
+            {filterOpen && <div className="filter-backdrop" onClick={() => setFilterOpen(false)} />}
+            <button className="filter-btn" onClick={() => setFilterOpen((v) => !v)} aria-expanded={filterOpen} aria-label="Open filters">
+              <SlidersHorizontal />
+              <span>Filter</span>
+              {((category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)) > 0 && (
+                <span className="filter-badge">{(category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)}</span>
+              )}
+              <ChevronDown />
+            </button>
+            {filterOpen && (
+              <div className="filter-panel" onClick={(e) => e.stopPropagation()}>
+                <div className="filter-panel-header">
+                  <strong>Filter Cards</strong>
+                  <button className="icon-btn" onClick={() => setFilterOpen(false)} aria-label="Close filters"><X /></button>
+                </div>
+                <div className="filter-panel-body">
+                  <label className="filter-panel-label">
+                    Category
+                    <select value={pendingCategory} onChange={(event) => {
+                      setPendingCategory(event.target.value as (typeof categories)[number]);
+                      setPendingSubcategory("");
+                    }}>{categories.map((item) => <option key={item}>{item}</option>)}</select>
+                  </label>
+                  <label className="filter-panel-label">
+                    Subcategory
+                    <select value={pendingSubcategory} disabled={pendingCategory === "All"} onChange={(event) => setPendingSubcategory(event.target.value)}>
+                      {pendingCategory === "All"
+                        ? <option value="">Pick a category first</option>
+                        : <><option value="">All subcategories</option>{SUBCATEGORY_OPTIONS[pendingCategory as CardCategory].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</>
                       }
-                    }
-                  }
-                }
-
-                if (cityMatches.length > 0) {
-                  let best = cityMatches[0];
-                  if (cityMatches.length > 1) {
-                    // Get user's approximate lat/lon from current wall location
-                    let userLat = 0;
-                    let userLon = 0;
-                    if (selectedCity && selectedState) {
-                      const uc = City.getCitiesOfState(selectedCountry, selectedState).find((c) => c.name === selectedCity);
-                      if (uc) { userLat = Number(uc.latitude ?? 0); userLon = Number(uc.longitude ?? 0); }
-                    } else if (selectedCountry) {
-                      const co = Country.getAllCountries().find((c) => c.isoCode === selectedCountry);
-                      if (co) { userLat = Number(co.latitude ?? 0); userLon = Number(co.longitude ?? 0); }
-                    }
-                    let minDist = Number.POSITIVE_INFINITY;
-                    for (const m of cityMatches) {
-                      const d = (m.lat - userLat) ** 2 + (m.lon - userLon) ** 2;
-                      if (d < minDist) { minDist = d; best = m; }
-                    }
-                  }
-                  foundCityCountry = best.country;
-                  foundCityState = best.state;
-                  foundCityName = best.city;
-                  finalKeyword = "";
-                }
-              }
-
-              // 4. Build path-based URL
-              setSubcategory("");
-              const newCat = detectedCategory || "";
-              if (newCat) setCategory(newCat as (typeof categories)[number]); else setCategory("All");
-
-              let destCountry = selectedCountry;
-              let destState = selectedState;
-              let destCity = selectedCity;
-
-              if (parsed.state) {
-                destCountry = "US"; destState = parsed.state;
-                destCity = parsed.city ?? "";
-              } else if (detectedCountryCode) {
-                destCountry = detectedCountryCode; destState = ""; destCity = "";
-              } else if (foundCityCountry) {
-                destCountry = foundCityCountry; destState = foundCityState; destCity = foundCityName;
-              }
-
-              const newPath = buildWallPath(destCountry, destState || undefined, destCity || undefined, newCat || undefined);
-              const next = new URLSearchParams(window.location.search);
-              next.delete("subcategory");
-              if (finalKeyword) { next.set("keyword", finalKeyword); setQuery(finalKeyword); }
-              else { next.delete("keyword"); if (!newCat || foundCityCountry) setQuery(""); }
-              const qs = next.toString();
-              router.push(`${newPath}${qs ? `?${qs}` : ""}`);
-            }} placeholder="Search ads by name, location or category" aria-label="Search advertisements" /></div>
-          <label className="filter-select">Browse<select value={category} onChange={(event) => {
-              const val = event.target.value as (typeof categories)[number];
-              setCategory(val); setSubcategory("");
-              const next = new URLSearchParams(window.location.search);
-              next.delete("subcategory");
-              const qs = next.toString();
-              const target = val === "All" ? locationBasePath : `${locationBasePath}/${toCategorySlug(val)}`;
-              router.push(`${target}${qs ? `?${qs}` : ""}`);
-            }}>{categories.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown /></label>
-          {category !== "All" ? <label className="filter-select">Type<select value={subcategory} onChange={(event) => {
-              const val = event.target.value;
-              setSubcategory(val);
-              const next = new URLSearchParams(window.location.search);
-              if (val) next.set("subcategory", val); else next.delete("subcategory");
-              router.replace(`${pathname}?${next.toString()}`);
-            }}><option value="">All types</option>{SUBCATEGORY_OPTIONS[category as CardCategory].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select><ChevronDown /></label> : null}
+                    </select>
+                  </label>
+                  <label className="filter-panel-label">
+                    Sort by
+                    <select value={pendingSortBy} onChange={(event) => setPendingSortBy(event.target.value as typeof sortBy)}>
+                      <option value="default">Default</option>
+                      <option value="most-viewed">Most viewed</option>
+                      <option value="most-reviews">Most reviews</option>
+                    </select>
+                  </label>
+                  <div className="filter-panel-toggles">
+                    <label className="filter-panel-toggle">
+                      <input type="checkbox" checked={pendingFresh} onChange={(event) => setPendingFresh(event.target.checked)} />
+                      <span>Newest first</span>
+                    </label>
+                    <label className="filter-panel-toggle">
+                      <input type="checkbox" checked={pendingHasWebsite} onChange={(event) => setPendingHasWebsite(event.target.checked)} />
+                      <span>Has website</span>
+                    </label>
+                    <label className="filter-panel-toggle">
+                      <input type="checkbox" checked={pendingHasPhotos} onChange={(event) => setPendingHasPhotos(event.target.checked)} />
+                      <span>Has photos</span>
+                    </label>
+                    <label className="filter-panel-toggle filter-featured-toggle">
+                      <input type="checkbox" checked={pendingFeaturedOnly} onChange={(event) => setPendingFeaturedOnly(event.target.checked)} />
+                      <span>⭐ Featured only</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="filter-panel-footer">
+                  <button className="primary" onClick={() => {
+                    setCategory(pendingCategory);
+                    setSubcategory(pendingSubcategory);
+                    setFresh(pendingFresh);
+                    setSortBy(pendingSortBy);
+                    setFilterHasWebsite(pendingHasWebsite);
+                    setFilterHasPhotos(pendingHasPhotos);
+                    setFilterFeaturedOnly(pendingFeaturedOnly);
+                    const next = new URLSearchParams(window.location.search);
+                    if (pendingSubcategory) next.set("subcategory", pendingSubcategory); else next.delete("subcategory");
+                    next.delete("neighborhood");
+                    const target = pendingCategory === "All" ? locationBasePath : `${locationBasePath}/${toCategorySlug(pendingCategory)}`;
+                    const qs = next.toString();
+                    router.push(`${target}${qs ? `?${qs}` : ""}`);
+                    setFilterOpen(false);
+                  }}>Apply filters</button>
+                  {((category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)) > 0 && (
+                    <button className="filter-clear-btn" onClick={() => {
+                      setCategory("All"); setSubcategory(""); setSelectedNeighborhood(""); setFresh(false);
+                      setSortBy("default"); setFilterHasWebsite(false); setFilterHasPhotos(false); setFilterFeaturedOnly(false);
+                      const next = new URLSearchParams(window.location.search);
+                      next.delete("subcategory"); next.delete("neighborhood");
+                      const qs = next.toString();
+                      router.push(`${locationBasePath}${qs ? `?${qs}` : ""}`);
+                      setFilterOpen(false);
+                    }}>Clear all</button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           <button onClick={shareWall}><Link2 />{shareNotice ? "Copied!" : "Share"}</button>
           {ownerCards ? <button onClick={() => { setDashboard(true); setMobileMenu(false); }}><LayoutDashboard /> My cards</button> : null}
           {isAdmin && onOpenAdmin ? <button className="admin-nav-button" onClick={() => { onOpenAdmin(); setMobileMenu(false); }}><ShieldCheck /> Admin</button> : null}
@@ -991,50 +1000,6 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         <button className="primary post-button" onClick={openComposer}><Plus />Post your card</button>
         <button className="icon-btn mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label={mobileMenu ? "Close menu" : "Open menu"} aria-expanded={mobileMenu}><Menu /></button>
       </header>
-      {locationDropdown ? (
-        <div className="location-dropdown-backdrop" onClick={() => setLocationDropdown(false)}>
-          <div className="location-dropdown" onClick={(e) => e.stopPropagation()}>
-            <div className="location-dropdown-header">
-              <strong>Choose your location</strong>
-              <button className="icon-btn" onClick={() => setLocationDropdown(false)} aria-label="Close"><X /></button>
-            </div>
-            <div className="location-dropdown-body">
-              <label>Country<select value={selectedCountry} onChange={(event) => {
-                setSelectedCountry(event.target.value);
-                setSelectedState("");
-                setSelectedCity("");
-              }}>
-                {Country.getAllCountries().map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}
-              </select></label>
-              {hasStateOptions ? (
-                <label>State<select value={selectedState} onChange={(event) => {
-                  setSelectedState(event.target.value);
-                  setSelectedCity("");
-                  setSelectedNeighborhood("");
-                }}>
-                  <option value="">— All states —</option>
-                  {availableStates.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}
-                </select></label>
-              ) : null}
-              {hasCityOptions ? (
-                <label>City<select value={selectedCity} onChange={(event) => { setSelectedCity(event.target.value); setSelectedNeighborhood(""); }}>
-                  <option value="">— All cities —</option>
-                  {availableCities.map((city) => <option key={`${city.name}-${city.latitude}-${city.longitude}`} value={city.name}>{city.name}</option>)}
-                </select></label>
-              ) : null}
-              {selectedCity ? (
-                <label>Neighborhood (optional)<input type="text" value={selectedNeighborhood} onChange={(event) => setSelectedNeighborhood(event.target.value)} placeholder="e.g. Downtown, Williamsburg" /></label>
-              ) : null}
-            </div>
-            {locationNotice ? <div className="location-dropdown-notice">{locationNotice}</div> : null}
-            <div className="location-dropdown-actions">
-              <button type="button" className="secondary" onClick={useMyLocation}>Use my location</button>
-              <button type="button" className="secondary" onClick={resetToDefault}>Reset wall</button>
-              <button type="button" className="primary location-dropdown-select" onClick={() => applyLocation(selectedCountry, selectedState, selectedCity)}>Apply location</button>
-            </div>
-          </div>
-        </div>
-      ) : null}
       {MAP_ENABLED && mapPickerOpen ? (
         <div className="map-picker-backdrop" onClick={() => setMapPickerOpen(false)}>
           <div className="map-picker-dialog" onClick={(e) => e.stopPropagation()}>

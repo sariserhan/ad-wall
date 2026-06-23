@@ -83,7 +83,7 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
 
   return (
     <article
-      className={`wall-card theme-${displayTheme} ${card.imageMode === "business-card" && cardImage ? "image-business-card" : ""} ${active ? "is-active" : ""} ${ownerDraggable ? "is-owner-card" : ""} ${dragging ? "is-owner-dragging" : ""}`}
+      className={`wall-card theme-${displayTheme} ${card.imageMode === "business-card" && cardImage ? "image-business-card" : ""} ${active ? "is-active" : ""} ${ownerDraggable ? "is-owner-card" : ""} ${dragging ? "is-owner-dragging" : ""} ${card.featuredTier ? `featured-${card.featuredTier}` : ""}`}
       style={style}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -104,6 +104,8 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
       aria-label={ownerDraggable ? `Your advertisement for ${card.name}. Drag to reposition or activate to open.` : `Open advertisement for ${card.name}`}
     >
       <span className="card-tape" aria-hidden="true" />
+      {card.featuredTier === "gold" ? <span className="featured-ribbon" aria-label="Featured Gold">⭐ Featured</span> : null}
+      {card.featuredTier === "silver" || card.featuredTier === "bronze" ? <span className="featured-badge" aria-label={`Featured ${card.featuredTier}`}>⭐</span> : null}
       <div className="card-copy">
         <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
         <h2>{card.name}</h2>

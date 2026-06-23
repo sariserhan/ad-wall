@@ -31,8 +31,11 @@ export const completePaidCard = internalMutation({
     const owner = await ctx.db.get(pending.ownerId);
     if (!owner || owner.tokenIdentifier !== args.tokenIdentifier) throw new Error("You can only complete your own card.");
     if (owner.blockedAt) throw new Error("Your account is blocked by WALL admin. Contact support for help.");
-    if (pending.paidAmount !== args.paidAmount || !packageDurations[args.paidAmount]) throw new Error("The verified payment does not match this card.");
+    if (pending.paidAmount !== args.paidAmount) throw new Error("The verified payment does not match this card.");
     const payload = pending.payload;
+    const basePaidAmount = typeof payload.basePaidAmount === "number" ? payload.basePaidAmount : args.paidAmount;
+    if (!packageDurations[basePaidAmount]) throw new Error("The payment amount is invalid.");
+    const featuredTier = payload.featuredTier as "bronze" | "silver" | "gold" | undefined;
     const createdAt = Date.now();
     const cardId = await ctx.db.insert("cards", {
       ownerId: pending.ownerId,
@@ -67,8 +70,10 @@ export const completePaidCard = internalMutation({
       width: payload.width,
       zIndex: createdAt,
       status: "published",
-      paidAmount: args.paidAmount,
-      expiresAt: createdAt + packageDurations[args.paidAmount],
+      paidAmount: basePaidAmount,
+      featuredTier,
+      reviewCount: 0,
+      expiresAt: createdAt + packageDurations[basePaidAmount],
       positionLockedAt: createdAt,
       updatedAt: createdAt,
       createdAt,
@@ -83,7 +88,7 @@ export const completePaidCard = internalMutation({
       Promise.all(imageIds.map((imageId) => ctx.storage.getUrl(imageId))),
       Promise.all(thumbnailImageIds.map((imageId) => ctx.storage.getUrl(imageId))),
     ]);
-    return { id: cardId, ...payload, ownerId: pending.ownerId, images: urls.filter((url): url is string => url !== null), thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null), zIndex: createdAt, status: "published" as const, expiresAt: createdAt + packageDurations[args.paidAmount], positionLockedAt: createdAt, updatedAt: createdAt, createdAt, clicks: 0 };
+    return { id: cardId, ...payload, ownerId: pending.ownerId, images: urls.filter((url): url is string => url !== null), thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null), zIndex: createdAt, status: "published" as const, paidAmount: basePaidAmount, featuredTier, reviewCount: 0, expiresAt: createdAt + packageDurations[basePaidAmount], positionLockedAt: createdAt, updatedAt: createdAt, createdAt, clicks: 0 };
   },
 });
 

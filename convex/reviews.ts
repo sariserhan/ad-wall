@@ -85,6 +85,7 @@ export const upsert = mutation({
         createdAt: now,
         updatedAt: now,
       });
+      await ctx.db.patch(card._id, { reviewCount: (card.reviewCount ?? 0) + 1 });
     }
   },
 });
@@ -100,6 +101,10 @@ export const remove = mutation({
       .query("reviews")
       .withIndex("by_user_and_card", (q) => q.eq("userId", user._id).eq("cardId", args.cardId))
       .unique();
-    if (existing) await ctx.db.delete(existing._id);
+    if (existing) {
+      await ctx.db.delete(existing._id);
+      const card = await ctx.db.get(args.cardId);
+      if (card) await ctx.db.patch(card._id, { reviewCount: Math.max(0, (card.reviewCount ?? 0) - 1) });
+    }
   },
 });

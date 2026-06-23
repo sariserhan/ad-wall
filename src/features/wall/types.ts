@@ -109,6 +109,8 @@ export interface WallCard {
   paidAmount?: number;
   expiresAt?: number;
   clicks?: number;
+  featuredTier?: "bronze" | "silver" | "gold";
+  reviewCount?: number;
 }
 
 export interface OwnerCard extends WallCard {
@@ -152,6 +154,7 @@ export interface CardDraft {
   theme: CardTheme;
   imageMode: CardImageMode;
   paymentOption: "free" | "2.99" | "7.99" | "24.99";
+  featuredTier: "none" | "bronze" | "silver" | "gold";
   files: File[];
   previews: string[];
 }

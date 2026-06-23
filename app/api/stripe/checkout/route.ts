@@ -6,7 +6,20 @@ import { isSameOriginRequest, rateLimit } from "../../_rate-limit";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
-const paidAmounts = new Set([2.99, 7.99, 24.99]);
+// Validate using integer cents to avoid floating-point matching issues.
+// Valid base durations: free (0), $2.99, $7.99, $24.99
+// Valid featured add-ons: none (0), Bronze $2.99, Silver $4.99, Gold $9.99
+const validBaseCents = [0, 299, 799, 2499];
+const validFeaturedCents = [0, 299, 499, 999];
+const validAmountCents = new Set<number>();
+for (const base of validBaseCents) {
+  for (const feat of validFeaturedCents) {
+    if (base + feat > 0) validAmountCents.add(base + feat);
+  }
+}
+function isValidAmount(amount: number) {
+  return validAmountCents.has(Math.round(amount * 100));
+}
 
 function json(body: unknown, status = 200) {
   return Response.json(body, { status });
@@ -32,7 +45,7 @@ export async function POST(request: NextRequest) {
     const renewalPayload = body?.renewalPayload;
     if (renewalPayload) {
       const paidAmount = Number(renewalPayload.paidAmount);
-      if (!paidAmounts.has(paidAmount) || typeof renewalPayload.cardId !== "string") {
+      if (!isValidAmount(paidAmount) || typeof renewalPayload.cardId !== "string") {
         return json({ error: "Invalid renewal request." }, 400);
       }
 
@@ -64,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     const pendingCardId = body?.pendingCardId;
     const paidAmount = Number(body?.paidAmount);
-    if (typeof pendingCardId !== "string" || !paidAmounts.has(paidAmount)) {
+    if (typeof pendingCardId !== "string" || !isValidAmount(paidAmount)) {
       return json({ error: "Invalid paid card request." }, 400);
     }
 

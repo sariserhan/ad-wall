@@ -160,6 +160,8 @@ export const listPublished = query({
         paidAmount: card.paidAmount,
         expiresAt: card.expiresAt,
         clicks: card.clicks,
+        featuredTier: card.featuredTier,
+        reviewCount: card.reviewCount ?? 0,
       };
     }));
   },
@@ -214,6 +216,8 @@ export const getPublishedById = query({
       paidAmount: card.paidAmount,
       expiresAt: card.expiresAt,
       clicks: stats?.clicks ?? card.clicks,
+      featuredTier: card.featuredTier,
+      reviewCount: card.reviewCount ?? 0,
     };
   },
 });
@@ -498,6 +502,7 @@ export const create = mutation({
     tiktok: v.optional(v.string()),
     linkedin: v.optional(v.string()),
     paidAmount: v.number(),
+    featuredTier: v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold"))),
     theme,
     imageMode: v.optional(imageMode),
     imageIds: v.array(v.id("_storage")),
@@ -511,6 +516,9 @@ export const create = mutation({
     const identity = await requireIdentity(ctx);
     const phone = args.phone?.trim() ?? "";
     const email = args.email?.trim() ?? "";
+    const featuredPrices: Record<string, number> = { bronze: 2.99, silver: 4.99, gold: 9.99 };
+    const featuredPaidAmount = args.featuredTier ? (featuredPrices[args.featuredTier] ?? 0) : 0;
+    const totalPaidAmount = args.paidAmount + featuredPaidAmount;
     if (args.imageIds.length > 2) throw new Error("A card can have at most two images.");
     if (args.thumbnailImageIds && args.thumbnailImageIds.length !== args.imageIds.length) throw new Error("Each full image needs a matching thumbnail.");
     if (args.imageMode === "business-card" && args.imageIds.length !== 1) throw new Error("A finished business card needs exactly one image.");
@@ -574,12 +582,14 @@ export const create = mutation({
       tiktok: args.tiktok?.trim() || undefined,
       linkedin: args.linkedin?.trim() || undefined,
       width: cardWidth,
+      basePaidAmount: args.paidAmount,
+      featuredTier: args.featuredTier,
     };
-    if (args.paidAmount > 0) {
+    if (totalPaidAmount > 0) {
       const pendingCardId = await ctx.db.insert("pendingCards", {
         ownerId: user._id,
         payload: normalizedPayload,
-        paidAmount: args.paidAmount,
+        paidAmount: totalPaidAmount,
         status: "pending",
         createdAt,
         expiresAt: createdAt + 2 * 60 * 60 * 1000,
@@ -622,6 +632,8 @@ export const create = mutation({
       zIndex,
       status: "published",
       paidAmount: args.paidAmount,
+      featuredTier: args.featuredTier,
+      reviewCount: 0,
       expiresAt,
       positionLockedAt: createdAt,
       updatedAt: createdAt,
@@ -670,6 +682,8 @@ export const create = mutation({
       updatedAt: createdAt,
       createdAt,
       paidAmount: args.paidAmount,
+      featuredTier: args.featuredTier,
+      reviewCount: 0,
       expiresAt,
       clicks: 0,
     };

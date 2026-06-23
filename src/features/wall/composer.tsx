@@ -13,7 +13,7 @@ interface ComposerProps {
 
 interface ComposerForm {
   name: string;
-  category: CardCategory;
+  category: CardCategory | "";
   subcategory: string;
   line: string;
   message: string;
@@ -35,6 +35,7 @@ interface ComposerForm {
   theme: CardTheme;
   imageMode: CardImageMode;
   paymentOption: "free" | "2.99" | "7.99" | "24.99";
+  featuredTier: "none" | "bronze" | "silver" | "gold";
 }
 
 const countries = Country.getAllCountries();
@@ -46,7 +47,7 @@ const defaultCity = defaultCities[0]?.name ?? "";
 
 const initialForm: ComposerForm = {
   name: "",
-  category: "Services",
+  category: "",
   subcategory: "",
   line: "",
   message: "",
@@ -68,6 +69,7 @@ const initialForm: ComposerForm = {
   theme: "yellow",
   imageMode: "photo",
   paymentOption: "free",
+  featuredTier: "none",
 };
 
 const themeOptions: ReadonlyArray<{ theme: CardTheme; label: string; description: string }> = [
@@ -88,6 +90,13 @@ const paymentOptions: ReadonlyArray<{ value: ComposerForm["paymentOption"]; pric
   { value: "2.99", price: "$2.99", duration: "30 days", description: "Great for a quick local offer." },
   { value: "7.99", price: "$7.99", duration: "90 days", description: "Best for regular neighborhood services.", featured: true },
   { value: "24.99", price: "$24.99", duration: "365 days", description: "A full year on your local wall." },
+];
+
+const featuredTierOptions: ReadonlyArray<{ value: ComposerForm["featuredTier"]; price: string; label: string; perks: string[] }> = [
+  { value: "none", price: "", label: "No boost", perks: ["Normal card", "Appears in regular results"] },
+  { value: "bronze", price: "+$2.99", label: "Bronze", perks: ["⭐ Featured badge", "Gold border", "Appears before free listings"] },
+  { value: "silver", price: "+$4.99", label: "Silver", perks: ["Everything in Bronze", "Higher in search results", "Appears in Featured section"] },
+  { value: "gold", price: "+$9.99", label: "Gold", perks: ["Everything in Silver", "Pinned to top", "Homepage spotlight", "⭐ Featured ribbon"] },
 ];
 
 const stepLabels = ["Design", "Details", "Duration"] as const;
@@ -140,7 +149,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
     if (typeof window === "undefined") return { ...initialForm, country: baseCountry, state, city };
     try {
       const saved = JSON.parse(window.localStorage.getItem(DRAFT_STORAGE_KEY) ?? "null") as Partial<ComposerForm> | null;
-      return { ...initialForm, ...saved, country: baseCountry, state, city };
+      return { ...initialForm, ...saved, category: "", subcategory: "", country: baseCountry, state, city };
     } catch {
       return { ...initialForm, country: baseCountry, state, city };
     }
@@ -330,6 +339,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
     }
     onReady({
       ...form,
+      category: form.category as CardCategory,
       subcategory: form.subcategory,
       area: form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall",
       message: form.message.trim() || undefined,
@@ -343,6 +353,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
       facebook: form.facebook.trim() || undefined,
       tiktok: form.tiktok.trim() || undefined,
       linkedin: form.linkedin.trim() || undefined,
+      featuredTier: form.featuredTier,
       files,
       previews,
     });
@@ -364,9 +375,9 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
         });
       }}>
         <header>
-          <button type="button" className="icon-btn" onClick={step > 1 ? () => setStep((current) => current - 1) : onClose} aria-label={step > 1 ? "Back" : "Close"}>{step > 1 ? <ArrowLeft /> : <X />}</button>
+          <button type="button" className="icon-btn" onClick={() => setStep((current) => current - 1)} aria-label="Back" style={{ visibility: step > 1 ? "visible" : "hidden" }}><ArrowLeft /></button>
           <div><span>{stepLabels[step - 1]}</span><small>POST A CARD · STEP {step} OF 3</small></div>
-          <span className="step-count">0{step}</span>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close"><X /></button>
         </header>
         <div className="composer-progress" aria-label={`Step ${step} of 3: ${stepLabels[step - 1]}`}>
           {stepLabels.map((label, index) => {
@@ -393,14 +404,13 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
             {Object.keys(fieldErrors).length ? <div className="validation-summary" role="alert"><strong>Fix these details to continue</strong>{(Object.keys(fieldErrors) as DetailField[]).map((field) => <button type="button" key={field} onClick={() => (formRef.current?.elements.namedItem(field) as HTMLElement | null)?.focus()}><span>{detailFieldLabels[field]}</span>{fieldErrors[field]}</button>)}</div> : null}
             <label>Business or service<input name="name" required maxLength={60} autoFocus value={form.name} onChange={(event) => setForm((value) => ({ ...value, name: event.target.value }))} placeholder="What should the wall call you?" />{fieldError("name")}</label>
             <div className="form-grid">
-              <label>Category<select value={form.category} onChange={(event) => setForm((value) => ({ ...value, category: event.target.value as CardCategory, subcategory: "" }))}>{categories.slice(1).map((category) => <option key={category}>{category}</option>)}</select></label>
-              <label>Subcategory<select required value={form.subcategory} onChange={(event) => setForm((value) => ({ ...value, subcategory: event.target.value }))}><option value="" disabled>— Select a type —</option>{SUBCATEGORY_OPTIONS[form.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></label>
+              <label>Category<select required value={form.category} onChange={(event) => setForm((value) => ({ ...value, category: event.target.value as CardCategory, subcategory: "" }))}><option value="" disabled>— Select a category —</option>{categories.slice(1).map((cat) => <option key={cat}>{cat}</option>)}</select></label>
+              <label>Subcategory<select required value={form.subcategory} disabled={!form.category} onChange={(event) => setForm((value) => ({ ...value, subcategory: event.target.value }))}><option value="" disabled>— Select a type —</option>{form.category ? SUBCATEGORY_OPTIONS[form.category as CardCategory].map((sub) => <option key={sub} value={sub}>{sub}</option>) : null}</select></label>
               <label>Posting on selected wall<input value={`${form.city}${form.state ? `, ${form.state}` : ""}${form.country ? `, ${form.country}` : ""}`} readOnly aria-readonly /></label>
             </div>
             <div className="form-grid">
               <label>Neighborhood<input name="area" maxLength={50} value={form.area} onChange={(event) => setForm((value) => ({ ...value, area: event.target.value }))} placeholder="Optional" />{fieldError("area")}</label>
               <label>Zip code<input name="zipcode" maxLength={20} value={form.zipcode} onChange={(event) => setForm((value) => ({ ...value, zipcode: event.target.value }))} placeholder="Optional" />{fieldError("zipcode")}</label>
-              <label>Sub-neighborhood <span>(optional)</span><input name="neighborhood" maxLength={50} value={form.neighborhood} onChange={(event) => setForm((value) => ({ ...value, neighborhood: event.target.value }))} placeholder="District, quarter, etc." /></label>
             </div>
             <label>Subtitle<textarea name="line" required maxLength={90} value={form.line} onChange={(event) => setForm((value) => ({ ...value, line: event.target.value }))} placeholder="Short line shown on the card." />{fieldError("line")}</label>
             <label>Message <span>(optional)</span><textarea name="message" maxLength={300} aria-describedby="message-safety" value={form.message} onChange={(event) => setForm((value) => ({ ...value, message: event.target.value }))} placeholder="Longer details shown when someone opens the card." />{fieldError("message")}<small id="message-safety" className="safety-hint">Messages are checked for adult and unsafe content before publishing.</small>{step === 2 && moderationError ? <small className="field-error" role="alert">{moderationError}</small> : null}{moderationMatches.length ? <span className="flagged-terms">Flagged: {moderationMatches.map((match) => <mark key={`${match.field}-${match.start}`}>{match.field}: {match.term}</mark>)}</span> : null}</label>
@@ -415,7 +425,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
               <label>Website<input name="website" type="text" inputMode="url" maxLength={240} value={form.website} onChange={(event) => setForm((value) => ({ ...value, website: event.target.value }))} placeholder="example.com" />{fieldError("website")}</label>
               <label>Google Maps location <span>(optional)</span><input name="location" type="text" maxLength={300} value={form.location} onChange={(event) => setForm((value) => ({ ...value, location: event.target.value }))} placeholder="Address or Google Maps link" />{fieldError("location")}<small className="field-help">Share only a public business or meeting location.</small></label>
             </fieldset>
-            <fieldset>
+            <fieldset style={{ paddingBottom: "20px" }}>
               <legend>Social media <span>(optional)</span></legend>
               <div className="form-grid social-fields">
                 <label>Instagram<input name="instagram" maxLength={240} value={form.instagram} onChange={(event) => setForm((value) => ({ ...value, instagram: event.target.value }))} placeholder="@yourbusiness" />{fieldError("instagram")}</label>
@@ -501,7 +511,30 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
                     <span className="payment-price">{option.price}</span>
                     <span className="payment-duration"><Clock3 /> {option.duration}</span>
                     <small>{option.description}</small>
-                    <span className="payment-select">{form.paymentOption === option.value ? <><Check /> Selected</> : "Select"}</span>
+                    <span className="payment-select">{form.paymentOption === option.value ? "Selected" : "Select"}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset className="featured-tier-fieldset">
+              <legend>Boost your listing <span>(optional)</span></legend>
+              <div className="featured-tier-options" role="radiogroup" aria-label="Choose a featured tier">
+                {featuredTierOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={form.featuredTier === option.value}
+                    className={`featured-tier-option featured-tier-${option.value} ${form.featuredTier === option.value ? "selected" : ""}`}
+                    onClick={() => setForm((value) => ({ ...value, featuredTier: option.value }))}
+                  >
+                    <span className="featured-tier-header">
+                      <strong>{option.label}</strong>
+                      {option.price ? <span className="featured-tier-price">{option.price}</span> : null}
+                    </span>
+                    <ul className="featured-tier-perks">
+                      {option.perks.map((perk) => <li key={perk}>{perk}</li>)}
+                    </ul>
                   </button>
                 ))}
               </div>
