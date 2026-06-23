@@ -3,6 +3,8 @@ import type { NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { durableUserRateLimit } from "../../_distributed-rate-limit";
 import { isSameOriginRequest, rateLimit } from "../../_rate-limit";
+import { log } from "@/lib/logger";
+import { observe } from "../../_observe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
@@ -25,7 +27,7 @@ function json(body: unknown, status = 200) {
   return Response.json(body, { status });
 }
 
-export async function POST(request: NextRequest) {
+async function handleCheckout(request: NextRequest): Promise<Response> {
   if (!isSameOriginRequest(request)) return json({ error: "Cross-site checkout requests are not allowed." }, 403);
   const contentLength = Number(request.headers.get("content-length") ?? 0);
   if (contentLength > 8 * 1024) return json({ error: "Checkout request is too large." }, 413);
@@ -107,7 +109,15 @@ export async function POST(request: NextRequest) {
     return json({ url: session.url, sessionId: session.id });
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "Stripe checkout could not be started.";
-    console.error("Stripe checkout error", cause);
+    log({
+      event: "checkout.failure",
+      level: "error",
+      error: message,
+      stripeCode: cause instanceof Stripe.errors.StripeError ? cause.code : undefined,
+      type: cause instanceof Stripe.errors.StripeError ? cause.type : undefined,
+    });
     return json({ error: message }, 500);
   }
 }
+
+export const POST = observe("/api/stripe/checkout", handleCheckout);

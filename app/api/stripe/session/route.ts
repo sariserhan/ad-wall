@@ -1,10 +1,12 @@
 import Stripe from "stripe";
 import type { NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { log } from "@/lib/logger";
+import { observe } from "../../_observe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
-export async function GET(request: NextRequest) {
+async function handleSession(request: NextRequest): Promise<Response> {
   const { userId } = await auth();
   if (!userId) return Response.json({ success: false, error: "Sign in to verify checkout." }, { status: 401 });
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -27,7 +29,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to retrieve Stripe session.";
-    console.error("Stripe session verification error", error);
+    log({
+      event: "checkout.session_error",
+      level: "error",
+      error: message,
+      stripeCode: error instanceof Stripe.errors.StripeError ? error.code : undefined,
+    });
     return Response.json({ success: false, error: message }, { status: 500 });
   }
 }
+
+export const GET = observe("/api/stripe/session", handleSession);

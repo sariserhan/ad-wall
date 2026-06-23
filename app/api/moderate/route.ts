@@ -6,6 +6,8 @@ import { createWorker, type Worker } from "tesseract.js";
 import { auth } from "@clerk/nextjs/server";
 import { durableUserRateLimit } from "../_distributed-rate-limit";
 import { isSameOriginRequest, rateLimit } from "../_rate-limit";
+import { log } from "@/lib/logger";
+import { observe } from "../_observe";
 
 export const runtime = "nodejs";
 
@@ -85,15 +87,22 @@ async function moderateImage(image: File, imageIndex: number) {
     .resize({ width: 2000, height: 2000, fit: "inside", withoutEnlargement: true })
     .jpeg({ quality: 82 })
     .toBuffer();
-  const [visual, extractedText] = await Promise.all([classifyImage(buffer), readImageText(ocrImage)]);
+
+  const t0 = performance.now();
+  const [visualResult, ocrResult] = await Promise.all([
+    (async () => { const t = performance.now(); const r = await classifyImage(buffer); return { r, ms: Math.round(performance.now() - t) }; })(),
+    (async () => { const t = performance.now(); const r = await readImageText(ocrImage); return { r, ms: Math.round(performance.now() - t) }; })(),
+  ]);
+  void t0;
+
   const flags: Array<{ image: number; label: string; score?: number }> = [];
-  if (visual.adult >= 0.6) flags.push({ image: imageIndex + 1, label: "adult or sexual content", score: visual.adult });
-  if (visual.gore >= 0.55) flags.push({ image: imageIndex + 1, label: "violent or gory content", score: visual.gore });
-  if (findBlockedText("image", extractedText).length > 0) flags.push({ image: imageIndex + 1, label: "abusive, hateful, or racist text" });
-  return flags;
+  if (visualResult.r.adult >= 0.6) flags.push({ image: imageIndex + 1, label: "adult or sexual content", score: visualResult.r.adult });
+  if (visualResult.r.gore >= 0.55) flags.push({ image: imageIndex + 1, label: "violent or gory content", score: visualResult.r.gore });
+  if (findBlockedText("image", ocrResult.r).length > 0) flags.push({ image: imageIndex + 1, label: "abusive, hateful, or racist text" });
+  return { flags, classifyMs: visualResult.ms, ocrMs: ocrResult.ms };
 }
 
-export async function POST(request: NextRequest) {
+async function handleModerate(request: NextRequest): Promise<Response> {
   if (!isSameOriginRequest(request)) return Response.json({ safe: false, error: "Cross-site moderation requests are not allowed." }, { status: 403 });
   const contentLength = Number(request.headers.get("content-length") ?? 0);
   if (contentLength > MAX_REQUEST_BYTES) return Response.json({ safe: false, error: "The moderation request is too large." }, { status: 413 });
@@ -114,8 +123,12 @@ export async function POST(request: NextRequest) {
   if (name.length > 60 || line.length > 90 || message.length > 300) return Response.json({ safe: false, error: "Card text is too long." }, { status: 400 });
   const images = formData.getAll("images").filter((value): value is File => value instanceof File);
   if (images.length > 2) return Response.json({ safe: false, error: "A card can include at most two images." }, { status: 400 });
+
+  const textStart = performance.now();
   const matches = [...findBlockedText("name", name), ...findBlockedText("line", line), ...findBlockedText("message", message)];
+  const textMs = Math.round(performance.now() - textStart);
   if (matches.length > 0) {
+    log({ event: "moderation.blocked", reason: "text", textMs, hasImages: images.length > 0 });
     return Response.json({ safe: false, error: "Remove the highlighted profanity or adult content before continuing.", matches }, { status: 422 });
   }
 
@@ -132,16 +145,22 @@ export async function POST(request: NextRequest) {
   if (images.length > 0) activeImageRequests += 1;
   try {
     const results = await Promise.all(images.map(moderateImage));
-    const blocked = results.flat();
+    const totalClassifyMs = results.reduce((s, r) => s + r.classifyMs, 0);
+    const totalOcrMs = results.reduce((s, r) => s + r.ocrMs, 0);
+    const blocked = results.flatMap((r) => r.flags);
     if (blocked.length > 0) {
       const categories = [...new Set(blocked.map(({ label }) => label))];
+      log({ event: "moderation.blocked", reason: "image", textMs, classifyMs: totalClassifyMs, ocrMs: totalOcrMs, imageCount: images.length });
       return Response.json({ safe: false, error: `Image blocked for: ${categories.join(", ")}.`, imageFlags: blocked }, { status: 422 });
     }
+    log({ event: "moderation.complete", safe: true, textMs, classifyMs: totalClassifyMs, ocrMs: totalOcrMs, imageCount: images.length });
     return Response.json({ safe: true, mode: "local" });
   } catch (cause) {
-    console.error("Local image moderation failed", cause);
+    log({ event: "moderation.error", level: "error", error: cause instanceof Error ? cause.message : String(cause), imageCount: images.length });
     return Response.json({ safe: false, error: "The local image safety check could not run. Please try another image." }, { status: 503 });
   } finally {
     if (images.length > 0) activeImageRequests -= 1;
   }
 }
+
+export const POST = observe("/api/moderate", handleModerate);
