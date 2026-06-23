@@ -13,7 +13,7 @@ import "@fontsource/inter/800.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LocalWall — Your city's community board",
+  title: "LocalWall — Your Local Bulletin Board",
   description: "Find and post local ads for services, jobs, real estate, and more in your city.",
 };
 

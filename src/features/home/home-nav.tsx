@@ -1,7 +1,6 @@
 "use client";
 
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
-import Image from "next/image";
 import Link from "next/link";
 
 export function HomeNav() {
@@ -9,14 +8,8 @@ export function HomeNav() {
   return (
     <header className="home-nav">
       <Link href="/" className="home-nav-brand">
-        <Image
-          src="/assets/logo-small.png"
-          alt="LocalWall"
-          width={1916}
-          height={821}
-          style={{ height: 40, width: "auto" }}
-          priority
-        />
+        <strong>LocalWall</strong>
+        <small>your local bulletin board</small>
       </Link>
       <nav className="home-nav-right">
         <Link href="/us" className="home-nav-link">Browse ads</Link>

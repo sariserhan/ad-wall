@@ -846,7 +846,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   return (
     <main className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={resetFilters}>LOCAL WALL<span>YOUR CITY'S COMMUNITY BOARD</span></button>
+        <button className="brand" onClick={resetFilters}>LocalWall<span>your local bulletin board</span></button>
         <div className="location-wrap">
           <button className="location" onClick={() => { if (locationReady) setLocationDropdown(!locationDropdown); }} aria-expanded={locationDropdown}>
             <MapPin />

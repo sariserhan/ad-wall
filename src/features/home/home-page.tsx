@@ -210,7 +210,7 @@ export async function HomePage() {
         <section className="home-hero">
           <div className="home-hero-inner">
             <div className="home-hero-text">
-              <h1 className="home-hero-title">Your city's community wall</h1>
+              <h1 className="home-hero-title">Your local bulletin wall</h1>
               <p className="home-hero-subtitle">
                 Find and post local ads for services, jobs, real estate, and everything in between.
               </p>
