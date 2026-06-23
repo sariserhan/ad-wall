@@ -746,6 +746,27 @@ export const recordEvent = mutation({
   },
 });
 
+export const recordSearch = mutation({
+  args: {
+    keyword: v.optional(v.string()),
+    category: v.optional(v.string()),
+    country: v.string(),
+    state: v.string(),
+    city: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("searchEvents", {
+      keyword: args.keyword?.trim().slice(0, 100) || undefined,
+      category: args.category && args.category !== "All" ? args.category.slice(0, 60) : undefined,
+      country: args.country.slice(0, 10),
+      state: args.state.slice(0, 50),
+      city: args.city.slice(0, 100),
+      createdAt: Date.now(),
+    });
+    return null;
+  },
+});
+
 export const report = mutation({
   args: { cardId: v.id("cards"), reason: v.union(v.literal("spam"), v.literal("scam"), v.literal("inappropriate"), v.literal("expired"), v.literal("other")), details: v.optional(v.string()) },
   handler: async (ctx, args) => {

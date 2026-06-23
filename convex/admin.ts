@@ -34,17 +34,37 @@ export const getDashboard = query({
   args: {},
   handler: async (ctx) => {
     await requireAdmin(ctx);
-    const [cards, users, reports] = await Promise.all([
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const [cards, users, reports, allCardStats, recentSearches] = await Promise.all([
       ctx.db.query("cards").order("desc").take(150),
       ctx.db.query("users").order("desc").take(150),
       ctx.db.query("reports").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(100),
+      ctx.db.query("cardStats").take(500),
+      ctx.db.query("searchEvents").withIndex("by_createdAt", (q) => q.gte("createdAt", thirtyDaysAgo)).order("desc").take(1000),
     ]);
+
     const userById = new Map(users.map((user) => [user._id, user]));
     const cardCountByUser = new Map<string, number>();
     for (const card of cards) {
       const ownerId = String(card.ownerId);
       cardCountByUser.set(ownerId, (cardCountByUser.get(ownerId) ?? 0) + 1);
     }
+    const statsMap = new Map(allCardStats.map((s) => [String(s.cardId), s]));
+
+    // Aggregate search terms over the last 30 days
+    const keywordCounts = new Map<string, number>();
+    const categoryCounts = new Map<string, number>();
+    for (const search of recentSearches) {
+      if (search.keyword) {
+        const kw = search.keyword.toLowerCase();
+        keywordCounts.set(kw, (keywordCounts.get(kw) ?? 0) + 1);
+      }
+      if (search.category) {
+        categoryCounts.set(search.category, (categoryCounts.get(search.category) ?? 0) + 1);
+      }
+    }
+    const topKeywords = [...keywordCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([keyword, count]) => ({ keyword, count }));
+    const topCategories = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([category, count]) => ({ category, count }));
 
     return {
       stats: {
@@ -52,9 +72,11 @@ export const getDashboard = query({
         published: cards.filter((card) => card.status === "published" && card.expiresAt > Date.now()).length,
         users: users.length,
         reports: reports.length,
+        searches: recentSearches.length,
       },
       cards: cards.map((card) => {
         const owner = userById.get(card.ownerId);
+        const stats = statsMap.get(String(card._id));
         return {
           id: card._id,
           name: card.name,
@@ -66,9 +88,18 @@ export const getDashboard = query({
           status: card.status === "published" && card.expiresAt <= Date.now() ? "expired" as const : card.status,
           ownerName: owner?.displayName,
           ownerEmail: owner?.email,
-          clicks: card.clicks,
+          clicks: stats?.clicks ?? card.clicks,
           expiresAt: card.expiresAt,
           createdAt: card.createdAt,
+          conversions: stats ? {
+            website: stats.websiteClicks,
+            phone: stats.phoneClicks,
+            email: stats.emailClicks,
+            social: stats.socialClicks,
+            saves: stats.saves,
+            shares: stats.shares,
+            total: stats.websiteClicks + stats.phoneClicks + stats.emailClicks + stats.socialClicks + stats.saves + stats.shares,
+          } : undefined,
         };
       }),
       users: users.map((user) => ({
@@ -84,6 +115,11 @@ export const getDashboard = query({
         const card = await ctx.db.get(report.cardId);
         return { id: report._id, cardId: report.cardId, cardName: card?.name ?? "Deleted card", reason: report.reason, details: report.details, createdAt: report.createdAt };
       })),
+      searchInsights: {
+        topKeywords,
+        topCategories,
+        total: recentSearches.length,
+      },
     };
   },
 });

@@ -171,4 +171,13 @@ export default defineSchema({
   })
     .index("by_card", ["cardId"])
     .index("by_status_and_createdAt", ["status", "createdAt"]),
+
+  searchEvents: defineTable({
+    keyword: v.optional(v.string()),
+    category: v.optional(v.string()),
+    country: v.string(),
+    state: v.string(),
+    city: v.string(),
+    createdAt: v.number(),
+  }).index("by_createdAt", ["createdAt"]),
 });

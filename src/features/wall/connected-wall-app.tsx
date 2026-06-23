@@ -359,7 +359,6 @@ export function ConnectedWallApp({
         }
       }}
       onCardEvent={(card, event) => {
-        if (event === "save") return;
         if (!String(card.id).startsWith("demo-")) void recordCardEvent({ cardId: card.id as Id<"cards">, event });
       }}
       onReportCard={async (card, reason, details) => {

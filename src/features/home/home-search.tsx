@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Crosshair, Loader2, MapPin, Search } from "lucide-react";
 import Link from "next/link";
@@ -57,6 +57,7 @@ async function resolveIpLocation(): Promise<ResolvedLoc | null> {
 
 export function HomeSearch() {
   const router = useRouter();
+  const recordSearch = useMutation(api.cards.recordSearch);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("All");
   const [locationInput, setLocationInput] = useState("");
@@ -158,6 +159,7 @@ export function HomeSearch() {
       }
     }
 
+    void recordSearch({ keyword: kw || undefined, category: category !== "All" ? category : undefined, country, state, city }).catch(() => {});
     const path = buildWallPath(country, state, city, category !== "All" ? category : undefined);
     const qs = kw ? `?keyword=${encodeURIComponent(kw)}` : "";
     router.push(`${path}${qs}`);

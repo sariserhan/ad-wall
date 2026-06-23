@@ -1,11 +1,11 @@
 "use client";
 
-import { AlertTriangle, Check, Eye, EyeOff, Flag, Mail, Search, Send, ShieldCheck, Trash2, UserRound, X } from "lucide-react";
+import { AlertTriangle, BarChart2, Check, Eye, EyeOff, Flag, Mail, Phone, Search, Send, ShieldCheck, Share2, Bookmark, ExternalLink, MapPin, Trash2, UserRound, X } from "lucide-react";
 import { useDeferredValue, useMemo, useState } from "react";
 import type { Id } from "../../../convex/_generated/dataModel";
 
 export interface AdminDashboardData {
-  stats: { cards: number; published: number; users: number; reports: number };
+  stats: { cards: number; published: number; users: number; reports: number; searches: number };
   cards: Array<{
     id: Id<"cards">;
     name: string;
@@ -20,6 +20,7 @@ export interface AdminDashboardData {
     clicks: number;
     expiresAt: number;
     createdAt: number;
+    conversions?: { website: number; phone: number; email: number; social: number; saves: number; shares: number; total: number };
   }>;
   users: Array<{
     id: Id<"users">;
@@ -31,6 +32,7 @@ export interface AdminDashboardData {
     cardCount: number;
   }>;
   reports: Array<{ id: Id<"reports">; cardId: Id<"cards">; cardName: string; reason: string; details?: string; createdAt: number }>;
+  searchInsights?: { topKeywords: Array<{ keyword: string; count: number }>; topCategories: Array<{ category: string; count: number }>; total: number };
 }
 
 interface AdminPanelProps {
@@ -49,7 +51,7 @@ function dateLabel(timestamp: number) {
 }
 
 export function AdminPanel({ data, onClose, onSetCardStatus, onDeleteCard, onBlockUser, onUnblockUser, onResolveReport, onSendTestEmail }: AdminPanelProps) {
-  const [tab, setTab] = useState<"cards" | "users" | "reports">("cards");
+  const [tab, setTab] = useState<"cards" | "users" | "reports" | "analytics">("cards");
   const [query, setQuery] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminDashboardData["cards"][number] | null>(null);
@@ -113,6 +115,7 @@ export function AdminPanel({ data, onClose, onSetCardStatus, onDeleteCard, onBlo
           <div><Eye /><span>Recent cards</span><strong>{data?.stats.cards ?? "—"}</strong></div>
           <div><UserRound /><span>Recent users</span><strong>{data?.stats.users ?? "—"}</strong></div>
           <div><Flag /><span>Open reports</span><strong>{data?.stats.reports ?? "—"}</strong></div>
+          <div><Search /><span>Searches (30d)</span><strong>{data?.stats.searches ?? "—"}</strong></div>
         </div>
 
         <div className="admin-tools">
@@ -149,8 +152,9 @@ export function AdminPanel({ data, onClose, onSetCardStatus, onDeleteCard, onBlo
             <button role="tab" aria-selected={tab === "cards"} className={tab === "cards" ? "selected" : ""} onClick={() => setTab("cards")}>Cards</button>
             <button role="tab" aria-selected={tab === "users"} className={tab === "users" ? "selected" : ""} onClick={() => setTab("users")}>Users</button>
             <button role="tab" aria-selected={tab === "reports"} className={tab === "reports" ? "selected" : ""} onClick={() => setTab("reports")}>Reports</button>
+            <button role="tab" aria-selected={tab === "analytics"} className={tab === "analytics" ? "selected" : ""} onClick={() => setTab("analytics")}><BarChart2 size={13} /> Analytics</button>
           </div>
-          <label className="admin-search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${tab}`} aria-label={`Search ${tab}`} /></label>
+          {tab !== "analytics" ? <label className="admin-search"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${tab}`} aria-label={`Search ${tab}`} /></label> : null}
         </div>
 
         {error ? <div className="dashboard-error" role="alert">{error}</div> : null}
@@ -167,6 +171,17 @@ export function AdminPanel({ data, onClose, onSetCardStatus, onDeleteCard, onBlo
                     <h3>{card.name}</h3>
                     <p>{card.line}</p>
                     <small>{card.ownerName || card.ownerEmail || "Unknown owner"} · {card.city}, {card.state || card.country} · {card.clicks} opens</small>
+                    {card.conversions && card.conversions.total > 0 ? (
+                      <div className="admin-conversions">
+                        {card.conversions.website > 0 ? <span title="Website clicks"><ExternalLink size={10} />{card.conversions.website}</span> : null}
+                        {card.conversions.phone > 0 ? <span title="Phone taps"><Phone size={10} />{card.conversions.phone}</span> : null}
+                        {card.conversions.email > 0 ? <span title="Email clicks"><Mail size={10} />{card.conversions.email}</span> : null}
+                        {card.conversions.social > 0 ? <span title="Social clicks"><MapPin size={10} />{card.conversions.social}</span> : null}
+                        {card.conversions.saves > 0 ? <span title="Saves"><Bookmark size={10} />{card.conversions.saves}</span> : null}
+                        {card.conversions.shares > 0 ? <span title="Shares"><Share2 size={10} />{card.conversions.shares}</span> : null}
+                        <span className="admin-conv-total">{card.conversions.total} conversions</span>
+                      </div>
+                    ) : null}
                   </div>
                   <div className="admin-row-actions admin-row-actions-wide">
                     <button className="secondary" disabled={!card.ownerEmail} onClick={() => sendMessage(card.ownerEmail, card.name)}><Mail /> Send message</button>
@@ -208,6 +223,61 @@ export function AdminPanel({ data, onClose, onSetCardStatus, onDeleteCard, onBlo
               </article>
             ))}
             {!users.length ? <div className="dashboard-empty">No users match this search.</div> : null}
+          </div>
+        ) : null}
+
+        {data && tab === "analytics" ? (
+          <div className="admin-analytics" role="tabpanel">
+            <div className="admin-analytics-section">
+              <h3>Top search keywords <span className="admin-analytics-period">(last 30 days)</span></h3>
+              {data.searchInsights && data.searchInsights.topKeywords.length > 0 ? (
+                <ol className="admin-analytics-list">
+                  {data.searchInsights.topKeywords.map(({ keyword, count }) => (
+                    <li key={keyword}>
+                      <span className="admin-analytics-term">{keyword}</span>
+                      <span className="admin-analytics-bar" style={{ width: `${Math.round((count / (data.searchInsights?.topKeywords[0]?.count ?? 1)) * 100)}%` }} />
+                      <span className="admin-analytics-count">{count}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : <p className="dashboard-empty">No keyword searches yet.</p>}
+            </div>
+            <div className="admin-analytics-section">
+              <h3>Top searched categories <span className="admin-analytics-period">(last 30 days)</span></h3>
+              {data.searchInsights && data.searchInsights.topCategories.length > 0 ? (
+                <ol className="admin-analytics-list">
+                  {data.searchInsights.topCategories.map(({ category, count }) => (
+                    <li key={category}>
+                      <span className="admin-analytics-term">{category}</span>
+                      <span className="admin-analytics-bar" style={{ width: `${Math.round((count / (data.searchInsights?.topCategories[0]?.count ?? 1)) * 100)}%` }} />
+                      <span className="admin-analytics-count">{count}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : <p className="dashboard-empty">No category searches yet.</p>}
+            </div>
+            <div className="admin-analytics-section">
+              <h3>Top converting cards</h3>
+              {data.cards.filter((c) => (c.conversions?.total ?? 0) > 0).length > 0 ? (
+                <ol className="admin-analytics-list">
+                  {data.cards
+                    .filter((c) => (c.conversions?.total ?? 0) > 0)
+                    .sort((a, b) => (b.conversions?.total ?? 0) - (a.conversions?.total ?? 0))
+                    .slice(0, 10)
+                    .map((card) => (
+                      <li key={String(card.id)}>
+                        <span className="admin-analytics-term">{card.name} <em>{card.city}</em></span>
+                        <span className="admin-analytics-card-stats">
+                          {card.clicks} opens · {card.conversions?.total} conv.
+                          {card.conversions?.phone ? <> · <Phone size={10} />{card.conversions.phone}</> : null}
+                          {card.conversions?.website ? <> · <ExternalLink size={10} />{card.conversions.website}</> : null}
+                          {card.conversions?.email ? <> · <Mail size={10} />{card.conversions.email}</> : null}
+                        </span>
+                      </li>
+                    ))}
+                </ol>
+              ) : <p className="dashboard-empty">No conversion data yet.</p>}
+            </div>
           </div>
         ) : null}
 
