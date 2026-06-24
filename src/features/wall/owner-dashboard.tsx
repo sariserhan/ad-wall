@@ -1,9 +1,26 @@
 "use client";
 
-import { AlertTriangle, BarChart3, Bookmark, Check, Clock3, Eye, EyeOff, MapPin, MousePointerClick, Pencil, Plus, RefreshCw, ShieldCheck, Trash2, User, X } from "lucide-react";
+import { AlertTriangle, BarChart3, Bookmark, Check, Clock3, Code2, Copy, Eye, EyeOff, MapPin, MousePointerClick, Pencil, Plus, RefreshCw, ShieldCheck, Trash2, User, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { EditCardModal } from "./edit-card-modal";
 import type { CardUpdate, OwnerCard, RenewalAmount, SavedWall, WallCard } from "./types";
+
+function Sparkline({ data }: { data: number[] }) {
+  const max = Math.max(...data, 1);
+  const w = 70;
+  const h = 22;
+  const gap = 1;
+  const barW = (w - gap * (data.length - 1)) / data.length;
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" className="card-sparkline">
+      {data.map((v, i) => {
+        const barH = Math.max(2, Math.round((v / max) * h));
+        const x = i * (barW + gap);
+        return <rect key={i} x={x} y={h - barH} width={barW} height={barH} rx="1" className={v > 0 ? "spark-bar" : "spark-empty"} />;
+      })}
+    </svg>
+  );
+}
 
 interface OwnerDashboardProps {
   cards: OwnerCard[];
@@ -23,6 +40,7 @@ interface OwnerDashboardProps {
   profile: { displayName: string | null; username: string | null; businessName: string | null; verified?: boolean; verificationStatus?: "pending" | "approved" | "rejected" | null } | null;
   onUpdateProfile?: (username: string | undefined, businessName: string | undefined) => Promise<void>;
   onRequestVerification?: (plan: "monthly" | "annual") => Promise<void>;
+  cardDailyStats?: { dates: string[]; byCard: Record<string, number[]> } | null;
 }
 
 const renewalOptions: ReadonlyArray<{ amount: RenewalAmount; name: string; price: string; duration: string }> = [
@@ -40,7 +58,7 @@ function expiryLabel(expiresAt: number) {
   return `${days} days left`;
 }
 
-export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose, onCreate, onView, onRemoveSaved, onRemoveSavedWall, onNavigateToWall, onSetVisibility, onUpdate, onDelete, onRenew, profile, onUpdateProfile, onRequestVerification }: OwnerDashboardProps) {
+export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose, onCreate, onView, onRemoveSaved, onRemoveSavedWall, onNavigateToWall, onSetVisibility, onUpdate, onDelete, onRenew, profile, onUpdateProfile, onRequestVerification, cardDailyStats }: OwnerDashboardProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<OwnerCard | null>(null);
@@ -56,6 +74,8 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
   const [profileError, setProfileError] = useState<string | null>(null);
   const [verificationBusy, setVerificationBusy] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [embedTarget, setEmbedTarget] = useState<OwnerCard | null>(null);
+  const [embedCopied, setEmbedCopied] = useState(false);
 
   const requestVerification = async (plan: "monthly" | "annual") => {
     if (!onRequestVerification) return;
@@ -313,14 +333,31 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
                     <h3>{card.name}</h3>
                     <p>{card.line}</p>
                     <small><Eye /> {card.clicks} views · {(card.websiteClicks ?? 0) + (card.phoneClicks ?? 0) + (card.emailClicks ?? 0) + (card.socialClicks ?? 0)} contacts · {card.saves ?? 0} saves · {card.shares ?? 0} shares <Clock3 /> {expiryLabel(card.expiresAt)}</small>
+                    {(() => {
+                      const data = cardDailyStats?.byCard[String(card.id)];
+                      if (!data) return null;
+                      const lastWeek = data.slice(0, 7).reduce((a, b) => a + b, 0);
+                      const thisWeek = data.slice(7).reduce((a, b) => a + b, 0);
+                      const diff = lastWeek > 0 ? Math.round(((thisWeek - lastWeek) / lastWeek) * 100) : null;
+                      return (
+                        <div className="card-spark-row">
+                          <Sparkline data={data} />
+                          <span className="spark-trend">
+                            {thisWeek} views this week
+                            {diff !== null ? <span className={diff >= 0 ? "trend-up" : "trend-down"}>{diff >= 0 ? ` ↑${diff}%` : ` ↓${Math.abs(diff)}%`}</span> : null}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div className="dashboard-card-actions">
-                    <button className="secondary" onClick={() => onView(card)}>View</button>
+                    <button className="secondary" disabled={expired} onClick={() => onView(card)}>View</button>
                     <button className="secondary" disabled={busy} onClick={() => setEditingCard(card)}><Pencil /> Edit</button>
                     <button className="secondary" disabled={busy} onClick={() => { setRenewTarget(card); setRenewalAmount(7.99); }}><RefreshCw /> Renew</button>
                     <button className="secondary" disabled={expired || busy} onClick={() => changeVisibility(card)}>
                       {card.status === "published" ? <><EyeOff /> Hide</> : <><Eye /> {expired ? "Expired" : "Publish"}</>}
                     </button>
+                    <button className="secondary" disabled={expired} onClick={() => { setEmbedTarget(card); setEmbedCopied(false); }}><Code2 size={13} /> Embed</button>
                     <button className="secondary danger-action" disabled={busy} onClick={() => setDeleteTarget(card)}><Trash2 /> Delete</button>
                   </div>
                 </article>
@@ -331,6 +368,28 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
         {deleteTarget ? <div className="dashboard-confirm-backdrop"><div className="dashboard-confirm" role="alertdialog" aria-modal="true" aria-labelledby="delete-card-title"><AlertTriangle /><h3 id="delete-card-title">Delete {deleteTarget.name}?</h3><p>This permanently removes the card and its uploaded images. This cannot be undone.</p><div><button className="secondary" onClick={() => setDeleteTarget(null)} disabled={busyId !== null}>Cancel</button><button className="primary danger-confirm" onClick={deleteCard} disabled={busyId !== null}>{busyId ? "Deleting…" : "Delete permanently"}</button></div></div></div> : null}
         {renewTarget ? <div className="dashboard-confirm-backdrop"><div className="dashboard-confirm renewal-dialog" role="dialog" aria-modal="true" aria-labelledby="renew-card-title"><RefreshCw /><h3 id="renew-card-title">Renew {renewTarget.name}</h3><p>Choose how much time to add. Time is added after the current expiration date when the card is still active.</p><div className="renewal-options" role="radiogroup" aria-label="Renewal duration">{renewalOptions.map((option) => <button key={option.amount} type="button" role="radio" aria-checked={renewalAmount === option.amount} className={`renewal-option ${renewalAmount === option.amount ? "selected" : ""}`} onClick={() => setRenewalAmount(option.amount)}><strong>{option.price}</strong><span>{option.duration}</span>{renewalAmount === option.amount ? <Check /> : null}</button>)}</div><div className="renewal-actions"><button className="secondary" onClick={() => setRenewTarget(null)} disabled={busyId !== null}>Cancel</button><button className="primary" onClick={renewCard} disabled={busyId !== null}>{busyId ? "Starting…" : renewalAmount === 0 ? "Renew free" : `Continue for $${renewalAmount}`}</button></div></div></div> : null}
         {editingCard ? <EditCardModal card={editingCard} onClose={() => setEditingCard(null)} onSave={onUpdate} /> : null}
+        {embedTarget ? (() => {
+          const origin = typeof window !== "undefined" ? window.location.origin : "";
+          const snippet = `<iframe\n  src="${origin}/embed/card/${String(embedTarget.id)}"\n  width="360" height="200"\n  frameborder="0"\n  style="border:none;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.15);"\n  title="${embedTarget.name.replace(/"/g, "&quot;")}"\n></iframe>`;
+          return (
+            <div className="dashboard-confirm-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setEmbedTarget(null)}>
+              <div className="dashboard-confirm embed-dialog" role="dialog" aria-modal="true" aria-labelledby="embed-dialog-title">
+                <Code2 size={20} />
+                <h3 id="embed-dialog-title">Embed {embedTarget.name}</h3>
+                <p>Paste this snippet into any website to show your card as a widget.</p>
+                <pre className="embed-snippet">{snippet}</pre>
+                <div className="embed-dialog-actions">
+                  <button className="secondary" onClick={() => setEmbedTarget(null)}>Close</button>
+                  <button className="primary" onClick={() => {
+                    navigator.clipboard.writeText(snippet).then(() => { setEmbedCopied(true); setTimeout(() => setEmbedCopied(false), 2500); }).catch(() => {});
+                  }}>
+                    {embedCopied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy code</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })() : null}
       </section>
     </div>
   );

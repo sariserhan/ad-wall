@@ -210,6 +210,13 @@ export default defineSchema({
     .index("by_wall", ["wallId"])
     .index("by_wall_and_user", ["wallId", "userId"]),
 
+  dailyCardStats: defineTable({
+    cardId: v.id("cards"),
+    date: v.string(),
+    clicks: v.number(),
+  })
+    .index("by_card_and_date", ["cardId", "date"]),
+
   verificationRequests: defineTable({
     userId: v.id("users"),
     status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),

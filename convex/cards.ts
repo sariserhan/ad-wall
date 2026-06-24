@@ -94,6 +94,32 @@ export const getMyProfile = query({
   },
 });
 
+export const getMyCardDailyStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
+    if (!user) return null;
+    const cards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", user._id)).take(100);
+    const d = new Date();
+    const dates: string[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const day = new Date(d);
+      day.setUTCDate(day.getUTCDate() - i);
+      dates.push(`${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, "0")}-${String(day.getUTCDate()).padStart(2, "0")}`);
+    }
+    const fromDate = dates[0];
+    const byCard: Record<string, number[]> = {};
+    for (const card of cards) {
+      const rows = await ctx.db.query("dailyCardStats").withIndex("by_card_and_date", (q) => q.eq("cardId", card._id).gte("date", fromDate)).collect();
+      const dayMap = new Map(rows.map((r) => [r.date, r.clicks]));
+      byCard[String(card._id)] = dates.map((date) => dayMap.get(date) ?? 0);
+    }
+    return { dates, byCard };
+  },
+});
+
 export const updateProfile = mutation({
   args: { username: v.optional(v.string()), businessName: v.optional(v.string()) },
   handler: async (ctx, args) => {
@@ -236,6 +262,41 @@ export const getPublishedById = query({
       featuredTier: card.featuredTier,
       reviewCount: card.reviewCount ?? 0,
       verified: owner?.verified ?? false,
+    };
+  },
+});
+
+export const getCardForEmbed = query({
+  args: { cardId: v.id("cards") },
+  handler: async (ctx, args) => {
+    const card = await ctx.db.get(args.cardId);
+    if (!card) return null;
+    const isLive = card.status === "published" && card.expiresAt > Date.now();
+    const effectiveStatus = isLive ? "live" : card.status === "published" ? "expired" : card.status;
+    const [urls, thumbnailUrls, owner] = await Promise.all([
+      isLive ? Promise.all(card.imageIds.map((id: Id<"_storage">) => ctx.storage.getUrl(id))) : Promise.resolve([]),
+      isLive ? Promise.all((card.thumbnailImageIds ?? []).map((id: Id<"_storage">) => ctx.storage.getUrl(id))) : Promise.resolve([]),
+      ctx.db.get(card.ownerId),
+    ]);
+    return {
+      id: card._id,
+      name: card.name,
+      category: card.category,
+      line: card.line,
+      area: card.area,
+      city: card.city,
+      state: card.state,
+      price: isLive ? (card.price ?? null) : null,
+      phone: isLive ? (card.phone ?? null) : null,
+      email: isLive ? (card.email ?? null) : null,
+      website: isLive ? (card.website ?? null) : null,
+      theme: card.theme,
+      images: urls.filter((u): u is string => u !== null),
+      thumbnailImages: thumbnailUrls.filter((u): u is string => u !== null),
+      verified: isLive ? (owner?.verified ?? false) : false,
+      ownerName: card.ownerName ?? null,
+      status: effectiveStatus as "live" | "expired" | "hidden",
+      expiresAt: card.expiresAt,
     };
   },
 });
@@ -794,10 +855,18 @@ export const incrementClicks = mutation({
       const viewer = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
       if (viewer?._id === card.ownerId) return { success: true, incremented: false, clicks: card.clicks ?? 0 };
     }
-    const stats = await ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", args.cardId)).unique();
+    const now = Date.now();
+    const d = new Date(now);
+    const today = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+    const [stats, dailyRow] = await Promise.all([
+      ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", args.cardId)).unique(),
+      ctx.db.query("dailyCardStats").withIndex("by_card_and_date", (q) => q.eq("cardId", args.cardId).eq("date", today)).unique(),
+    ]);
     const clicks = (stats?.clicks ?? card.clicks ?? 0) + 1;
-    if (stats) await ctx.db.patch(stats._id, { clicks, updatedAt: Date.now() });
-    else await ctx.db.insert("cardStats", { cardId: card._id, clicks, websiteClicks: 0, phoneClicks: 0, emailClicks: 0, socialClicks: 0, saves: 0, shares: 0, updatedAt: Date.now() });
+    if (stats) await ctx.db.patch(stats._id, { clicks, updatedAt: now });
+    else await ctx.db.insert("cardStats", { cardId: card._id, clicks, websiteClicks: 0, phoneClicks: 0, emailClicks: 0, socialClicks: 0, saves: 0, shares: 0, updatedAt: now });
+    if (dailyRow) await ctx.db.patch(dailyRow._id, { clicks: dailyRow.clicks + 1 });
+    else await ctx.db.insert("dailyCardStats", { cardId: card._id, date: today, clicks: 1 });
     return { success: true, incremented: true, clicks };
   },
 });

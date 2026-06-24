@@ -115,6 +115,7 @@ export function ConnectedWallApp({
     });
   }, [layoutCards, liveViewCounts, publishedCards, renderCards]);
   const ownerCards = useQuery(api.cards.listMine, isAuthenticated ? {} : "skip") as OwnerCard[] | undefined;
+  const cardDailyStats = useQuery(api.cards.getMyCardDailyStats, isAuthenticated ? {} : "skip") as { dates: string[]; byCard: Record<string, number[]> } | null | undefined;
   const savedCards = useQuery(api.savedCards.list, isAuthenticated ? {} : "skip") as WallCard[] | undefined;
   const adminAccess = useQuery(api.admin.getAccess, isAuthenticated ? {} : "skip") as { isAdmin: boolean } | undefined;
   const [adminOpen, setAdminOpen] = useState(false);
@@ -446,6 +447,7 @@ export function ConnectedWallApp({
       onOpenAdmin={() => setAdminOpen(true)}
       profile={profile ?? null}
       onUpdateProfile={async (username, businessName) => { await updateProfileMutation({ username, businessName }); }}
+      cardDailyStats={cardDailyStats ?? null}
       onRequestVerification={isAuthenticated ? async (plan) => {
         const response = await fetch("/api/stripe/checkout", {
           method: "POST",
