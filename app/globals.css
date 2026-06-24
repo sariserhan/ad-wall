@@ -1463,3 +1463,38 @@ button { color: inherit; }
 .unsubscribe-body { font: 400 14px/1.6 var(--font-inter); color: #555; margin: 0 0 20px; }
 .unsubscribe-home-link { display: inline-block; padding: 10px 22px; background: #edcf35; color: #1a1a18; border-radius: 6px; font: 700 13px var(--font-inter); text-decoration: none; transition: opacity .15s; }
 .unsubscribe-home-link:hover { opacity: .8; }
+
+/* 404 Not Found page */
+.nf-page { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background-color: #747672; background-image: linear-gradient(#0001, #0001), url('/assets/wall-texture.png'); background-size: cover; background-position: center; padding: 60px 20px 80px; overflow: hidden; }
+.nf-grain { position: absolute; inset: 0; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.65' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E"); opacity: .08; mix-blend-mode: overlay; }
+
+/* Ghost cards for wall atmosphere */
+.nf-ghost { position: absolute; border-radius: 1px; background: #0002; box-shadow: 1px 3px 8px #0003; }
+.nf-ghost::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #0001; }
+.nf-ghost-1 { width: 200px; height: 240px; top: 12%; left: 7%; transform: rotate(3.5deg); opacity: .55; }
+.nf-ghost-2 { width: 160px; height: 200px; top: 18%; right: 9%; transform: rotate(-2.5deg); opacity: .4; }
+.nf-ghost-3 { width: 180px; height: 160px; bottom: 16%; left: 14%; transform: rotate(1.2deg); opacity: .35; }
+
+/* Main card */
+.nf-card { position: relative; width: min(360px, calc(100vw - 40px)); background: #edede8; padding: 38px 28px 26px; box-shadow: 3px 6px 2px #0006, 14px 22px 28px #0004; transform: rotate(-1.8deg); animation: nf-slap .55s both cubic-bezier(.16,.75,.32,1.25); overflow: visible; }
+.nf-card::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .14; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence baseFrequency='.65' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.35'/%3E%3C/svg%3E"); mix-blend-mode: multiply; }
+.nf-card::after { content: ''; position: absolute; inset: auto 0 -1px 0; height: 7px; background: #edede8; clip-path: polygon(0 0, 8% 35%, 17% 0, 27% 48%, 38% 4%, 48% 35%, 58% 0, 70% 43%, 81% 7%, 91% 38%, 100% 0, 100% 60%, 0 60%); }
+@keyframes nf-slap { from { opacity: 0; transform: rotate(-1.8deg) scale(.92) translateY(-12px); } to { opacity: 1; transform: rotate(-1.8deg) scale(1) translateY(0); } }
+
+/* Tape */
+.nf-tape { position: absolute; top: -13px; left: 50%; width: 88px; height: 26px; transform: translateX(-50%) rotate(-1.5deg); background: #d9d2b7a8; box-shadow: 0 1px #fff5; opacity: .86; }
+
+/* REMOVED stamp */
+.nf-stamp { position: absolute; top: 18px; right: 16px; padding: 3px 8px; border: 2px solid #e05555bb; color: #e05555bb; font: 800 9px var(--font-inter); letter-spacing: .14em; text-transform: uppercase; transform: rotate(8deg); }
+
+.nf-eyebrow { margin: 0 0 10px; font: 800 9px var(--font-inter); letter-spacing: .14em; text-transform: uppercase; color: #aaa; }
+.nf-code { margin: 0 0 2px; font: 900 108px/.82 var(--font-barlow-condensed); text-transform: uppercase; letter-spacing: -.02em; color: #1a1a18; }
+.nf-headline { margin: 0 0 12px; font: 900 28px/1 var(--font-barlow-condensed); text-transform: uppercase; letter-spacing: .02em; color: #1a1a18; }
+.nf-body { margin: 0 0 24px; font: 400 13px/1.6 var(--font-inter); color: #666; }
+.nf-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 24px; }
+.nf-btn-primary { display: inline-flex; align-items: center; padding: 10px 18px; background: #1a1a18; color: #f5f1e8; text-decoration: none; font: 800 11px var(--font-inter); letter-spacing: .08em; text-transform: uppercase; transition: opacity .15s; }
+.nf-btn-primary:hover { opacity: .8; }
+.nf-btn-secondary { display: inline-flex; align-items: center; padding: 10px 18px; background: #edcf35; color: #1a1a18; text-decoration: none; font: 800 11px var(--font-inter); letter-spacing: .08em; text-transform: uppercase; transition: opacity .15s; }
+.nf-btn-secondary:hover { opacity: .8; }
+.nf-card-footer { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 16px; border-top: 1px solid #d4d0c8; font: 800 9px var(--font-barlow-condensed); letter-spacing: .12em; text-transform: uppercase; color: #bbb; }
+.nf-brand { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); font: 900 11px var(--font-barlow-condensed); letter-spacing: .22em; color: #fff3; text-transform: uppercase; pointer-events: none; user-select: none; }
