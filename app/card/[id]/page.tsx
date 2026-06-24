@@ -44,11 +44,52 @@ export default async function CardPage({ params }: CardPageProps) {
   const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   if (!convexUrl || !clerkPublishableKey) notFound();
 
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
+  const canonicalUrl = `${appUrl}/card/${id}`;
+  const locationParts = [card.area, card.city, card.state, card.country].filter(Boolean).join(", ");
+
+  const sameAs = [
+    card.website,
+    card.instagram ? `https://instagram.com/${card.instagram.replace(/^@/, "")}` : null,
+    card.facebook,
+    card.linkedin,
+    card.tiktok ? `https://tiktok.com/@${card.tiktok.replace(/^@/, "")}` : null,
+  ].filter(Boolean) as string[];
+
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: card.name,
+    description: card.message || card.line || undefined,
+    url: card.website || canonicalUrl,
+    ...(card.phone ? { telephone: card.phone } : {}),
+    ...(card.email ? { email: card.email } : {}),
+    ...(card.images[0] ? { image: card.images[0] } : {}),
+    ...(card.price ? { priceRange: card.price } : {}),
+    ...(locationParts ? { areaServed: locationParts } : {}),
+    ...(card.city || card.state || card.country || card.zipcode ? {
+      address: {
+        "@type": "PostalAddress",
+        ...(card.area ? { streetAddress: card.area } : {}),
+        ...(card.city ? { addressLocality: card.city } : {}),
+        ...(card.state ? { addressRegion: card.state } : {}),
+        ...(card.country ? { addressCountry: card.country } : {}),
+        ...(card.zipcode ? { postalCode: card.zipcode } : {}),
+      },
+    } : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+  };
+
+  const jsonLdString = JSON.stringify(jsonLd).replace(/<\//g, "<\\/");
+
   return (
-    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
-      <Suspense fallback={<div className="app-loading"><strong>WALL</strong><span>Loading {card.name}…</span></div>}>
-        <ConnectedWallApp initialCardId={id} />
-      </Suspense>
-    </AppProviders>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString }} />
+      <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
+        <Suspense fallback={<div className="app-loading"><strong>WALL</strong><span>Loading {card.name}…</span></div>}>
+          <ConnectedWallApp initialCardId={id} />
+        </Suspense>
+      </AppProviders>
+    </>
   );
 }
