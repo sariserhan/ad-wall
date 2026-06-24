@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { startTransition, useDeferredValue, useMemo, useRef, useState, useEffect, type PointerEvent, type ReactNode } from "react";
+import { startTransition, useCallback, useDeferredValue, useMemo, useRef, useState, useEffect, type PointerEvent, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Country, State, City } from "country-state-city";
 import { LocationCombobox } from "./location-combobox";
@@ -77,6 +77,7 @@ interface WallAppProps {
   onRequestVerification?: (plan: "monthly" | "annual") => Promise<void>;
   cardDailyStats?: { dates: string[]; byCard: Record<string, number[]> } | null;
   wallViewCount?: number;
+  onCategoryChange?: (category: string) => void;
 }
 
 const MAX_CARD_Y = 1500;
@@ -124,7 +125,7 @@ const defaultSeedLocation = (() => {
   };
 })();
 
-export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds, likedCardIds, onToggleLike, isAdmin = false, onOpenAdmin, onCardEvent, onReportCard, initialCardId, initialLocation, initialKeyword, initialCategory, savedCards = [], onSetSavedCard, savedWall = false, onSetSavedWall, savedWalls = [], onRemoveSavedWall, profile, onUpdateProfile, onRequestVerification, cardDailyStats, wallViewCount }: WallAppProps) {
+export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onMoveCard, ownedCardIds, likedCardIds, onToggleLike, isAdmin = false, onOpenAdmin, onCardEvent, onReportCard, initialCardId, initialLocation, initialKeyword, initialCategory, savedCards = [], onSetSavedCard, savedWall = false, onSetSavedWall, savedWalls = [], onRemoveSavedWall, profile, onUpdateProfile, onRequestVerification, cardDailyStats, wallViewCount, onCategoryChange }: WallAppProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -161,6 +162,10 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     const cat = initialCategory ?? "";
     return (categories as readonly string[]).includes(cat) ? cat as (typeof categories)[number] : "All";
   });
+  const applyCategory = useCallback((cat: (typeof categories)[number]) => {
+    setCategory(cat);
+    onCategoryChange?.(cat);
+  }, [onCategoryChange]);
   const [subcategory, setSubcategory] = useState(searchParams.get("subcategory") ?? "");
   const [query, setQuery] = useState(searchParams.get("keyword") ?? initialKeyword ?? "");
   const initialLocationRef = useRef(initialLocation);
@@ -468,7 +473,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     const cat = (categories as readonly string[]).includes(initialCategory ?? "")
       ? initialCategory as (typeof categories)[number]
       : "All";
-    setCategory(cat);
+    applyCategory(cat);
     setSubcategory("");
   }, [initialCategory]);
 
@@ -882,7 +887,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
 
   const resetFilters = () => {
     startTransition(() => {
-      setCategory("All");
+      applyCategory("All");
       setSubcategory("");
       setQuery("");
       setFresh(false);
@@ -1033,7 +1038,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                 </div>
                 <div className="filter-panel-footer">
                   <button className="primary" onClick={() => {
-                    setCategory(pendingCategory);
+                    applyCategory(pendingCategory);
                     setSubcategory(pendingSubcategory);
                     setFresh(pendingFresh);
                     setSortBy(pendingSortBy);
@@ -1050,7 +1055,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                   }}>Apply filters</button>
                   {((category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)) > 0 && (
                     <button className="filter-clear-btn" onClick={() => {
-                      setCategory("All"); setSubcategory(""); setSelectedNeighborhood(""); setFresh(false);
+                      applyCategory("All"); setSubcategory(""); setSelectedNeighborhood(""); setFresh(false);
                       setSortBy("default"); setFilterHasWebsite(false); setFilterHasPhotos(false); setFilterFeaturedOnly(false);
                       const next = new URLSearchParams(window.location.search);
                       next.delete("subcategory"); next.delete("neighborhood");

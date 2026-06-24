@@ -136,10 +136,13 @@ export const updateProfile = mutation({
 });
 
 export const listPublished = query({
-  args: { country: v.optional(v.string()), state: v.optional(v.string()), city: v.optional(v.string()) },
+  args: { country: v.optional(v.string()), state: v.optional(v.string()), city: v.optional(v.string()), category: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const now = Date.now();
-    const cards = args.country && args.state && args.city
+    const cat = args.category && args.category !== "All" ? args.category : undefined;
+    const cards = args.country && args.state && args.city && cat
+      ? await ctx.db.query("cards").withIndex("by_status_country_state_city_category_createdAt", (q) => q.eq("status", "published").eq("country", args.country!).eq("state", args.state!).eq("city", args.city!).eq("category", cat as any)).order("desc").collect()
+      : args.country && args.state && args.city
       ? await ctx.db.query("cards").withIndex("by_status_and_country_and_state_and_city_and_createdAt", (q) => q.eq("status", "published").eq("country", args.country!).eq("state", args.state!).eq("city", args.city!)).order("desc").collect()
       : args.country && args.state
       ? await ctx.db.query("cards").withIndex("by_status_and_country_and_state_and_city_and_createdAt", (q) => q.eq("status", "published").eq("country", args.country!).eq("state", args.state!)).order("desc").collect()

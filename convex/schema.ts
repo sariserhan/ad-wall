@@ -89,6 +89,7 @@ export default defineSchema({
   })
     .index("by_status_created", ["status", "createdAt"])
     .index("by_status_and_country_and_state_and_city_and_createdAt", ["status", "country", "state", "city", "createdAt"])
+    .index("by_status_country_state_city_category_createdAt", ["status", "country", "state", "city", "category", "createdAt"])
     .index("by_status_and_expiresAt", ["status", "expiresAt"])
     .index("by_owner", ["ownerId"]),
 
