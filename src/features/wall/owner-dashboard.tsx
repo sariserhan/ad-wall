@@ -65,17 +65,25 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
   const [deleteTarget, setDeleteTarget] = useState<OwnerCard | null>(null);
   const [renewTarget, setRenewTarget] = useState<OwnerCard | null>(null);
   const [renewalAmount, setRenewalAmount] = useState<RenewalAmount>(7.99);
-  const [usernameInput, setUsernameInput] = useState(profile?.username ?? "");
+  const [usernameInput, setUsernameInput] = useState("");
   const [businessNameInput, setBusinessNameInput] = useState(profile?.businessName ?? "");
-  useEffect(() => { setUsernameInput(profile?.username ?? ""); }, [profile?.username]);
-  useEffect(() => { setBusinessNameInput(profile?.businessName ?? ""); }, [profile?.businessName]);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [verificationBusy, setVerificationBusy] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [selectedVerificationPlan, setSelectedVerificationPlan] = useState<"monthly" | "annual" | null>("annual");
   const [embedTarget, setEmbedTarget] = useState<OwnerCard | null>(null);
   const [embedCopied, setEmbedCopied] = useState(false);
+  const [previewTarget, setPreviewTarget] = useState<OwnerCard | null>(null);
+
+  const handleClose = () => {
+    setUsernameInput("");
+    setBusinessNameInput("");
+    setProfileSaved(false);
+    setProfileError(null);
+    onClose();
+  };
 
   const requestVerification = async (plan: "monthly" | "annual") => {
     if (!onRequestVerification) return;
@@ -156,11 +164,11 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
   };
 
   return (
-    <div className="dashboard-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className="dashboard-backdrop" onMouseDown={(event) => event.target === event.currentTarget && handleClose()}>
       <section className="owner-dashboard" aria-label="Your card dashboard">
         <header className="dashboard-header">
           <div><span>YOUR WALL</span><h2>My Board</h2></div>
-          <button className="icon-btn" onClick={onClose} aria-label="Close dashboard"><X /></button>
+          <button className="icon-btn" onClick={handleClose} aria-label="Close dashboard"><X /></button>
         </header>
 
         <div className="dashboard-profile">
@@ -179,7 +187,7 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
                   id="dashboard-username"
                   type="text"
                   maxLength={40}
-                  placeholder={profile?.displayName ?? "Your name or handle"}
+                  placeholder={profile?.username ?? profile?.displayName ?? "Your name or handle"}
                   value={usernameInput}
                   onChange={(e) => { setUsernameInput(e.target.value); setProfileSaved(false); }}
                 />
@@ -215,42 +223,53 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
         </div>
 
         <div className="dashboard-verification">
-          <div className="dashboard-verification-header"><ShieldCheck size={14} /><strong>Verified Business Badge</strong></div>
+          {!profile?.verified ? (
+            <div className="dashboard-verification-header">
+              <span className="verified-badge dashboard-verification-badge-preview">✓ Verified Business Badge</span>
+            </div>
+          ) : null}
           {profile?.verified ? (
             <div className="dashboard-verification-active">
-              <span className="verification-active-check">✓</span>
-              <div>
-                <strong>Your business is verified</strong>
-                <p>Your checkmark appears on all your cards.</p>
-              </div>
+              <span className="verified-badge dashboard-verified-badge-lg">✓ Verified Business</span>
+              <p>Your checkmark badge appears on all your cards.</p>
             </div>
           ) : profile?.verificationStatus === "pending" ? (
             <div className="dashboard-verification-status">
               <span className="verification-status-tag pending">Under Review</span>
               <p>Our team is reviewing your request. Your badge will go live within 24 hours of approval.</p>
             </div>
-          ) : profile?.verificationStatus === "rejected" ? (
-            <div className="dashboard-verification-status">
-              <span className="verification-status-tag rejected">Not Approved</span>
-              <p>Your last request was not approved. You can submit a new request:</p>
-              <div className="verification-plans">
-                <button className="verification-plan" onClick={() => void requestVerification("monthly")} disabled={verificationBusy || !onRequestVerification}>
-                  <strong>$4.99</strong><span>Monthly</span>
-                </button>
-                <button className="verification-plan verification-plan-featured" onClick={() => void requestVerification("annual")} disabled={verificationBusy || !onRequestVerification}>
-                  <strong>$19.99</strong><span>Annual — save 66%</span>
-                </button>
-              </div>
-            </div>
           ) : (
             <div className="dashboard-verification-cta">
-              <p>Get a ✓ verified checkmark on all your cards — builds trust and drives more clicks.</p>
+              {profile?.verificationStatus === "rejected" ? (
+                <><span className="verification-status-tag rejected">Not Approved</span><p>Your last request was not approved. You can submit a new request below.</p></>
+              ) : (
+                <p>Get a ✓ verified checkmark on all your cards — builds trust and drives more clicks.</p>
+              )}
               <div className="verification-plans">
-                <button className="verification-plan" onClick={() => void requestVerification("monthly")} disabled={verificationBusy || !onRequestVerification}>
+                <button
+                  className={`verification-plan${selectedVerificationPlan === "monthly" ? " verification-plan-selected" : ""}`}
+                  onClick={() => setSelectedVerificationPlan("monthly")}
+                  disabled={verificationBusy || !onRequestVerification}
+                  aria-pressed={selectedVerificationPlan === "monthly"}
+                >
+                  {selectedVerificationPlan === "monthly" ? <Check size={11} className="plan-check" /> : null}
                   <strong>$4.99 / mo</strong><span>Monthly</span>
                 </button>
-                <button className="verification-plan verification-plan-featured" onClick={() => void requestVerification("annual")} disabled={verificationBusy || !onRequestVerification}>
+                <button
+                  className={`verification-plan verification-plan-featured${selectedVerificationPlan === "annual" ? " verification-plan-selected" : ""}`}
+                  onClick={() => setSelectedVerificationPlan("annual")}
+                  disabled={verificationBusy || !onRequestVerification}
+                  aria-pressed={selectedVerificationPlan === "annual"}
+                >
+                  {selectedVerificationPlan === "annual" ? <Check size={11} className="plan-check" /> : null}
                   <strong>$19.99 / yr</strong><span>Annual — save 66%</span>
+                </button>
+                <button
+                  className="primary verification-purchase-btn"
+                  disabled={!selectedVerificationPlan || verificationBusy || !onRequestVerification}
+                  onClick={() => { if (selectedVerificationPlan) void requestVerification(selectedVerificationPlan); }}
+                >
+                  {verificationBusy ? "…" : "Get Verified"}
                 </button>
               </div>
             </div>
@@ -304,7 +323,7 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
                     <span>{wall.label}</span>
                   </div>
                   <div className="dashboard-card-actions">
-                    <button className="secondary" onClick={() => { onNavigateToWall(wall); onClose(); }}>Visit</button>
+                    <button className="secondary" onClick={() => { onNavigateToWall(wall); handleClose(); }}>Visit</button>
                     <button className="secondary danger-action" onClick={() => void onRemoveSavedWall(wall)}>Remove</button>
                   </div>
                 </div>
@@ -351,7 +370,7 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
                     })()}
                   </div>
                   <div className="dashboard-card-actions">
-                    <button className="secondary" disabled={expired} onClick={() => onView(card)}>View</button>
+                    <button className="secondary" disabled={expired} onClick={() => setPreviewTarget(card)}><Eye size={13} /> Preview</button>
                     <button className="secondary" disabled={busy} onClick={() => setEditingCard(card)}><Pencil /> Edit</button>
                     <button className="secondary" disabled={busy} onClick={() => { setRenewTarget(card); setRenewalAmount(7.99); }}><RefreshCw /> Renew</button>
                     <button className="secondary" disabled={expired || busy} onClick={() => changeVisibility(card)}>
@@ -368,6 +387,42 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
         {deleteTarget ? <div className="dashboard-confirm-backdrop"><div className="dashboard-confirm" role="alertdialog" aria-modal="true" aria-labelledby="delete-card-title"><AlertTriangle /><h3 id="delete-card-title">Delete {deleteTarget.name}?</h3><p>This permanently removes the card and its uploaded images. This cannot be undone.</p><div><button className="secondary" onClick={() => setDeleteTarget(null)} disabled={busyId !== null}>Cancel</button><button className="primary danger-confirm" onClick={deleteCard} disabled={busyId !== null}>{busyId ? "Deleting…" : "Delete permanently"}</button></div></div></div> : null}
         {renewTarget ? <div className="dashboard-confirm-backdrop"><div className="dashboard-confirm renewal-dialog" role="dialog" aria-modal="true" aria-labelledby="renew-card-title"><RefreshCw /><h3 id="renew-card-title">Renew {renewTarget.name}</h3><p>Choose how much time to add. Time is added after the current expiration date when the card is still active.</p><div className="renewal-options" role="radiogroup" aria-label="Renewal duration">{renewalOptions.map((option) => <button key={option.amount} type="button" role="radio" aria-checked={renewalAmount === option.amount} className={`renewal-option ${renewalAmount === option.amount ? "selected" : ""}`} onClick={() => setRenewalAmount(option.amount)}><strong>{option.price}</strong><span>{option.duration}</span>{renewalAmount === option.amount ? <Check /> : null}</button>)}</div><div className="renewal-actions"><button className="secondary" onClick={() => setRenewTarget(null)} disabled={busyId !== null}>Cancel</button><button className="primary" onClick={renewCard} disabled={busyId !== null}>{busyId ? "Starting…" : renewalAmount === 0 ? "Renew free" : `Continue for $${renewalAmount}`}</button></div></div></div> : null}
         {editingCard ? <EditCardModal card={editingCard} onClose={() => setEditingCard(null)} onSave={onUpdate} /> : null}
+        {previewTarget ? (() => {
+          const card = previewTarget;
+          const locationParts = [card.area, card.city, card.state].filter(Boolean).join(", ");
+          const image = card.thumbnailImages?.[0] ?? card.images[0];
+          return (
+            <div className="dashboard-confirm-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setPreviewTarget(null)}>
+              <div className="card-preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-card-title">
+                {image ? (
+                  <div className="card-preview-image"><img src={image} alt={card.name} /></div>
+                ) : (
+                  <div className={`card-preview-swatch theme-${card.theme}`} aria-hidden="true" />
+                )}
+                <div className="card-preview-body">
+                  <div className="card-preview-meta">
+                    <span className="card-preview-category">{card.category}{card.subcategory ? ` · ${card.subcategory}` : ""}</span>
+                    {card.verified ? <span className="embed-verified">✓ Verified</span> : null}
+                  </div>
+                  <h3 id="preview-card-title" className="card-preview-name">{card.name}</h3>
+                  <p className="card-preview-line">{card.line}</p>
+                  {locationParts ? <p className="card-preview-location">{locationParts}</p> : null}
+                  {card.price ? <p className="card-preview-price">{card.price}</p> : null}
+                  {card.message ? <p className="card-preview-message">{card.message}</p> : null}
+                  {card.website ? (
+                    <div className="card-preview-actions">
+                      <a className="embed-action" href={card.website} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.96 6.96 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7.03 7.03 0 0 0 2.072 2.472zM3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7.03 7.03 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a6.96 6.96 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.03 7.03 0 0 0-2.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z"/></svg>Website</a>
+                    </div>
+                  ) : null}
+                </div>
+                <div className="card-preview-footer">
+                  <button className="secondary" onClick={() => setPreviewTarget(null)}>Close</button>
+                  <button className="primary" onClick={() => { setPreviewTarget(null); setRenewTarget(card); setRenewalAmount(7.99); }}><RefreshCw size={13} /> Renew card</button>
+                </div>
+              </div>
+            </div>
+          );
+        })() : null}
         {embedTarget ? (() => {
           const origin = typeof window !== "undefined" ? window.location.origin : "";
           const snippet = `<iframe\n  src="${origin}/embed/card/${String(embedTarget.id)}"\n  width="360" height="200"\n  frameborder="0"\n  style="border:none;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.15);"\n  title="${embedTarget.name.replace(/"/g, "&quot;")}"\n></iframe>`;

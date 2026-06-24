@@ -133,6 +133,30 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const [selected, setSelected] = useState<WallCardModel | null>(null);
   const [composer, setComposer] = useState(false);
   const [dashboard, setDashboard] = useState(false);
+
+  useEffect(() => {
+    const locked = !!selected || dashboard || composer;
+    if (!locked) return;
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    const block = (e: WheelEvent | TouchEvent) => {
+      let el = e.target as HTMLElement | null;
+      while (el) {
+        if (el !== document.documentElement && el !== document.body && el.scrollHeight > el.clientHeight) return;
+        el = el.parentElement;
+      }
+      e.preventDefault();
+    };
+    document.addEventListener("wheel", block, { passive: false });
+    document.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      document.documentElement.style.overflow = prev;
+      document.body.style.overflow = "";
+      document.removeEventListener("wheel", block);
+      document.removeEventListener("touchmove", block);
+    };
+  }, [selected, dashboard, composer]);
   const [category, setCategory] = useState<(typeof categories)[number]>(() => {
     const cat = initialCategory ?? "";
     return (categories as readonly string[]).includes(cat) ? cat as (typeof categories)[number] : "All";

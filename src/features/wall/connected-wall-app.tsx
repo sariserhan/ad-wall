@@ -119,6 +119,30 @@ export function ConnectedWallApp({
   const savedCards = useQuery(api.savedCards.list, isAuthenticated ? {} : "skip") as WallCard[] | undefined;
   const adminAccess = useQuery(api.admin.getAccess, isAuthenticated ? {} : "skip") as { isAdmin: boolean } | undefined;
   const [adminOpen, setAdminOpen] = useState(false);
+
+  useEffect(() => {
+    if (!adminOpen) return;
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    const block = (e: WheelEvent | TouchEvent) => {
+      let el = e.target as HTMLElement | null;
+      while (el) {
+        if (el !== document.documentElement && el !== document.body && el.scrollHeight > el.clientHeight) return;
+        el = el.parentElement;
+      }
+      e.preventDefault();
+    };
+    document.addEventListener("wheel", block, { passive: false });
+    document.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      document.documentElement.style.overflow = prev;
+      document.body.style.overflow = "";
+      document.removeEventListener("wheel", block);
+      document.removeEventListener("touchmove", block);
+    };
+  }, [adminOpen]);
+
   const adminDashboard = useQuery(api.admin.getDashboard, adminOpen && adminAccess?.isAdmin ? {} : "skip") as AdminDashboardData | undefined;
   const profile = useQuery(api.cards.getMyProfile, isAuthenticated ? {} : "skip") as { displayName: string | null; username: string | null; businessName: string | null; verified: boolean; verificationStatus: "pending" | "approved" | "rejected" | null } | null | undefined;
   const updateProfileMutation = useMutation(api.cards.updateProfile);

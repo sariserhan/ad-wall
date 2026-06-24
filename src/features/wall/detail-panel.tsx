@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark, Copy, ExternalLink, Flag, Heart, Mail, Phone, QrCode, Share2, X } from "lucide-react";
+import { Bookmark, Copy, ExternalLink, Eye, Flag, Heart, Mail, Phone, QrCode, Share2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { WallCard } from "./types";
@@ -248,7 +248,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
         <button type="button" className="secondary" onClick={() => void openQr()}><QrCode size={15} /> QR Code</button>
         {onReport ? <button type="button" className="secondary" onClick={openReport}><Flag /> Report</button> : null}
       </div>
-      <div className="sheet-meta"><span>{viewCount > 0 ? `${viewCount} views` : "No views yet"}</span><span>CARD #{String(card.id).slice(-6).toUpperCase()}</span></div>
+      <div className="sheet-meta"><span><Eye size={12} /> {viewCount > 0 ? viewCount : 0}{optimisticLikeCount > 0 ? <> · <Heart size={12} fill="currentColor" style={{ color: "#f43d38" }} /> {optimisticLikeCount}</> : null}</span><span>CARD #{String(card.id).slice(-6).toUpperCase()}</span></div>
       <ReviewsSection cardId={card.id} onRequestSignIn={onRequestSignIn} />
       {similarCards.length > 0 ? (
         <div className="similar-cards">

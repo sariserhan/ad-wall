@@ -111,14 +111,13 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
         {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
         <h2>{card.name}</h2>
         <p className="card-line">{card.line}</p>
+        {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
       </div>
       {cardImage ? <img src={cardImage} alt="" draggable="false" loading="lazy" decoding="async" /> : null}
       <footer>
         <span>{card.area}</span>
-        {card.price ? <strong>{card.price}</strong> : null}
-        {card.likes && card.likes > 0 ? <span className="card-likes" aria-label={`${card.likes} likes`}>♥ {card.likes}</span> : null}
+        {card.price ? <strong className="card-price-right">{card.price}</strong> : null}
       </footer>
-      {card.ownerName ? <span className="card-owner" aria-label={`Posted by ${card.ownerName}`}>{card.ownerName}</span> : null}
     </article>
   );
 }
