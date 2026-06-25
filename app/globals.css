@@ -639,6 +639,20 @@ button { color: inherit; }
 .toast-info { background: #f5f1e8; color: #111; }
 .toast-error { background: #f43d38; color: #fff; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.wall-card-skeleton { position: absolute; left: var(--x); top: var(--y); width: var(--w); min-height: var(--h); transform: rotate(var(--r)); background: #cdc9c1; border-radius: 1px; box-shadow: 2px 5px 2px #0005, 12px 18px 22px #0003; overflow: visible; animation: skel-appear .35s both ease; }
+.wall-card-skeleton-list { position: relative !important; left: 0 !important; top: 0 !important; transform: none !important; width: 100% !important; padding: 17px 15px 50px; }
+.skel-body { position: relative; overflow: hidden; padding: 14px 15px 12px; }
+.skel-body::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,.22) 50%, transparent 75%); animation: skel-shimmer 1.7s infinite ease-in-out; }
+.wall-card-skeleton-list .skel-body { padding: 0; }
+.wall-card-skeleton-list .skel-body::after { animation-delay: inherit; }
+.skel-line { border-radius: 2px; background: rgba(0,0,0,.14); margin-bottom: 9px; }
+.skel-xs   { height: 9px;  width: 42%; }
+.skel-title{ height: 20px; width: 70%; }
+.skel-sm   { height: 10px; width: 56%; }
+.skel-md   { height: 10px; width: 62%; }
+.skel-img  { height: 72px; border-radius: 2px; background: rgba(0,0,0,.1); margin-top: 12px; }
+@keyframes skel-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes skel-appear  { from { opacity: 0; transform: rotate(var(--r)) scale(.96); } to { opacity: 1; transform: rotate(var(--r)); } }
 .stack-picker-backdrop { position: fixed; inset: 0; z-index: 7600; display: grid; place-items: center; padding: 18px; background: #111b; backdrop-filter: blur(2px); }
 .stack-picker { width: min(560px, 100%); max-height: min(78vh, 680px); overflow: auto; background: var(--ui-bg); box-shadow: 8px 12px 35px #0007; }
 .stack-picker-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #aaa; }

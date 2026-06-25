@@ -39,6 +39,7 @@ const OwnerDashboard = dynamic(() => import("./owner-dashboard").then((m) => ({ 
 import { seedCards } from "./seed-cards";
 import { WallCard } from "./wall-card";
 import { WallMinimap } from "./wall-minimap";
+import { WallSkeletons } from "./wall-skeletons";
 import { categories, SUBCATEGORY_OPTIONS, getCardFormat, type CardCategory, type CardDraft, type CardUpdate, type CreateCard, type OwnerCard, type Placement, type RenewalAmount, type WallCard as WallCardModel } from "./types";
 import { buildWallPath, toCategorySlug } from "@/lib/wall-slug";
 import type { SavedWall } from "./types";
@@ -1401,7 +1402,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         onKeyDown={handleWallKeyDown}
       >
         <div className="wall-grain" />
-        {!isLoading ? (
+        {isLoading ? <WallSkeletons listView={listView} /> : (
           listView ? (
             visible.length ? (
               <div className="list-card-list">
@@ -1460,7 +1461,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
               <div className="empty-note"><strong>Nothing matched your filters.</strong><span>Try broadening your search or reset filters.</span><button onClick={resetFilters}>Reset filters</button></div>
             )
           )
-        ) : null}
+        )}
         <div className="wall-tools">
           <button aria-label={listView ? "Switch to wall view" : "Switch to list view"} onClick={() => setListView((v) => !v)}>
             {listView ? <LayoutGrid /> : <LayoutList />}
