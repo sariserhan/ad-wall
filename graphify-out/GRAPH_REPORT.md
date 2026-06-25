@@ -1,7 +1,7 @@
 # Graph Report - local-wall  (2026-06-25)
 
 ## Corpus Check
-- 193 files · ~422,480 words
+- 193 files · ~422,903 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `713d4157`
+- Built from commit: `0d2c361a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -268,7 +268,7 @@ Cohesion: 0.67
 Nodes (4): LocalWall Logo Big (Full Branding with Tagline and Category Icons), LocalWall Logo Small (Compact Horizontal Logo), Wall Concept Mockup (Bulletin Board UI with Cards and Detail Panel), Wall Texture (Weathered Urban Bulletin Board Background Texture)
 
 ## Knowledge Gaps
-- **349 isolated node(s):** `getAccess`, `getDashboard`, `sendTestReminderEmail`, `setUserVerified`, `approveVerification` (+344 more)
+- **349 isolated node(s):** `category`, `theme`, `imageMode`, `packageDurations`, `paymentAmount` (+344 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -285,7 +285,7 @@ _Questions this graph is uniquely positioned to answer:_
   _`parseCountrySlug()` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `fetchInitialCards()` (e.g. with `GET()` and `GET()`) actually correct?**
   _`fetchInitialCards()` has 4 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `getAccess`, `getDashboard`, `sendTestReminderEmail` to the rest of the system?**
+- **What connects `category`, `theme`, `imageMode` to the rest of the system?**
   _350 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Rate Limiting & API Utilities` be split into smaller, more focused modules?**
   _Cohesion score 0.07678075855689177 - nodes in this community are weakly interconnected._

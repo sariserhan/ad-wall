@@ -250,9 +250,9 @@
     "semantic_hash": "a145223d896f453b4dc621991872e16b"
   },
   "convex/cards.ts": {
-    "mtime": 1782408616.9077685,
-    "ast_hash": "3d8a0308ebf000d4a67c19a4c49d1a64",
-    "semantic_hash": "3d8a0308ebf000d4a67c19a4c49d1a64"
+    "mtime": 1782424661.8182242,
+    "ast_hash": "00d5d1d557eaac80b7dac0e440a25509",
+    "semantic_hash": ""
   },
   "convex/convex.config.ts": {
     "mtime": 1782011679.0590646,
@@ -315,8 +315,8 @@
     "semantic_hash": "e6fb19f83af33e69f1137cf7e384b590"
   },
   "convex/schema.ts": {
-    "mtime": 1782421666.3688767,
-    "ast_hash": "b7604322dafb52672aa3b3525e2f342e",
+    "mtime": 1782424645.4339511,
+    "ast_hash": "21a96fd816b81ce423e31b68c3fe1d64",
     "semantic_hash": ""
   },
   "convex/tsconfig.json": {
@@ -480,13 +480,13 @@
     "semantic_hash": "732bde35dfd9997c4cf61d1a9216df81"
   },
   "src/features/wall/composer.tsx": {
-    "mtime": 1782377620.5454016,
-    "ast_hash": "6d8271ce00a928a758df326f7759de2b",
-    "semantic_hash": "6d8271ce00a928a758df326f7759de2b"
+    "mtime": 1782426021.2286844,
+    "ast_hash": "1b5f192a92dba6801b5b505f833b7757",
+    "semantic_hash": ""
   },
   "src/features/wall/connected-wall-app.tsx": {
-    "mtime": 1782409212.5429094,
-    "ast_hash": "b4d3d804f43afb57ae8692f09cc37992",
+    "mtime": 1782424723.71065,
+    "ast_hash": "6757ed851922ca6edba6c2cbefe756f6",
     "semantic_hash": ""
   },
   "src/features/wall/detail-panel.tsx": {
@@ -530,9 +530,9 @@
     "semantic_hash": "33200ea18cd36a5fe5f49ad0835483f8"
   },
   "src/features/wall/types.ts": {
-    "mtime": 1782314060.5895095,
-    "ast_hash": "784d7e6485888ae64c627d19b3b814ee",
-    "semantic_hash": "784d7e6485888ae64c627d19b3b814ee"
+    "mtime": 1782424648.8164663,
+    "ast_hash": "fe586c429cd842af971b886e9529c033",
+    "semantic_hash": ""
   },
   "src/features/wall/wall-app.tsx": {
     "mtime": 1782421435.5126035,
@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/wall-card.tsx": {
-    "mtime": 1782422662.8861141,
-    "ast_hash": "17fab7cdce180ed8f80b6044fda41155",
+    "mtime": 1782424773.604627,
+    "ast_hash": "10db2c1785f460f80782f7da5898e13d",
     "semantic_hash": ""
   },
   "src/features/wall/wall-minimap.tsx": {

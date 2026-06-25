@@ -240,9 +240,9 @@
     "semantic_hash": "7f96a22ed6ab02f9d8c22de8c7089630"
   },
   "convex/admin.ts": {
-    "mtime": 1782335106.9100666,
-    "ast_hash": "b384926315487b954939738563a7ba4c",
-    "semantic_hash": "b384926315487b954939738563a7ba4c"
+    "mtime": 1782421723.3454282,
+    "ast_hash": "e51e2079acea11e91253f36343a08a48",
+    "semantic_hash": ""
   },
   "convex/auth.config.ts": {
     "mtime": 1781975199.7945778,
@@ -315,9 +315,9 @@
     "semantic_hash": "e6fb19f83af33e69f1137cf7e384b590"
   },
   "convex/schema.ts": {
-    "mtime": 1782409159.874043,
-    "ast_hash": "6222906c78da68e7911f460353b87e04",
-    "semantic_hash": "6222906c78da68e7911f460353b87e04"
+    "mtime": 1782421666.3688767,
+    "ast_hash": "b7604322dafb52672aa3b3525e2f342e",
+    "semantic_hash": ""
   },
   "convex/tsconfig.json": {
     "mtime": 1781892275.8608165,
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/detail-panel.tsx": {
-    "mtime": 1782421020.2031028,
-    "ast_hash": "ba3c04a09edf47be0f8fc971b9b01fa1",
+    "mtime": 1782422122.1042926,
+    "ast_hash": "6fd84cc478ed0a1c48b6126a71566758",
     "semantic_hash": ""
   },
   "src/features/wall/edit-card-modal.tsx": {
@@ -535,14 +535,14 @@
     "semantic_hash": "784d7e6485888ae64c627d19b3b814ee"
   },
   "src/features/wall/wall-app.tsx": {
-    "mtime": 1782420909.5228746,
-    "ast_hash": "b850d1d296095fe55dd04b7e40e43044",
+    "mtime": 1782421435.5126035,
+    "ast_hash": "fc7fa570b0923ec696358f65ff5f4d71",
     "semantic_hash": ""
   },
   "src/features/wall/wall-card.tsx": {
-    "mtime": 1782375872.20324,
-    "ast_hash": "923651702d7b5bcc7a212a25223da163",
-    "semantic_hash": "923651702d7b5bcc7a212a25223da163"
+    "mtime": 1782422662.8861141,
+    "ast_hash": "17fab7cdce180ed8f80b6044fda41155",
+    "semantic_hash": ""
   },
   "src/features/wall/wall-minimap.tsx": {
     "mtime": 1782349170.0198064,

@@ -1,16 +1,16 @@
 # Graph Report - local-wall  (2026-06-25)
 
 ## Corpus Check
-- 193 files · ~422,317 words
+- 193 files · ~422,480 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 840 nodes · 1361 edges · 81 communities (61 shown, 20 thin omitted)
+- 842 nodes · 1363 edges · 75 communities (56 shown, 19 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1943b617`
+- Built from commit: `713d4157`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -33,12 +33,10 @@
 - [[_COMMUNITY_Home Page & Root Routes|Home Page & Root Routes]]
 - [[_COMMUNITY_Location Combobox & Seed Data|Location Combobox & Seed Data]]
 - [[_COMMUNITY_Convex TypeScript Config|Convex TypeScript Config]]
-- [[_COMMUNITY_Home Location Picker & Onboarding|Home Location Picker & Onboarding]]
 - [[_COMMUNITY_Cron Jobs, HTTP & Users|Cron Jobs, HTTP & Users]]
 - [[_COMMUNITY_Card Types & Wall Card Component|Card Types & Wall Card Component]]
 - [[_COMMUNITY_Playwright CLI Testing Skill|Playwright CLI Testing Skill]]
 - [[_COMMUNITY_Dashboard Signal & Wall App|Dashboard Signal & Wall App]]
-- [[_COMMUNITY_Home Navigation & Post Button|Home Navigation & Post Button]]
 - [[_COMMUNITY_Build & Dev Scripts|Build & Dev Scripts]]
 - [[_COMMUNITY_Digest Email System|Digest Email System]]
 - [[_COMMUNITY_Payments Internal Logic|Payments Internal Logic]]
@@ -47,10 +45,7 @@
 - [[_COMMUNITY_Renewal Reminder Emails|Renewal Reminder Emails]]
 - [[_COMMUNITY_Dev Dependencies|Dev Dependencies]]
 - [[_COMMUNITY_Composer Props & Placement Mode|Composer Props & Placement Mode]]
-- [[_COMMUNITY_Theme System & Clerk Portal|Theme System & Clerk Portal]]
 - [[_COMMUNITY_Package Metadata & Overrides|Package Metadata & Overrides]]
-- [[_COMMUNITY_Sitemap Generation|Sitemap Generation]]
-- [[_COMMUNITY_Wall Location & Category Routing|Wall Location & Category Routing]]
 - [[_COMMUNITY_GDPR Data Export & Delete|GDPR Data Export & Delete]]
 - [[_COMMUNITY_Saved Cards|Saved Cards]]
 - [[_COMMUNITY_Generated Convex Server Types|Generated Convex Server Types]]
@@ -61,7 +56,6 @@
 - [[_COMMUNITY_Convex Skill Icons|Convex Skill Icons]]
 - [[_COMMUNITY_Brand Assets & UI Mockups|Brand Assets & UI Mockups]]
 - [[_COMMUNITY_E2E Wall Load Tests|E2E Wall Load Tests]]
-- [[_COMMUNITY_Home Category Grid|Home Category Grid]]
 - [[_COMMUNITY_Sentry API Error Example|Sentry API Error Example]]
 - [[_COMMUNITY_Sentry Frontend Error Example|Sentry Frontend Error Example]]
 - [[_COMMUNITY_Global Error Boundary|Global Error Boundary]]
@@ -115,7 +109,7 @@
 - **PostHog Integration Workflow (Plan/Edit/Revise/Conclude)** — 1_begin_posthog_event_plan, 2_edit_posthog_event_impl, 3_revise_posthog_event_revise, 4_conclude_posthog_conclude [EXTRACTED 1.00]
 - **Playwright CLI Test Lifecycle (Generate/Debug/Heal)** — spec_driven_testing_plan_generate_heal, playwright_tests_debug_attach, test_generation_playwright_codegen [EXTRACTED 1.00]
 
-## Communities (81 total, 20 thin omitted)
+## Communities (75 total, 19 thin omitted)
 
 ### Community 0 - "Rate Limiting & API Utilities"
 Cohesion: 0.08
@@ -158,16 +152,16 @@ Cohesion: 0.17
 Nodes (18): OwnerDashboard, ComposerForm, EditCardModal(), themeLabels, OwnerDashboardProps, renewalOptions, CardCategory, CardImageMode (+10 more)
 
 ### Community 10 - "Admin Backend (Convex)"
-Cohesion: 0.09
-Nodes (24): approveVerification, blockUser, configuredAdminEmails(), getAccess, getAdminIdentity(), getDashboard, PG_DURATIONS, playgroundCreateCard (+16 more)
+Cohesion: 0.08
+Nodes (25): approveVerification, blockUser, configuredAdminEmails(), getAccess, getAdminIdentity(), getAuditLog, getDashboard, PG_DURATIONS (+17 more)
 
 ### Community 11 - "Dependencies & Package Config"
 Cohesion: 0.09
 Nodes (23): dependencies, @clerk/nextjs, convex, country-state-city, @fontsource/barlow-condensed, @fontsource/caveat, @fontsource/inter, lucide-react (+15 more)
 
 ### Community 12 - "Trending Feed UI"
-Cohesion: 0.13
-Nodes (18): CardVars, hashStr(), MiniCard(), Props, TrendingCardGrid(), DetailPanel, Props, TrendingCardModal() (+10 more)
+Cohesion: 0.06
+Nodes (34): ClerkThemePortal(), HomeHowItWorksModal(), STEPS, HomeNav(), HomePage(), HomePostButton(), Loc, HomeSearch() (+26 more)
 
 ### Community 13 - "TypeScript Configuration"
 Cohesion: 0.10
@@ -178,8 +172,8 @@ Cohesion: 0.12
 Nodes (15): BundleCity, clearImagesFromIDB(), countries, defaultStates, DetailField, detailFieldLabels, featuredTierOptions, initialForm (+7 more)
 
 ### Community 15 - "Home Page & Root Routes"
-Cohesion: 0.24
-Nodes (13): metadata, Props, RootPage(), buildWallPath(), CATEGORY_SLUGS, formatWallPath(), parseWallPath(), toCategorySlug() (+5 more)
+Cohesion: 0.07
+Nodes (31): metadata, Props, RootPage(), BASE_URL, CITY_PATHS, sitemap(), STATIC_ROUTES, US_STATE_CODES (+23 more)
 
 ### Community 16 - "Location Combobox & Seed Data"
 Cohesion: 0.14
@@ -188,10 +182,6 @@ Nodes (12): LocationCombobox(), Option, Props, seedCards, Composer, defaultSeedL
 ### Community 17 - "Convex TypeScript Config"
 Cohesion: 0.12
 Nodes (15): compilerOptions, allowJs, allowSyntheticDefaultImports, forceConsistentCasingInFileNames, isolatedModules, jsx, lib, module (+7 more)
-
-### Community 18 - "Home Location Picker & Onboarding"
-Cohesion: 0.15
-Nodes (9): HomeHowItWorksModal(), STEPS, HomeLocationPicker(), Level, Props, HomePage(), DetectedLoc, HomeSearch() (+1 more)
 
 ### Community 19 - "Cron Jobs, HTTP & Users"
 Cohesion: 0.16
@@ -208,10 +198,6 @@ Nodes (13): Playwright CLI Element Attribute Inspection, Playwright CLI Page Sna
 ### Community 22 - "Dashboard Signal & Wall App"
 Cohesion: 0.21
 Nodes (10): openDashboard(), pushDashboardHandler(), stack, AdminPanel, allowedImageTypes, ConnectedWallApp(), createImageVariants(), encodeWebpVariant() (+2 more)
-
-### Community 23 - "Home Navigation & Post Button"
-Cohesion: 0.21
-Nodes (8): HomePostButton(), Loc, actionBtn, barlowUpper, clerkUserButtonAppearance, clerkUserProfileAppearance, font, iconBox
 
 ### Community 24 - "Build & Dev Scripts"
 Cohesion: 0.17
@@ -245,21 +231,9 @@ Nodes (9): devDependencies, convex-test, @edge-runtime/vm, @playwright/test, @ty
 Cohesion: 0.31
 Nodes (8): ComposerProps, LiveCardPreview(), PlacementMode(), PlacementModeProps, CardDraft, getCardFormat(), Placement, makeDemoCard()
 
-### Community 32 - "Theme System & Clerk Portal"
-Cohesion: 0.32
-Nodes (4): ClerkThemePortal(), HomeNav(), Resolved, useTheme()
-
 ### Community 33 - "Package Metadata & Overrides"
 Cohesion: 0.25
 Nodes (7): name, overrides, postcss, ws, private, type, version
-
-### Community 34 - "Sitemap Generation"
-Cohesion: 0.33
-Nodes (6): BASE_URL, CITY_PATHS, sitemap(), STATIC_ROUTES, US_STATE_CODES, fetchPublishedCardIds()
-
-### Community 35 - "Wall Location & Category Routing"
-Cohesion: 0.38
-Nodes (5): Props, WallLocationCategoryPage(), parseLocationSlug(), Props, WallLocationPage()
 
 ### Community 36 - "GDPR Data Export & Delete"
 Cohesion: 0.29
@@ -294,15 +268,15 @@ Cohesion: 0.67
 Nodes (4): LocalWall Logo Big (Full Branding with Tagline and Category Icons), LocalWall Logo Small (Compact Horizontal Logo), Wall Concept Mockup (Bulletin Board UI with Cards and Detail Panel), Wall Texture (Weathered Urban Bulletin Board Background Texture)
 
 ## Knowledge Gaps
-- **348 isolated node(s):** `CardEvent`, `ReportReason`, `REPORT_REASONS`, `Composer`, `DetailPanel` (+343 more)
+- **349 isolated node(s):** `getAccess`, `getDashboard`, `sendTestReminderEmail`, `setUserVerified`, `approveVerification` (+344 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `api` connect `Billing, Admin & Test Infrastructure` to `Rate Limiting & API Utilities`, `Geo-Routed Pages & RSS Feeds`, `Card Display & Embed Pages`, `Admin Panel & Moderation UI`, `UI Shared Components & Detail Panel`, `Owner Dashboard & Card Editing`, `Admin Backend (Convex)`, `Trending Feed UI`, `Home Location Picker & Onboarding`, `Dashboard Signal & Wall App`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+- **Why does `api` connect `Billing, Admin & Test Infrastructure` to `Rate Limiting & API Utilities`, `Geo-Routed Pages & RSS Feeds`, `Card Display & Embed Pages`, `Admin Panel & Moderation UI`, `UI Shared Components & Detail Panel`, `Owner Dashboard & Card Editing`, `Admin Backend (Convex)`, `Trending Feed UI`, `Home Page & Root Routes`, `Dashboard Signal & Wall App`?**
+  _High betweenness centrality (0.081) - this node is a cross-community bridge._
 - **Why does `WallCard` connect `Card Types & Wall Card Component` to `Geo-Routed Pages & RSS Feeds`, `UI Shared Components & Detail Panel`, `Owner Dashboard & Card Editing`, `Trending Feed UI`, `Location Combobox & Seed Data`, `Dashboard Signal & Wall App`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Why does `mutation` connect `Rate Limits & Reviews` to `Card Data Layer (Convex)`, `Saved Cards`, `Saved Walls`, `Admin Backend (Convex)`, `Cron Jobs, HTTP & Users`, `Digest Email System`?**
@@ -311,7 +285,7 @@ _Questions this graph is uniquely positioned to answer:_
   _`parseCountrySlug()` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `fetchInitialCards()` (e.g. with `GET()` and `GET()`) actually correct?**
   _`fetchInitialCards()` has 4 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `CardEvent`, `ReportReason`, `REPORT_REASONS` to the rest of the system?**
-  _349 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `getAccess`, `getDashboard`, `sendTestReminderEmail` to the rest of the system?**
+  _350 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Rate Limiting & API Utilities` be split into smaller, more focused modules?**
   _Cohesion score 0.07678075855689177 - nodes in this community are weakly interconnected._

@@ -122,8 +122,9 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
         card.imageMode === "business-card" ? (
           <div className="wall-card-biz-wrap"><Image src={cardImage} alt="" fill sizes="280px" className="wall-card-biz-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} /></div>
         ) : (
-          <div className="wall-card-img-wrap">
-            <Image src={cardImage} alt="" fill sizes="280px" className="wall-card-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} />
+          <div className="wall-card-clip">
+            {/* ponytail: plain img — position is user-defined (%, %) */}
+            <img src={cardImage} alt="" draggable={false} className="wall-card-img-free" style={{ left: `${card.imageX ?? 50}%`, top: `${card.imageY ?? 35}%`, width: `${card.imageWidth ?? 90}%` }} />
           </div>
         )
       ) : null}

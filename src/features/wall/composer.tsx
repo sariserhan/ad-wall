@@ -36,6 +36,9 @@ interface ComposerForm {
   telegram: string;
   theme: CardTheme;
   imageMode: CardImageMode;
+  imageX: number;
+  imageY: number;
+  imageWidth: number;
   paymentOption: "free" | "2.99" | "7.99" | "24.99" | "bundle";
   featuredTier: "none" | "bronze" | "silver" | "gold";
 }
@@ -74,6 +77,9 @@ const initialForm: ComposerForm = {
   telegram: "",
   theme: "yellow",
   imageMode: "photo",
+  imageX: 50,
+  imageY: 35,
+  imageWidth: 90,
   paymentOption: "free",
   featuredTier: "none",
 };
@@ -182,16 +188,48 @@ function validSocialProfile(value: string) {
   return /^@?[A-Za-z0-9._-]{2,100}$/.test(value) || /^(https?:\/\/)?(www\.)?[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/\S*)?$/.test(value);
 }
 
-function LiveCardPreview({ form, image }: { form: ComposerForm; image?: string }) {
-  const displayTheme = form.imageMode === "business-card" ? "biz" : form.theme;
-  const format = getCardFormat(displayTheme);
+function LiveCardPreview({ form, image, onImageChange }: { form: ComposerForm; image?: string; onImageChange?: (x: number, y: number, w: number) => void }) {
+  const dragRef = useRef<{ startX: number; startY: number; startIX: number; startIY: number } | null>(null);
+  const resizeRef = useRef<{ startX: number; startY: number; startW: number } | null>(null);
+  const clipRef = useRef<HTMLDivElement>(null);
+  const format = getCardFormat(form.theme);
   const location = form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall";
+
+  if (form.imageMode === "business-card" && image) {
+    return (
+      <div className="composer-biz-preview" style={{ "--tape-w": "62px", "--tape-r": "-2deg", "--tape-l": "38%" } as CSSProperties} aria-label="Live card preview">
+        <span className="card-tape" aria-hidden="true" />
+        <img src={image} alt="" draggable={false} className="composer-biz-img" />
+      </div>
+    );
+  }
+
   const style = { "--w": `${format.width}px`, "--h": `${format.minHeight}px`, "--r": "-1deg", "--x": "0", "--y": "0" } as CSSProperties;
   return (
-    <article className={`wall-card composer-live-card theme-${displayTheme} ${form.imageMode === "business-card" && image ? "image-business-card" : ""}`} style={style} aria-label="Live card preview">
+    <article className={`wall-card composer-live-card theme-${form.theme}`} style={style} aria-label="Live card preview">
       <span className="card-tape" aria-hidden="true" />
       <div className="card-copy"><p className="card-category">{form.category}{form.subcategory ? <> · {form.subcategory}</> : null}</p><h2>{form.name || "Your business"}</h2><p className="card-line">{form.line || "Your offer goes here."}</p>{form.message.trim() ? <p className="composer-preview-message">{form.message}</p> : null}</div>
-      {image ? <img src={image} alt="" draggable={false} /> : null}
+      {image ? (
+        <div
+          ref={clipRef}
+          className={`wall-card-clip${onImageChange ? " img-interactive" : ""}`}
+          onPointerDown={onImageChange ? (e) => { e.currentTarget.setPointerCapture(e.pointerId); dragRef.current = { startX: e.clientX, startY: e.clientY, startIX: form.imageX, startIY: form.imageY }; } : undefined}
+          onPointerMove={onImageChange ? (e) => { if (!dragRef.current || !clipRef.current) return; const rect = clipRef.current.getBoundingClientRect(); onImageChange(Math.max(0, Math.min(100, dragRef.current.startIX + ((e.clientX - dragRef.current.startX) / rect.width) * 100)), Math.max(0, Math.min(100, dragRef.current.startIY + ((e.clientY - dragRef.current.startY) / rect.height) * 100)), form.imageWidth); } : undefined}
+          onPointerUp={onImageChange ? () => { dragRef.current = null; } : undefined}
+          onPointerCancel={onImageChange ? () => { dragRef.current = null; } : undefined}
+        >
+          <img src={image} alt="" draggable={false} className="wall-card-img-free" style={{ left: `${form.imageX}%`, top: `${form.imageY}%`, width: `${form.imageWidth}%` }} />
+          {onImageChange ? (
+            <div
+              className="img-resize-handle"
+              onPointerDown={(e) => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); resizeRef.current = { startX: e.clientX, startY: e.clientY, startW: form.imageWidth }; }}
+              onPointerMove={(e) => { if (!resizeRef.current || !clipRef.current) return; const rect = clipRef.current.getBoundingClientRect(); const delta = ((e.clientX - resizeRef.current.startX) + (e.clientY - resizeRef.current.startY)) / 2; onImageChange(form.imageX, form.imageY, Math.max(20, Math.min(200, resizeRef.current.startW + (delta / rect.width) * 100))); }}
+              onPointerUp={() => { resizeRef.current = null; }}
+              onPointerCancel={() => { resizeRef.current = null; }}
+            />
+          ) : null}
+        </div>
+      ) : null}
       <footer><span>{location}</span>{form.price ? <strong>{form.price}</strong> : null}</footer>
     </article>
   );
@@ -598,7 +636,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
                   <button
                     type="button"
                     key={theme}
-                    className={`style-option style-${theme} ${form.theme === theme ? "selected" : ""}`}
+                    className={`style-option style-${theme} ${form.theme === theme && form.imageMode !== "business-card" ? "selected" : ""}`}
                     onClick={() => setForm((value) => ({ ...value, theme }))}
                     disabled={form.imageMode === "business-card"}
                     role="radio"
@@ -606,7 +644,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
                   >
                     <span className="style-option-sample" aria-hidden="true"><i /><b /></span>
                     <span className="style-option-copy"><strong>{label}</strong><small>{description}</small></span>
-                    {form.theme === theme ? <Check className="style-option-check" /> : null}
+                    {form.theme === theme && form.imageMode !== "business-card" ? <Check className="style-option-check" /> : null}
                   </button>
                 ))}
               </div>
@@ -614,8 +652,9 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
             <div className="preview-stage">
               <span>Live preview</span>
               <div className="preview-canvas">
-                <LiveCardPreview form={form} image={previews[0]} />
+                <LiveCardPreview form={form} image={previews[0]} onImageChange={previews[0] && form.imageMode === "photo" ? (x, y, w) => setForm((f) => ({ ...f, imageX: x, imageY: y, imageWidth: w })) : undefined} />
               </div>
+              {previews[0] && form.imageMode === "photo" ? <small className="img-drag-hint">Drag to reposition · drag corner to resize</small> : null}
             </div>
           </div>
         ) : (

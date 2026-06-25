@@ -97,6 +97,9 @@ export interface WallCard {
   telegram?: string;
   theme: CardTheme;
   imageMode?: CardImageMode;
+  imageX?: number;
+  imageY?: number;
+  imageWidth?: number;
   images: string[];
   thumbnailImages?: string[];
   x: number;
@@ -161,6 +164,9 @@ export interface CardDraft {
   telegram?: string;
   theme: CardTheme;
   imageMode: CardImageMode;
+  imageX?: number;
+  imageY?: number;
+  imageWidth?: number;
   paymentOption: "free" | "2.99" | "7.99" | "24.99" | "bundle";
   bundleCities?: Array<{ country: string; state: string; city: string }>;
   featuredTier: "none" | "bronze" | "silver" | "gold";
