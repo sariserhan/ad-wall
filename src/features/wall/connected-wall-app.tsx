@@ -18,6 +18,7 @@ const AdminPanel = dynamic(() => import("./admin-panel").then((m) => ({ default:
 import { getCardFormat, type CardDraft, type CardUpdate, type OwnerCard, type Placement, type RenewalAmount, type SavedWall, type WallCard } from "./types";
 import { buildWallPath } from "@/lib/wall-slug";
 import posthog from "posthog-js";
+import { openDashboard } from "@/lib/dashboard-signal";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -82,7 +83,6 @@ export function ConnectedWallApp({
   const { isAuthenticated, isLoading: isConvexAuthLoading } = useConvexAuth();
   const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn, userId } = useAuth();
   const { isDark, toggleTheme } = useTheme();
-  const openDashboardRef = useRef<(() => void) | null>(null);
   const [layoutCards, setLayoutCards] = useState<WallCard[] | null>(null);
   const hasAppliedInitialServerSnapshotRef = useRef(false);
   const queryCountry = initialLocation?.country || undefined;
@@ -550,7 +550,7 @@ export function ConnectedWallApp({
             <UserButton.Action
               label="My board"
               labelIcon={<LayoutDashboard size={16} />}
-              onClick={() => openDashboardRef.current?.()}
+              onClick={() => openDashboard()}
             />
             <UserButton.Action
               label="Trending"
@@ -654,7 +654,6 @@ export function ConnectedWallApp({
         await updateCardPosition({ cardId: card.id as Id<"cards">, x: placement.x, y: placement.y });
         setLayoutCards((current) => current?.map((item) => String(item.id) === String(card.id) ? { ...item, ...placement, positionLockedAt: Date.now() } : item) ?? current);
       }}
-      openDashboardRef={openDashboardRef}
       />
       {adminOpen && adminAccess?.isAdmin ? (
         <AdminPanel

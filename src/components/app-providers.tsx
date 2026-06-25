@@ -5,6 +5,7 @@ import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useState } from "react";
 import { Toaster } from "@/lib/toast";
+import { GlobalOwnerDashboard } from "./global-owner-dashboard";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ function ConnectedProviders({ children, convexUrl }: { children: React.ReactNode
   return (
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       {children}
+      <GlobalOwnerDashboard />
       <Toaster />
     </ConvexProviderWithClerk>
   );

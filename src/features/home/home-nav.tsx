@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/lib/use-theme";
 import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
+import { openDashboard } from "@/lib/dashboard-signal";
 import { HomePostButton } from "./home-post-button";
 
 export function HomeNav() {
@@ -35,7 +36,7 @@ export function HomeNav() {
               <UserButton.Action
                 label="My board"
                 labelIcon={<LayoutDashboard size={16} />}
-                onClick={() => router.push("/us")}
+                onClick={() => openDashboard()}
               />
               <UserButton.Action
                 label="Trending"
