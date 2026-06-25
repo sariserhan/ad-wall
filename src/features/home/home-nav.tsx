@@ -5,7 +5,7 @@ import { CreditCard, LayoutDashboard, Moon, Sun, TrendingUp } from "lucide-react
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/lib/use-theme";
-import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
+import { clerkUserButtonAppearance, clerkUserProfileAppearance } from "@/lib/clerk-appearance";
 import { openDashboard } from "@/lib/dashboard-signal";
 import { HomePostButton } from "./home-post-button";
 
@@ -31,7 +31,7 @@ export function HomeNav() {
         )}        
         <HomePostButton />
         {isSignedIn ? (
-          <UserButton appearance={clerkUserButtonAppearance}>
+          <UserButton appearance={clerkUserButtonAppearance} userProfileProps={{ appearance: clerkUserProfileAppearance }}>
             <UserButton.MenuItems>
               <UserButton.Action
                 label="My board"

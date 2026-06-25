@@ -37,7 +37,7 @@ export function ClerkMyDataPage() {
       <p className="clerk-custom-page-desc">
         Download a copy of everything LocalWall holds about you — your profile, cards, reviews, and saved content — as a JSON file.
       </p>
-      <button className="clerk-custom-page-btn" onClick={handleExport} disabled={busy}>
+      <button className={`clerk-custom-page-btn${done ? " done" : ""}`} onClick={handleExport} disabled={busy}>
         {busy ? "Exporting…" : done ? "✓ Downloaded" : "Download my data"}
       </button>
       {error ? <p className="clerk-custom-page-error">{error}</p> : null}
