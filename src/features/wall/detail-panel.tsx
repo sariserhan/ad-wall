@@ -169,6 +169,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
   const openQr = async () => {
     setQrOpen(true);
     setQrDataUrl(null);
+    onEvent?.("share");
     const url = buildCardUrl();
     const QRCode = (await import("qrcode")).default;
     const dataUrl = await QRCode.toDataURL(url, { width: 280, margin: 2, color: { dark: "#111111", light: "#f5f1e8" } });

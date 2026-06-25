@@ -39,3 +39,19 @@ export async function fetchTopWalls(limit = 20): Promise<{ path: string; viewCou
     return [];
   }
 }
+
+export type TopCard = { id: string; name: string; category: string; line: string; area: string; city: string; state: string; theme: string; rotation: number; metric: number };
+
+export async function fetchTopCards(
+  type: "liked" | "reviewed" | "clicked" | "shared",
+  limit = 10,
+): Promise<TopCard[]> {
+  try {
+    const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!url) return [];
+    const client = new ConvexHttpClient(url);
+    return (await client.query(api.cards.getTopCards, { type, limit })) ?? [];
+  } catch {
+    return [];
+  }
+}

@@ -958,3 +958,65 @@ export const getStats = query({
     return { totalListings, totalBusinesses, totalCities };
   },
 });
+
+export const getTopCards = query({
+  args: {
+    type: v.union(v.literal("liked"), v.literal("reviewed"), v.literal("clicked"), v.literal("shared")),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(args.limit ?? 10, 25);
+    const now = Date.now();
+
+    if (args.type === "clicked" || args.type === "reviewed") {
+      const field = args.type === "clicked" ? "clicks" : "reviewCount";
+      const cards = await ctx.db
+        .query("cards")
+        .withIndex("by_status_created", (q) => q.eq("status", "published"))
+        .collect();
+      return cards
+        .filter((c) => c.expiresAt > now && (c[field] ?? 0) > 0)
+        .sort((a, b) => (b[field] ?? 0) - (a[field] ?? 0))
+        .slice(0, limit)
+        .map((c) => ({
+          id: String(c._id),
+          name: c.name,
+          category: c.category,
+          line: c.line,
+          area: c.area,
+          city: c.city,
+          state: c.state,
+          theme: c.theme,
+          rotation: c.rotation,
+          metric: c[field] ?? 0,
+        }));
+    }
+
+    // liked / shared — metric lives in cardStats
+    const statsField = args.type === "liked" ? "likes" : "shares";
+    const allStats = await ctx.db.query("cardStats").collect();
+    const sorted = allStats
+      .filter((s) => (s[statsField] ?? 0) > 0)
+      .sort((a, b) => (b[statsField] ?? 0) - (a[statsField] ?? 0));
+
+    const results: { id: string; name: string; category: string; line: string; area: string; city: string; state: string; theme: string; rotation: number; metric: number }[] = [];
+    for (const stat of sorted) {
+      if (results.length >= limit) break;
+      const card = await ctx.db.get(stat.cardId);
+      if (!card || card.status !== "published" || card.expiresAt <= now) continue;
+      results.push({
+        id: String(card._id),
+        name: card.name,
+        category: card.category,
+        line: card.line,
+        area: card.area,
+        city: card.city,
+        state: card.state,
+        theme: card.theme,
+        rotation: card.rotation,
+        metric: stat[statsField] ?? 0,
+      });
+    }
+    return results;
+  },
+});

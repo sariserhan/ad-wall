@@ -27,7 +27,7 @@ export function HomeNav() {
             <TrendingUp size={12} />
             Trending
           </Link>
-        )}
+        )}        
         <HomePostButton />
         {isSignedIn ? (
           <UserButton appearance={clerkUserButtonAppearance}>
@@ -38,7 +38,7 @@ export function HomeNav() {
                 onClick={() => router.push("/us")}
               />
               <UserButton.Action
-                label="Trending walls"
+                label="Trending"
                 labelIcon={<TrendingUp size={16} />}
                 onClick={() => router.push("/trending")}
               />

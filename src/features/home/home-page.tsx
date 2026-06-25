@@ -212,12 +212,12 @@ export async function HomePage() {
           </section>
         ) : null}
 
-        {/* ── Trending Walls ───────────────────────────────────────────── */}
+        {/* ── Trending ───────────────────────────────────────────── */}
         {topWalls.length > 0 ? (
           <section className="home-section home-section-dark">
             <div className="home-container">
               <div className="home-section-header">
-                <h2 className="home-section-title">Trending walls</h2>
+                <h2 className="home-section-title">Trending</h2>
                 <Link href="/trending" className="home-section-see-all">See all →</Link>
               </div>
               <div className="home-walls-grid">

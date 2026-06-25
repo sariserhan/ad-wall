@@ -549,7 +549,7 @@ export function ConnectedWallApp({
               onClick={() => openDashboardRef.current?.()}
             />
             <UserButton.Action
-              label="Trending walls"
+              label="Trending"
               labelIcon={<TrendingUp size={16} />}
               onClick={() => router.push("/trending")}
             />
