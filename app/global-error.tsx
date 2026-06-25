@@ -1,19 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
+import Error from "next/error";
 
 interface GlobalErrorProps {
-  error: Error & { digest?: string };
+  error: Error & { digest?: string, message?: string };
   reset: () => void;
 }
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
+    Sentry.captureException(error);
     navigator.sendBeacon(
       "/api/vitals",
       JSON.stringify({
         name: "client.error",
-        message: error.message,
+        message: error.message ?? "Unknown error",
         digest: error.digest ?? null,
       }),
     );
