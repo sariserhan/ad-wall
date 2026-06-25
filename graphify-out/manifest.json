@@ -540,9 +540,9 @@
     "semantic_hash": ""
   },
   "src/features/wall/wall-card.tsx": {
-    "mtime": 1782375872.20324,
-    "ast_hash": "923651702d7b5bcc7a212a25223da163",
-    "semantic_hash": "923651702d7b5bcc7a212a25223da163"
+    "mtime": 1782422662.8861141,
+    "ast_hash": "17fab7cdce180ed8f80b6044fda41155",
+    "semantic_hash": ""
   },
   "src/features/wall/wall-minimap.tsx": {
     "mtime": 1782349170.0198064,
