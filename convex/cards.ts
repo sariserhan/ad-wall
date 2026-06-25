@@ -216,12 +216,16 @@ export const getPublishedById = query({
   handler: async (ctx, args) => {
     const card = await ctx.db.get(args.cardId);
     if (!card || card.status !== "published" || card.expiresAt <= Date.now()) return null;
-    const [urls, thumbnailUrls, stats, owner] = await Promise.all([
+    const [urls, thumbnailUrls, stats, owner, reviews] = await Promise.all([
       Promise.all(card.imageIds.map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
       Promise.all((card.thumbnailImageIds ?? []).map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
       ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", card._id)).unique(),
       ctx.db.get(card.ownerId),
+      ctx.db.query("reviews").withIndex("by_card_and_createdAt", (q) => q.eq("cardId", card._id)).collect(),
     ]);
+    const avgRating = reviews.length > 0
+      ? Math.round(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length * 10) / 10
+      : 0;
     return {
       id: card._id,
       ownerId: card.ownerId,
@@ -264,7 +268,8 @@ export const getPublishedById = query({
       expiresAt: card.expiresAt,
       clicks: stats?.clicks ?? card.clicks,
       featuredTier: card.featuredTier,
-      reviewCount: card.reviewCount ?? 0,
+      reviewCount: reviews.length,
+      avgRating,
       verified: owner?.verified ?? false,
     };
   },

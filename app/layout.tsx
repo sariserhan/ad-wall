@@ -13,7 +13,10 @@ import "@fontsource/inter/latin-700.css";
 import "@fontsource/inter/latin-800.css";
 import "./globals.css";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localwall.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: "LocalWall — Your Local Bulletin Board",
   description: "Find and post local ads for services, jobs, real estate, and more in your city.",
 };

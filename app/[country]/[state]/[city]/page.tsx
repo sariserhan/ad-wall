@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: `${loc} Local Bulletin Board — Services, Jobs & Events | LocalWall`,
       description: `Browse local ads in ${loc}. Find services, repairs, jobs, events, real estate and more on the ${loc} community wall. Free to browse, easy to post.`,
+      alternates: { canonical: `/${cSlug}/${sSlug}/${citySlug}`, types: { "application/rss+xml": `/${cSlug}/${sSlug}/${citySlug}/feed.xml` } },
       openGraph: { title: `${loc} Local Bulletin Board`, description: `Local ads, services and events in ${loc}, ${countryName}.` },
-      alternates: { types: { "application/rss+xml": `/${cSlug}/${sSlug}/${citySlug}/feed.xml` } },
     };
   }
 
@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: `${category} · ${loc} Wall — Local Ads`,
       description: `Browse ${category} ads in ${loc}.`,
+      alternates: { canonical: `/${cSlug}/${sSlug}/${citySlug}` },
       openGraph: { title: `${category} in ${loc}`, description: `Local ${category} ads in ${loc}` },
     };
   }

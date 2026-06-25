@@ -3,7 +3,15 @@ import { categories } from "@/features/wall/types";
 import { toCategorySlug } from "@/lib/wall-slug";
 import { fetchPublishedCardIds } from "@/lib/server-cards";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localwall.app";
+const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://localwall.app").replace(/\/$/, "");
+
+const US_STATE_CODES = [
+  "al","ak","az","ar","ca","co","ct","de","fl","ga",
+  "hi","id","il","in","ia","ks","ky","la","me","md",
+  "ma","mi","mn","ms","mo","mt","ne","nv","nh","nj",
+  "nm","ny","nc","nd","oh","ok","or","pa","ri","sc",
+  "sd","tn","tx","ut","vt","va","wa","wv","wi","wy","dc",
+];
 
 const CITY_PATHS = [
   "/us/ny/new-york",
@@ -39,10 +47,10 @@ const CITY_PATHS = [
 ];
 
 const STATIC_ROUTES = [
-  { url: "/",                    priority: 1.0, changeFrequency: "daily"  as const },
-  { url: "/trending",            priority: 0.8, changeFrequency: "daily"  as const },
-  { url: "/terms-and-conditions",priority: 0.3, changeFrequency: "yearly" as const },
-  { url: "/privacy-policy",      priority: 0.3, changeFrequency: "yearly" as const },
+  { url: "/",                     priority: 1.0, changeFrequency: "daily"  as const },
+  { url: "/trending",             priority: 0.8, changeFrequency: "daily"  as const },
+  { url: "/terms-and-conditions", priority: 0.3, changeFrequency: "yearly" as const },
+  { url: "/privacy-policy",       priority: 0.3, changeFrequency: "yearly" as const },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -53,6 +61,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: now,
     changeFrequency,
     priority,
+  }));
+
+  const countryEntries: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/us`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.7 },
+  ];
+
+  const stateEntries: MetadataRoute.Sitemap = US_STATE_CODES.map((code) => ({
+    url: `${BASE_URL}/us/${code}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.65,
   }));
 
   const cityEntries: MetadataRoute.Sitemap = CITY_PATHS.map((path) => ({
@@ -80,5 +99,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticEntries, ...cityEntries, ...categoryEntries, ...cardEntries];
+  return [...staticEntries, ...countryEntries, ...stateEntries, ...cityEntries, ...categoryEntries, ...cardEntries];
 }

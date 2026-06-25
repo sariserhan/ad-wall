@@ -28,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${category} · ${loc} Wall — Local Ads`,
     description: `Browse ${category} ads in ${loc}, ${countryName}.`,
+    alternates: { canonical: `/${cSlug}/${sSlug}/${citySlug}/${catSlug}` },
     openGraph: { title: `${category} in ${loc}`, description: `Local ${category} ads in ${loc}` },
   };
 }

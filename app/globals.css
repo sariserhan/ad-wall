@@ -361,6 +361,7 @@ button { color: inherit; }
 .review-text { margin: 0; font: 400 13px/1.5 var(--font-inter); color: #333; overflow-wrap: break-word; }
 .composer-backdrop { position: fixed; inset: 0; z-index: 8000; display: grid; place-items: center; padding: 18px; background: #111b; backdrop-filter: blur(2px); }
 .composer { width: min(620px, 100%); max-height: calc(100vh - 36px); overflow-y: auto; background: var(--ui-bg); box-shadow: 14px 18px 0 #151515; }
+.composer-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .composer-step-2 { width: min(980px, 100%); }
 .composer > header { height: 76px; display: flex; align-items: center; gap: 14px; padding: 0 20px; border-bottom: 2px solid #181818; }
 .composer > header > div { display: grid; flex: 1; text-align: center; font: 900 22px var(--font-barlow-condensed); letter-spacing: .5px; }

@@ -25,8 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: `${loc} Wall — Local Ads`,
       description: `Browse local ads and services in ${loc}.`,
+      alternates: { canonical: `/${cSlug}/${sSlug}`, types: { "application/rss+xml": `/${cSlug}/${sSlug}/feed.xml` } },
       openGraph: { title: `${loc} Wall`, description: `Local ads in ${loc}` },
-      alternates: { types: { "application/rss+xml": `/${cSlug}/${sSlug}/feed.xml` } },
     };
   }
 
@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: `${category} · ${countryName} Wall — Local Ads`,
       description: `Browse ${category} ads in ${countryName}.`,
+      alternates: { canonical: `/${cSlug}/${sSlug}` },
       openGraph: { title: `${category} in ${countryName}`, description: `Local ${category} ads in ${countryName}` },
     };
   }

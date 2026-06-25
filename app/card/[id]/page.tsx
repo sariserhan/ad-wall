@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
   return {
     title,
     description,
+    alternates: { canonical: `/card/${id}` },
     openGraph: {
       title,
       description,
@@ -72,6 +73,15 @@ export default async function CardPage({ params }: CardPageProps) {
         ...(card.state ? { addressRegion: card.state } : {}),
         ...(card.country ? { addressCountry: card.country } : {}),
         ...(card.zipcode ? { postalCode: card.zipcode } : {}),
+      },
+    } : {}),
+    ...(card.reviewCount > 0 && card.avgRating > 0 ? {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: card.avgRating,
+        reviewCount: card.reviewCount,
+        bestRating: 5,
+        worstRating: 1,
       },
     } : {}),
     ...(sameAs.length > 0 ? { sameAs } : {}),

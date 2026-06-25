@@ -235,6 +235,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
       return !!(saved?.name?.trim() || saved?.line?.trim());
     } catch { return false; }
   });
+  const [honeypot, setHoneypot] = useState("");
   const [contactError, setContactError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<DetailField, string>>>({});
   const [moderationStatus, setModerationStatus] = useState<"idle" | "checking" | "passed" | "blocked">("idle");
@@ -431,6 +432,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (honeypot) return;
     if (step < 3) {
       await goToStep(step + 1);
       return;
@@ -484,6 +486,7 @@ export function Composer({ onClose, onReady, initialLocation }: ComposerProps) {
           return next;
         });
       }}>
+        <input name="url" type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" className="composer-hp" />
         <header>
           <button type="button" className="icon-btn" onClick={() => setStep((current) => current - 1)} aria-label="Back" style={{ visibility: step > 1 ? "visible" : "hidden" }}><ArrowLeft /></button>
           <div><span>{stepLabels[step - 1]}</span><small>POST A CARD · STEP {step} OF 3</small></div>

@@ -1,14 +1,49 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+// Hosts that need runtime network access beyond 'self'.
+// PostHog is proxied through /ingest/ rewrites so no external connect-src needed.
+const CSP = [
+  "default-src 'self'",
+  // Next.js needs 'unsafe-inline' for its bootstrapping scripts; remove if using nonce-based CSP.
+  "script-src 'self' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.convex.cloud https://images.unsplash.com https://img.clerk.com",
+  "font-src 'self'",
+  "connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://clerk.com https://*.clerk.accounts.dev https://*.sentry.io",
+  "frame-src https://challenges.cloudflare.com https://clerk.com https://*.clerk.accounts.dev",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
+      // Embed pages: allow framing from any origin (must come before the catch-all).
       {
         source: "/embed/:path*",
         headers: [
           { key: "X-Frame-Options", value: "ALLOWALL" },
           { key: "Content-Security-Policy", value: "frame-ancestors *" },
+        ],
+      },
+      // All other pages: security headers.
+      {
+        source: "/((?!embed).*)",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        ],
+      },
+      // All pages: CSP (no frame-ancestors here; handled per-route above).
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "Content-Security-Policy", value: CSP },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
         ],
       },
     ];
