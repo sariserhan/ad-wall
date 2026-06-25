@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { MapPin, Heart, Star, MousePointerClick, Share2, TrendingUp } from "lucide-react";
-import { formatWallPath } from "@/lib/wall-slug";
+import { Heart, Star, MousePointerClick, Share2, TrendingUp } from "lucide-react";
+import { parseWallPath } from "@/lib/wall-slug";
 import { TrendingCardGrid } from "./trending-card-grid";
 import { TrendingCardModal } from "./trending-card-modal";
 import type { TopCard } from "@/lib/server-cards";
@@ -75,18 +75,21 @@ export function TrendingTabs({ walls, liked, reviewed, contacted, shared }: Prop
           walls.length === 0 ? (
             <p className="trending-empty">No wall visits recorded yet.</p>
           ) : (
-            <ol className="trending-list">
-              {walls.map((wall, i) => (
-                <li key={wall.path} className="trending-item">
-                  <span className="trending-rank">{i + 1}</span>
-                  <Link href={wall.path} className="trending-link">
-                    <MapPin size={13} className="trending-pin" />
-                    {formatWallPath(wall.path)}
+            <div className="trending-walls-grid">
+              {walls.map((wall, i) => {
+                const { city, state, country } = parseWallPath(wall.path);
+                return (
+                  <Link key={wall.path} href={wall.path} className="trending-wall-card">
+                    <div className="twc-top">
+                      <span className="twc-rank">#{i + 1}</span>
+                      <span className="twc-views">{wall.viewCount.toLocaleString()} <em>views</em></span>
+                    </div>
+                    <strong className="twc-city">{city || state || country}</strong>
+                    <span className="twc-state">{state && city ? `${state} · ${country}` : country}</span>
                   </Link>
-                  <span className="trending-views">{wall.viewCount.toLocaleString()} <span>views</span></span>
-                </li>
-              ))}
-            </ol>
+                );
+              })}
+            </div>
           )
         ) : (
           <TrendingCardGrid

@@ -91,6 +91,13 @@ export function formatWallPath(path: string): string {
   return country.toUpperCase();
 }
 
+export function parseWallPath(path: string): { city: string; state: string; country: string } {
+  const cap = (s: string) => s.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const parts = path.replace(/^\//, "").split("/").filter(Boolean);
+  const [country = "", state = "", city = ""] = parts;
+  return { city: cap(city), state: state.toUpperCase(), country: country.toUpperCase() };
+}
+
 export function toCategorySlug(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }

@@ -1285,7 +1285,7 @@ button { color: inherit; }
 /* Trending page */
 .trending-page { min-height: calc(100vh - 56px); display: flex; flex-direction: column; }
 /* Sticky topbar */
-.trending-topbar { background: #f5f1e8; border-bottom: 1.5px solid #d4d0c8; position: sticky; top: 0; z-index: 200; padding: 0; }
+.trending-topbar { background: #f5f1e8; border-bottom: 1.5px solid #d4d0c8; position: sticky; top: 66px; z-index: 200; padding: 0; }
 .trending-topbar-row { display: flex; align-items: flex-end; gap: 0; padding-top: 22px; }
 .trending-title { margin: 0; padding: 0 32px 13px 0; font: 900 52px/.88 var(--font-barlow-condensed); text-transform: uppercase; color: #141414; flex-shrink: 0; border-right: 1.5px solid #d4d0c8; line-height: 1; }
 .trending-tabs { display: flex; overflow-x: auto; scrollbar-width: none; gap: 0; padding-left: 8px; }
@@ -1300,17 +1300,18 @@ button { color: inherit; }
 .trending-wall-view { flex: 1; background-color: #6d6b67; background-image: linear-gradient(#00000020, #00000020), url('/assets/wall-texture.png'); background-size: cover; background-position: center; box-shadow: inset 0 10px 28px #0005; padding: 48px 24px 64px; display: flex; flex-direction: column; align-items: center; }
 /* Walls list */
 .trending-empty { font: 400 14px var(--font-inter); color: #c8c4bc; margin: 0; }
-.trending-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; width: 100%; max-width: 680px; }
-.trending-item { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border: 1px solid #e0dcd4; background: #f7f4ee; transition: border-color .15s, background .15s; }
-.trending-item:hover { background: #fff; border-color: #cbc7be; }
-.trending-rank { width: 24px; flex-shrink: 0; font: 800 12px var(--font-barlow-condensed); color: #bbb; text-align: right; }
-.trending-list li:nth-child(-n+3) .trending-rank { color: #f43d38; }
-.trending-link { flex: 1; display: flex; align-items: center; gap: 8px; font: 700 14px var(--font-barlow-condensed); text-transform: uppercase; letter-spacing: .4px; color: #1a1a1a; text-decoration: none; transition: color .15s; min-width: 0; }
-.trending-link:hover { color: #f43d38; }
-.trending-pin { flex-shrink: 0; color: #bbb; }
-.trending-link:hover .trending-pin { color: #f43d38; }
-.trending-views { font: 600 12px var(--font-inter); color: #999; letter-spacing: .3px; flex-shrink: 0; text-align: right; }
-.trending-views span { font-weight: 400; display: block; font-size: 10px; }
+/* ── Trending walls grid ─────────────────────────────── */
+.trending-walls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 900px; }
+.trending-wall-card { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; background: rgba(245,241,232,.78); border: 1px solid rgba(245,241,232,.45); text-decoration: none; color: inherit; transition: background .18s, border-color .18s; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.trending-wall-card:hover { background: rgba(255,255,255,.9); border-color: rgba(244,61,56,.5); }
+.twc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.twc-rank { font: 900 11px var(--font-inter); letter-spacing: .8px; color: rgba(20,20,18,.5); }
+.trending-walls-grid > :nth-child(-n+3) .twc-rank { color: #f43d38; }
+.twc-views { font: 700 11px var(--font-inter); color: rgba(20,20,18,.65); letter-spacing: .3px; }
+.twc-views em { font-style: normal; font-weight: 400; color: rgba(20,20,18,.5); }
+.twc-city { font: 900 22px/.95 var(--font-barlow-condensed); text-transform: uppercase; color: #141414; letter-spacing: .3px; word-break: break-word; }
+.trending-wall-card:hover .twc-city { color: #f43d38; }
+.twc-state { font: 700 10px var(--font-inter); color: rgba(20,20,18,.62); letter-spacing: .8px; text-transform: uppercase; }
 /* Trending card wall grid */
 .tc-wall { position: relative; width: 100%; padding: 0; display: flex; flex-wrap: wrap; gap: 48px 36px; justify-content: center; align-content: flex-start; }
 .tc-card { position: relative !important; left: auto !important; top: auto !important; width: 210px !important; min-height: 210px !important; flex-shrink: 0; transform: rotate(var(--r, 0deg)); appearance: none; -webkit-appearance: none; text-align: left; display: flex; flex-direction: column; padding: 17px 15px 12px; border-radius: 1px; cursor: pointer; transition: transform .22s cubic-bezier(.22,.61,.36,1), box-shadow .22s ease; animation: slap .52s both cubic-bezier(.16,.75,.32,1.25); }
@@ -1479,8 +1480,8 @@ button { color: inherit; }
   .tc-wall { gap: 32px 20px; }
   .tc-card { width: 158px !important; min-height: 170px !important; }
   .tc-card h2 { font-size: 18px !important; }
-  .trending-item { gap: 10px; padding: 10px 12px; }
-  .trending-views span { display: none; }
+  .trending-walls-grid { grid-template-columns: repeat(2, 1fr); }
+  .twc-city { font-size: 18px; }
 }
 
 /* QR Code modal */
@@ -2109,18 +2110,12 @@ html[data-theme="dark"] .trending-tab { color: #555; }
 html[data-theme="dark"] .trending-tab:hover { color: #aaa; }
 html[data-theme="dark"] .trending-tab.active { color: #f07070; border-bottom-color: #f07070; }
 html[data-theme="dark"] .trending-tab-desc { color: #888; border-top-color: #2a2826; }
-html[data-theme="dark"] .trending-item { background: #2e2b27; border-color: #4a4742; }
-html[data-theme="dark"] .trending-item:hover { background: #363330; border-color: #5a5754; }
-html[data-theme="dark"] .trending-link { color: #ede9e3; }
-html[data-theme="dark"] .trending-link:hover { color: #f07070; }
-html[data-theme="dark"] .trending-link:hover .trending-pin { color: #f07070; }
 html[data-theme="dark"] .trending-card-name { color: #ede9e3; }
 html[data-theme="dark"] .trending-card-link:hover .trending-card-name { color: #f07070; }
 html[data-theme="dark"] .trending-card-cat { color: #555; }
 html[data-theme="dark"] .trending-card-loc { color: #444; }
-html[data-theme="dark"] .trending-views { color: #888; }
+
 html[data-theme="dark"] .trending-empty { color: #c8c4bc; }
-html[data-theme="dark"] .trending-rank { color: #555; }
 
 /* ── App footer (wall) ── */
 html[data-theme="dark"] .footer-digest-input { background: #1a1918; border-color: #333; }
