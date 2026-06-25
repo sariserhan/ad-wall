@@ -1,6 +1,6 @@
 # LocalWall
 
-A tactile community advertising wall built with Next.js, TypeScript, Tailwind CSS, Convex, and Clerk.
+A tactile community advertising wall built with Next.js, TypeScript, Convex, and Clerk.
 
 ## Local development
 
@@ -38,6 +38,26 @@ npx convex env set ADMIN_EMAILS "owner@example.com,moderator@example.com"
 
 After an allowlisted user signs in, an **Admin** button appears in the navigation. Admins can review recent cards and users, search records, hide or restore active cards, permanently delete cards and their uploaded images, block and unblock users, and resolve reports.
 
+## Homepage
+
+The homepage is a full-screen hero that auto-detects the visitor's city via IP geolocation and pre-fills the location search. On mobile, a single "Open [City] Wall" button replaces the expanded search form to reduce friction — tapping it navigates directly to the local wall. A "Customize search ↓" toggle reveals the full form when needed.
+
+A **How it works** link in the footer opens a modal with four steps explaining how LocalWall works. No other sections appear below the hero; the wall page itself is the primary discovery surface.
+
+## Trending page
+
+`/trending` shows five ranked tabs:
+
+| Tab | Metric |
+| --- | --- |
+| Trending Walls | All-time wall view counts — city-level only |
+| Most Liked | Cards ranked by total likes |
+| Most Reviewed | Cards ranked by review count |
+| Most Contacted | Cards ranked by call / email / website clicks |
+| Most Shared | Cards ranked by share events |
+
+The topbar (nav + tabs) is sticky so it remains accessible while scrolling a long list. The Trending Walls tab displays frosted-glass cards in a responsive grid showing city name, state, country, and view count.
+
 ## Location picker
 
 The country, state, and city selectors are typeable comboboxes — start typing to filter the list, then click or press Enter to confirm. The dropdown stays open while scrolling through long lists. Clicking **Apply** commits the selection to the wall filter.
@@ -58,6 +78,10 @@ Unfinished card content is preserved across composer sessions:
 ## Saved cards
 
 Cards can be saved (bookmarked) by signed-in users. Saved state syncs across devices through Convex. Local-storage favorites from before sign-in migrate automatically after the first sign-in. Each card has a shareable direct URL at `/card/[id]` with Open Graph and Twitter metadata. Invalid card IDs return a 404.
+
+## Card renewal reminders
+
+Before a card expires, Convex cron jobs send email reminders at 3 days and 1 day out. Sent timestamps are stored in `reminder3dSentAt` and `reminder1dSentAt` on the card document so reminders are never duplicated across cron runs.
 
 ## Commands
 
@@ -96,6 +120,10 @@ Coverage includes:
 - **Admin queries** — `getDashboard` returns stats, cards, users, and reports to admins only.
 - **Payment idempotency** — completing the same Stripe session ID twice returns the same card ID.
 - **Cron** — `markExpired` transitions published cards past their `expiresAt` to `expired`.
+- **Walls** — `recordVisit` creates / increments wall records; `getTopWalls` filters to city-level paths only, deduplicates, and sorts by view count; `getVisitors` returns visit history.
+- **Wall slug utilities** — `buildWallPath`, `formatWallPath`, `parseWallPath`, `toCategorySlug`, `parseCategorySlug`, `toCitySlug`, `parseLocationSlug` all have unit coverage.
+- **Analytics** — `getLiveViewCounts`, `incrementClicks`, `recordEvent`, `toggleLike`, `getLikedCards`, `updatePosition`.
+- **Saved cards** — `setSaved` and `list` isolation per user, idempotency.
 
 Admin tests inject `ADMIN_EMAILS` via `process.env` (which is what Convex's generated `env` resolves to in the test environment) using `beforeAll`/`afterAll`.
 
@@ -113,9 +141,13 @@ Three browser projects run in parallel: Desktop Chrome, Pixel 5 (mobile), iPad G
 | File | What it covers |
 | --- | --- |
 | `responsive.spec.ts` | Nav, topbar, location picker, sub-location routes at 375 / 768 / 1280 px |
+| `homepage.spec.ts` | Hero structure, search form, How it works modal (open / close / Escape), footer links, mobile layout |
+| `trending.spec.ts` | Trending page load, all 5 tabs, tab switching, URL hash, walls grid, sticky nav, mobile overflow |
 | `post-card.spec.ts` | Post button visibility, Clerk sign-in prompt (auth-free); full composer step flow (`@auth`) |
 | `checkout.spec.ts` | Stripe API endpoint validation; `/renew/[cardId]` route; paid card redirect (`@auth`) |
 | `moderation.spec.ts` | `/api/moderate` endpoint — safe content passes, blocked text rejected |
+| `wall-load.spec.ts` | Wall renders without errors, performance baseline, no layout overflow, stack-picker absent on load |
+| `not-found.spec.ts` | 404 page renders card aesthetic, REMOVED stamp, correct links |
 
 Tests tagged `@auth` require a saved browser session. Generate it once with:
 
