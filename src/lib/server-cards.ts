@@ -18,6 +18,17 @@ export async function fetchInitialCards(args: {
   }
 }
 
+export async function fetchPublishedCardIds(): Promise<{ id: string; updatedAt: number }[]> {
+  try {
+    const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!url) return [];
+    const client = new ConvexHttpClient(url);
+    return (await client.query(api.cards.listPublishedIds, {})) ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export async function fetchTopWalls(limit = 20): Promise<{ path: string; viewCount: number }[]> {
   try {
     const url = process.env.NEXT_PUBLIC_CONVEX_URL;

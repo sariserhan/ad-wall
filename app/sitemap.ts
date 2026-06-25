@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { categories } from "@/features/wall/types";
 import { toCategorySlug } from "@/lib/wall-slug";
+import { fetchPublishedCardIds } from "@/lib/server-cards";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localwall.app";
 
@@ -38,12 +39,13 @@ const CITY_PATHS = [
 ];
 
 const STATIC_ROUTES = [
-  { url: "/", priority: 1.0, changeFrequency: "daily" as const },
-  { url: "/terms-and-conditions", priority: 0.3, changeFrequency: "yearly" as const },
-  { url: "/privacy-policy", priority: 0.3, changeFrequency: "yearly" as const },
+  { url: "/",                    priority: 1.0, changeFrequency: "daily"  as const },
+  { url: "/trending",            priority: 0.8, changeFrequency: "daily"  as const },
+  { url: "/terms-and-conditions",priority: 0.3, changeFrequency: "yearly" as const },
+  { url: "/privacy-policy",      priority: 0.3, changeFrequency: "yearly" as const },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map(({ url, priority, changeFrequency }) => ({
@@ -70,5 +72,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
-  return [...staticEntries, ...cityEntries, ...categoryEntries];
+  const cardIds = await fetchPublishedCardIds();
+  const cardEntries: MetadataRoute.Sitemap = cardIds.map(({ id, updatedAt }) => ({
+    url: `${BASE_URL}/card/${id}`,
+    lastModified: new Date(updatedAt),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticEntries, ...cityEntries, ...categoryEntries, ...cardEntries];
 }

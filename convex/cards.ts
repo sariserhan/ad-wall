@@ -928,6 +928,21 @@ export const report = mutation({
   },
 });
 
+export const listPublishedIds = query({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const cards = await ctx.db
+      .query("cards")
+      .withIndex("by_status_created", (q) => q.eq("status", "published"))
+      .order("desc")
+      .collect();
+    return cards
+      .filter((c) => c.expiresAt > now)
+      .map((c) => ({ id: String(c._id), updatedAt: c.updatedAt ?? c.createdAt }));
+  },
+});
+
 export const getStats = query({
   args: {},
   handler: async (ctx) => {
