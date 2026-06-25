@@ -28,27 +28,29 @@ export default async function TrendingPage() {
       <HomeNav />
       <main className="trending-page">
         <div className="home-container">
-          <header className="trending-header">
-            <h1 className="trending-title">Trending walls</h1>
-            <p className="trending-sub">Most visited local boards, ranked by all-time views.</p>
-          </header>
+          <div className="trending-paper">
+            <header className="trending-header">
+              <h1 className="trending-title">Trending walls</h1>
+              <p className="trending-sub">Most visited local boards, ranked by all-time views.</p>
+            </header>
 
-          {walls.length === 0 ? (
-            <p className="trending-empty">No data yet — check back soon.</p>
-          ) : (
-            <ol className="trending-list">
-              {walls.map((wall, i) => (
-                <li key={wall.path} className="trending-item">
-                  <span className="trending-rank">{i + 1}</span>
-                  <Link href={wall.path} className="trending-link">
-                    <MapPin size={13} className="trending-pin" />
-                    {formatWallPath(wall.path)}
-                  </Link>
-                  <span className="trending-views">{wall.viewCount.toLocaleString()} <span>views</span></span>
-                </li>
-              ))}
-            </ol>
-          )}
+            {walls.length === 0 ? (
+              <p className="trending-empty">No data yet — check back soon.</p>
+            ) : (
+              <ol className="trending-list">
+                {walls.map((wall, i) => (
+                  <li key={wall.path} className="trending-item">
+                    <span className="trending-rank">{i + 1}</span>
+                    <Link href={wall.path} className="trending-link">
+                      <MapPin size={13} className="trending-pin" />
+                      {formatWallPath(wall.path)}
+                    </Link>
+                    <span className="trending-views">{wall.viewCount.toLocaleString()} <span>views</span></span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
         </div>
       </main>
       <footer className="home-footer">

@@ -260,6 +260,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const moveOffsetRef = useRef<{ x: number; y: number } | null>(null);
   const movePositionRef = useRef<Placement | null>(null);
   const closingCardRef = useRef<string | null>(null);
+  const autoOpenComposerRef = useRef(searchParams.get("post") === "1");
+  const didTriggerSignInRef = useRef(false);
   const currentCardParam = initialCardId ?? searchParams.get("card");
   const savedCardIds = useMemo(() => new Set(savedCards.map((card) => String(card.id))), [savedCards]);
   const ownerExpiryMap = useMemo(() => {
@@ -893,6 +895,23 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       location_city: selectedCity,
     });
   };
+
+  // Auto-open composer when redirected from "Post a card" on the homepage (?post=1)
+  useEffect(() => {
+    if (!autoOpenComposerRef.current) return;
+    if (isSignedIn) {
+      autoOpenComposerRef.current = false;
+      const next = new URLSearchParams(window.location.search);
+      next.delete("post");
+      const clean = next.toString();
+      window.history.replaceState({}, "", clean ? `${window.location.pathname}?${clean}` : window.location.pathname);
+      openComposer();
+    } else if (!didTriggerSignInRef.current) {
+      didTriggerSignInRef.current = true;
+      onRequestSignIn?.();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn]);
 
   const createFromDashboard = () => {
     setDashboard(false);

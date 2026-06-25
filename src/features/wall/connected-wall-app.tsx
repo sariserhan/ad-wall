@@ -3,10 +3,10 @@
 import { UserButton, useAuth, useClerk } from "@clerk/nextjs";
 import { useAction, useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LayoutDashboard, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, Moon, Sun, TrendingUp } from "lucide-react";
 import { useTheme } from "@/lib/use-theme";
 import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import dynamic from "next/dynamic";
@@ -72,6 +72,7 @@ export function ConnectedWallApp({
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
   const wallPath = useMemo(() => {
     if (!pathname || pathname === "/") return null;
     const sub = searchParams.get("subcategory");
@@ -546,6 +547,11 @@ export function ConnectedWallApp({
               label="My board"
               labelIcon={<LayoutDashboard size={16} />}
               onClick={() => openDashboardRef.current?.()}
+            />
+            <UserButton.Action
+              label="Trending walls"
+              labelIcon={<TrendingUp size={16} />}
+              onClick={() => router.push("/trending")}
             />
             <UserButton.Action label="manageAccount" />
             <UserButton.Action

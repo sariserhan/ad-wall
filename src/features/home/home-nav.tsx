@@ -1,16 +1,19 @@
 "use client";
 
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
-import { LayoutDashboard, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, Moon, Sun, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/lib/use-theme";
 import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
+import { HomePostButton } from "./home-post-button";
 
 export function HomeNav() {
   const { isSignedIn } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
+  const isTrending = pathname === "/trending";
 
   return (
     <header className="home-nav">
@@ -19,6 +22,13 @@ export function HomeNav() {
         <small>your local bulletin board</small>
       </Link>
       <nav className="home-nav-right">
+        {!isTrending && (
+          <Link href="/trending" className="home-nav-trending">
+            <TrendingUp size={12} />
+            Trending
+          </Link>
+        )}
+        <HomePostButton />
         {isSignedIn ? (
           <UserButton appearance={clerkUserButtonAppearance}>
             <UserButton.MenuItems>
@@ -26,6 +36,11 @@ export function HomeNav() {
                 label="My board"
                 labelIcon={<LayoutDashboard size={16} />}
                 onClick={() => router.push("/us")}
+              />
+              <UserButton.Action
+                label="Trending walls"
+                labelIcon={<TrendingUp size={16} />}
+                onClick={() => router.push("/trending")}
               />
               <UserButton.Action label="manageAccount" />
               <UserButton.Action
