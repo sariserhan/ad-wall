@@ -4,6 +4,7 @@ import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useState } from "react";
+import { Toaster } from "@/lib/toast";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ interface AppProvidersProps {
 }
 
 export function AppProviders({ children, clerkPublishableKey, convexUrl }: AppProvidersProps) {
-  if (!clerkPublishableKey || !convexUrl) return children;
+  if (!clerkPublishableKey || !convexUrl) return <>{children}<Toaster /></>;
 
   return (
     <ClerkProvider
@@ -42,6 +43,7 @@ function ConnectedProviders({ children, convexUrl }: { children: React.ReactNode
   return (
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       {children}
+      <Toaster />
     </ConvexProviderWithClerk>
   );
 }

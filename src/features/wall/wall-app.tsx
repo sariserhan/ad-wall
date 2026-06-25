@@ -43,6 +43,7 @@ import { categories, SUBCATEGORY_OPTIONS, getCardFormat, type CardCategory, type
 import { buildWallPath, toCategorySlug } from "@/lib/wall-slug";
 import type { SavedWall } from "./types";
 import posthog from "posthog-js";
+import { toast } from "@/lib/toast";
 
 interface WallAppProps {
   mode: "demo" | "connected";
@@ -962,6 +963,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         setSelected(card);
       }
       setFresh(true);
+      toast("Card posted!");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The card could not be posted.");
     } finally {
@@ -977,9 +979,48 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       await navigator.clipboard.writeText(url);
       setShareNotice(true);
       window.setTimeout(() => setShareNotice(false), 2500);
+      toast("Wall link copied", "info");
     } catch {
       window.prompt("Copy this link:", url);
     }
+  };
+
+  const handleWallKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    const wallEl = wallRef.current;
+    if (!wallEl) return;
+    const cards = Array.from(wallEl.querySelectorAll<HTMLElement>("[data-card-id]"));
+    if (!cards.length) return;
+    const focused = document.activeElement as HTMLElement;
+    const idx = cards.indexOf(focused);
+
+    if (e.key === "Tab") {
+      if (idx === -1) return;
+      if (!e.shiftKey && idx < cards.length - 1) {
+        e.preventDefault();
+        const next = cards[idx + 1];
+        next?.focus();
+        next?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      } else if (e.shiftKey && idx > 0) {
+        e.preventDefault();
+        const prev = cards[idx - 1];
+        prev?.focus();
+        prev?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      }
+      return;
+    }
+
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+    e.preventDefault();
+    let next: HTMLElement | undefined;
+    if (idx === -1) {
+      next = cards[0];
+    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      next = cards[Math.min(idx + 1, cards.length - 1)];
+    } else {
+      next = cards[Math.max(idx - 1, 0)];
+    }
+    next?.focus();
+    next?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   };
 
   const resetFilters = () => {
@@ -1357,6 +1398,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         aria-label="Community advertisement wall"
         style={{ backgroundImage: "linear-gradient(#0001, #0001), url('/assets/wall-texture.png')" }}
         onClick={(e) => { if (e.target === e.currentTarget && selected) closeCard(); }}
+        onKeyDown={handleWallKeyDown}
       >
         <div className="wall-grain" />
         {!isLoading ? (

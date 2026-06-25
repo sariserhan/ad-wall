@@ -633,6 +633,12 @@ button { color: inherit; }
 }
 .error-toast { position: fixed; left: 50%; bottom: 24px; z-index: 9000; display: flex; align-items: center; gap: 14px; max-width: calc(100vw - 30px); padding: 12px 14px; transform: translateX(-50%); border: 1px solid #111; background: #edcf35; box-shadow: 5px 6px 0 #111; font: 700 12px var(--font-inter); }
 .error-toast button { width: 25px; height: 25px; border: 0; background: #111; color: white; cursor: pointer; }
+.toaster { position: fixed; bottom: 72px; left: 50%; z-index: 9100; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
+.toast { padding: 9px 18px; font: 700 12px var(--font-inter); border: 1px solid #111; box-shadow: 3px 4px 0 #111; animation: toast-in .15s ease; white-space: nowrap; letter-spacing: .02em; }
+.toast-success { background: #edcf35; color: #111; }
+.toast-info { background: #f5f1e8; color: #111; }
+.toast-error { background: #f43d38; color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .stack-picker-backdrop { position: fixed; inset: 0; z-index: 7600; display: grid; place-items: center; padding: 18px; background: #111b; backdrop-filter: blur(2px); }
 .stack-picker { width: min(560px, 100%); max-height: min(78vh, 680px); overflow: auto; background: var(--ui-bg); box-shadow: 8px 12px 35px #0007; }
 .stack-picker-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #aaa; }

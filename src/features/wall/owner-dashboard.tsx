@@ -6,6 +6,7 @@ import Image from "next/image";
 import { EditCardModal } from "./edit-card-modal";
 import type { CardUpdate, OwnerCard, RenewalAmount, SavedWall, WallCard } from "./types";
 import posthog from "posthog-js";
+import { BLUR_PLACEHOLDER } from "@/lib/blur-placeholder";
 
 function Sparkline({ data }: { data: number[] }) {
   const max = Math.max(...data, 1);
@@ -323,7 +324,7 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
             <div className="dashboard-card-list dashboard-saved-list">
               {savedCards.map((card) => (
                 <article className="dashboard-card-row" key={`saved-${String(card.id)}`}>
-                <div className={`dashboard-card-thumb theme-${card.theme}`}>{card.thumbnailImages?.[0] || card.images[0] ? <Image src={card.thumbnailImages?.[0] ?? card.images[0]} alt="" fill sizes="94px" /> : <span>{card.name.slice(0, 1)}</span>}</div>
+                <div className={`dashboard-card-thumb theme-${card.theme}`}>{card.thumbnailImages?.[0] || card.images[0] ? <Image src={card.thumbnailImages?.[0] ?? card.images[0]} alt="" fill sizes="94px" placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} /> : <span>{card.name.slice(0, 1)}</span>}</div>
                   <div className="dashboard-card-copy">
                     <div><Bookmark /> saved</div>
                     <h3>{card.name}</h3>
@@ -374,7 +375,7 @@ export function OwnerDashboard({ cards, savedCards, savedWalls, loading, onClose
               const busy = busyId === String(card.id);
               return (
                 <article className="dashboard-card-row" key={String(card.id)}>
-                  <div className={`dashboard-card-thumb theme-${card.theme}`}>{card.images[0] ? <Image src={card.images[0]} alt="" fill sizes="94px" /> : <span>{card.name.slice(0, 1)}</span>}</div>
+                  <div className={`dashboard-card-thumb theme-${card.theme}`}>{card.images[0] ? <Image src={card.images[0]} alt="" fill sizes="94px" placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} /> : <span>{card.name.slice(0, 1)}</span>}</div>
                   <div className="dashboard-card-copy">
                     <div><span className={`status-dot status-${card.status}`} />{card.status}</div>
                     <h3>{card.name}</h3>

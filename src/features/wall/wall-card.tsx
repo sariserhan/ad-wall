@@ -3,6 +3,7 @@
 import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import Image from "next/image";
 import { getCardFormat, type WallCard as WallCardModel } from "./types";
+import { BLUR_PLACEHOLDER } from "@/lib/blur-placeholder";
 
 interface WallCardProps {
   card: WallCardModel;
@@ -119,10 +120,10 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
       </div>
       {cardImage ? (
         card.imageMode === "business-card" ? (
-          <Image src={cardImage} alt="" fill sizes="280px" className="wall-card-biz-photo" priority={false} />
+          <Image src={cardImage} alt="" fill sizes="280px" className="wall-card-biz-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} />
         ) : (
           <div className="wall-card-img-wrap">
-            <Image src={cardImage} alt="" fill sizes="280px" className="wall-card-photo" priority={false} />
+            <Image src={cardImage} alt="" fill sizes="280px" className="wall-card-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} />
           </div>
         )
       ) : null}

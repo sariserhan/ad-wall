@@ -7,6 +7,8 @@ import Image from "next/image";
 import type { WallCard } from "./types";
 import { SocialLinks } from "./social-links";
 import { ReviewsSection } from "./reviews-section";
+import { toast } from "@/lib/toast";
+import { BLUR_PLACEHOLDER } from "@/lib/blur-placeholder";
 
 function WhatsAppIcon() {
   return (
@@ -115,6 +117,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
     try {
       await onSetSaved(next);
       if (next) onEvent?.("save");
+      toast(next ? "Card saved" : "Card removed");
     } catch {
       setOptimisticSaved(!next);
     } finally {
@@ -157,6 +160,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
     await navigator.clipboard.writeText(buildCardUrl());
     onEvent?.("share");
     setShareMenuOpen(false);
+    toast("Link copied", "info");
   };
 
   const shareOnWhatsApp = () => {
@@ -216,7 +220,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
         <div className={card.images.length > 1 ? "sheet-images sheet-images-double" : "sheet-images"}>
           {card.images.map((image, index) => (
             <button className="sheet-image-button" type="button" onClick={() => setExpandedImage(image)} aria-label={`View ${card.name} image ${index + 1} full screen`} key={image}>
-              <Image className="sheet-image" src={card.thumbnailImages?.[index] ?? image} alt={`${card.name} service ${index + 1}`} fill sizes="(max-width: 600px) calc(100vw - 48px), 380px" />
+              <Image className="sheet-image" src={card.thumbnailImages?.[index] ?? image} alt={`${card.name} service ${index + 1}`} fill sizes="(max-width: 600px) calc(100vw - 48px), 380px" placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} />
               <span>View full screen</span>
             </button>
           ))}
@@ -258,7 +262,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
           <div className="similar-cards-list">
             {similarCards.map((sc) => (
               <button key={String(sc.id)} type="button" className={`similar-card theme-${sc.imageMode === "business-card" ? "biz" : sc.theme}`} onClick={() => onCardOpen?.(sc)}>
-                {sc.thumbnailImages?.[0] && <Image src={sc.thumbnailImages[0]} alt="" aria-hidden fill sizes="90px" />}
+                {sc.thumbnailImages?.[0] && <Image src={sc.thumbnailImages[0]} alt="" aria-hidden fill sizes="90px" placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} />}
                 <span className="similar-card-category">{sc.category}</span>
                 <strong>{sc.name}</strong>
                 {sc.line ? <span className="similar-card-line">{sc.line}</span> : null}

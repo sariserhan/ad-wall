@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node --input-type=module)",
+      "Bash(python3 -c \"import base64; svg=b'<svg xmlns=\\\\\"http://www.w3.org/2000/svg\\\\\" width=\\\\\"4\\\\\" height=\\\\\"3\\\\\"><rect fill=\\\\\"#d4cfc4\\\\\" width=\\\\\"4\\\\\" height=\\\\\"3\\\\\"/></svg>'; print\\('data:image/svg+xml;base64,' + base64.b64encode\\(svg\\).decode\\(\\)\\)\")",
+      "Read(//var/folders/fq/152jbfw16276cgngg15zvh780000gn/T/chrome-devtools-mcp-CClW8L/**)",
+      "Read(//private/var/folders/fq/152jbfw16276cgngg15zvh780000gn/T/chrome-devtools-mcp-CClW8L/**)",
+      "Read(//var/folders/fq/152jbfw16276cgngg15zvh780000gn/T/chrome-devtools-mcp-UuJ5Ib/**)",
+      "Read(//private/var/folders/fq/152jbfw16276cgngg15zvh780000gn/T/chrome-devtools-mcp-UuJ5Ib/**)"
+    ]
+  }
+}
