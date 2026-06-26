@@ -1,16 +1,16 @@
 # Graph Report - local-wall  (2026-06-25)
 
 ## Corpus Check
-- 199 files · ~425,090 words
+- 199 files · ~424,811 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1451 nodes · 1981 edges · 122 communities (100 shown, 22 thin omitted)
+- 1448 nodes · 1979 edges · 122 communities (102 shown, 20 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `69abe64b`
+- Built from commit: `f9f6df40`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -121,7 +121,7 @@
 - [[_COMMUNITY_Community 130|Community 130]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `api` - 25 edges
+1. `api` - 26 edges
 2. `WallCard` - 20 edges
 3. `parseCountrySlug()` - 19 edges
 4. `PostHog Next.js app router example` - 19 edges
@@ -155,7 +155,7 @@
 - **PostHog Integration Workflow (Plan/Edit/Revise/Conclude)** — 1_begin_posthog_event_plan, 2_edit_posthog_event_impl, 3_revise_posthog_event_revise, 4_conclude_posthog_conclude [EXTRACTED 1.00]
 - **Playwright CLI Test Lifecycle (Generate/Debug/Heal)** — spec_driven_testing_plan_generate_heal, playwright_tests_debug_attach, test_generation_playwright_codegen [EXTRACTED 1.00]
 
-## Communities (122 total, 22 thin omitted)
+## Communities (122 total, 20 thin omitted)
 
 ### Community 0 - "Rate Limiting & API Utilities"
 Cohesion: 0.08
@@ -190,8 +190,8 @@ Cohesion: 0.08
 Nodes (17): AdminDashboardData, AdminPanelProps, AdminPlayground(), BULK_CATEGORIES, BULK_COUNTS, BULK_LINES, BULK_NAMES, BULK_THEMES (+9 more)
 
 ### Community 8 - "UI Shared Components & Detail Panel"
-Cohesion: 0.10
-Nodes (11): CardEvent, DetailPanel(), REPORT_REASONS, ReportReason, websiteHref(), ReviewsSection(), mapsHref(), SocialCard (+3 more)
+Cohesion: 0.08
+Nodes (16): _handler(), toast(), Toaster(), ToastFn, ToastType, CardEvent, DetailPanel(), REPORT_REASONS (+8 more)
 
 ### Community 9 - "Owner Dashboard & Card Editing"
 Cohesion: 0.20
@@ -206,8 +206,8 @@ Cohesion: 0.09
 Nodes (23): dependencies, @clerk/nextjs, convex, country-state-city, @fontsource/barlow-condensed, @fontsource/caveat, @fontsource/inter, lucide-react (+15 more)
 
 ### Community 12 - "Trending Feed UI"
-Cohesion: 0.09
-Nodes (26): ClerkThemePortal(), HomeNav(), HomePostButton(), Loc, actionBtn, barlowUpper, font, getClerkUserButtonAppearance() (+18 more)
+Cohesion: 0.10
+Nodes (25): ClerkThemePortal(), HomeNav(), HomePostButton(), Loc, actionBtn, barlowUpper, font, getClerkUserButtonAppearance() (+17 more)
 
 ### Community 13 - "TypeScript Configuration"
 Cohesion: 0.10
@@ -242,8 +242,8 @@ Cohesion: 0.24
 Nodes (13): Playwright CLI Element Attribute Inspection, Playwright CLI Page Snapshot (TodoMVC 1), Playwright CLI Page Snapshot (TodoMVC 2), Playwright CLI Browser Automation Skill, Playwright Test Debugging with --debug=cli, Playwright CLI Request Mocking, Playwright CLI run-code Custom Code Execution, Playwright CLI Browser Session Management (+5 more)
 
 ### Community 22 - "Dashboard Signal & Wall App"
-Cohesion: 0.05
-Nodes (32): metadata, metadata, Props, AppProviders(), AppProvidersProps, BugReportLink(), GlobalBugReportModal(), GlobalOwnerDashboard() (+24 more)
+Cohesion: 0.06
+Nodes (27): metadata, metadata, Props, AppProviders(), AppProvidersProps, BugReportLink(), GlobalBugReportModal(), GlobalOwnerDashboard() (+19 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.07
@@ -330,12 +330,12 @@ Cohesion: 0.67
 Nodes (4): LocalWall Logo Big (Full Branding with Tagline and Category Icons), LocalWall Logo Small (Compact Horizontal Logo), Wall Concept Mockup (Bulletin Board UI with Cards and Detail Panel), Wall Texture (Weathered Urban Bulletin Board Background Texture)
 
 ### Community 46 - "Community 46"
-Cohesion: 0.10
-Nodes (20): 1. Name Browser Sessions Semantically, 2. Always Clean Up, 3. Delete Stale Browser Data, A/B Testing Sessions, Attach by channel name, Attach via browser extension, Attach via CDP endpoint, Attaching to a Running Browser (+12 more)
+Cohesion: 0.13
+Nodes (15): 1. Name Browser Sessions Semantically, 2. Always Clean Up, 3. Delete Stale Browser Data, A/B Testing Sessions, Best Practices, Browser Session Commands, Browser Session Configuration, Browser Session Isolation Properties (+7 more)
 
 ### Community 55 - "Privacy Policy Page"
-Cohesion: 0.33
-Nodes (6): 3.1 Find failing tests, 3.2 Debug one failure, 3.3 Apply the fix, 3.4 Reconcile with the spec, 3.5 Iteration and giving up, 3. Heal
+Cohesion: 0.40
+Nodes (5): Attach by channel name, Attach via browser extension, Attach via CDP endpoint, Attaching to a Running Browser, Detach
 
 ### Community 59 - "Terms & Conditions Page"
 Cohesion: 0.67
@@ -370,8 +370,8 @@ Cohesion: 0.12
 Nodes (15): 1. Reduce read set size, 2. Split hot documents, 3. Move non-critical work to scheduled functions, 4. Combine competing writes, Broad read sets causing false conflicts, Common Causes, Core Principle, Fan-out from triggers or cascading writes (+7 more)
 
 ### Community 88 - "Community 88"
-Cohesion: 0.12
-Nodes (16): 1. Start Tracing Before the Problem, 2. Clean Up Old Traces, Analyzing Performance, Basic Usage, Best Practices, Capturing Evidence, Debugging Failed Actions, Limitations (+8 more)
+Cohesion: 0.15
+Nodes (12): 1. Start Tracing Before the Problem, 2. Clean Up Old Traces, Analyzing Performance, Basic Usage, Best Practices, Capturing Evidence, Debugging Failed Actions, Limitations (+4 more)
 
 ### Community 89 - "Community 89"
 Cohesion: 0.14
@@ -390,8 +390,16 @@ Cohesion: 0.15
 Nodes (13): Clipboard, Complex Workflows, Error Handling, File Downloads, Frames and Iframes, Geolocation, JavaScript Execution, Media Emulation (+5 more)
 
 ### Community 93 - "Community 93"
-Cohesion: 0.17
-Nodes (12): 1.1 Prerequisite: workspace, 1.2 Prerequisite: seed test, 1.3 Explore the app, 1.4 Write the spec file, 1. Planning, 2.1 Inputs, 2.2 Generate one scenario, 2.3 Generate multiple scenarios (+4 more)
+Cohesion: 0.11
+Nodes (18): 1.1 Prerequisite: workspace, 1.2 Prerequisite: seed test, 1.3 Explore the app, 1.4 Write the spec file, 1. Planning, 2.1 Inputs, 2.2 Generate one scenario, 2.3 Generate multiple scenarios (+10 more)
+
+### Community 94 - "Community 94"
+Cohesion: 0.50
+Nodes (4): `resources/`, Trace Output Files, `trace-{timestamp}.network`, `trace-{timestamp}.trace`
+
+### Community 95 - "Community 95"
+Cohesion: 0.23
+Nodes (4): Examples, Inspecting Element Attributes, Debugging Playwright Tests, Running Playwright Tests
 
 ### Community 96 - "Community 96"
 Cohesion: 0.17
@@ -486,23 +494,23 @@ Cohesion: 0.67
 Nodes (3): Dual Read, Dual Write (Preferred), Zero-Downtime Strategies
 
 ## Knowledge Gaps
-- **807 isolated node(s):** `npx`, `Props`, `Props`, `Props`, `Props` (+802 more)
+- **806 isolated node(s):** `metadata`, `AdminPanel`, `allowedImageTypes`, `ImageVariants`, `barlowUpper` (+801 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `api` connect `Billing, Admin & Test Infrastructure` to `Geo-Routed Pages & RSS Feeds`, `Card Display & Embed Pages`, `Admin Panel & Moderation UI`, `Community 104`, `Owner Dashboard & Card Editing`, `Admin Backend (Convex)`, `UI Shared Components & Detail Panel`, `Trending Feed UI`, `Home Page & Root Routes`, `Dashboard Signal & Wall App`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `api` connect `Billing, Admin & Test Infrastructure` to `Geo-Routed Pages & RSS Feeds`, `Card Data Layer (Convex)`, `Card Display & Embed Pages`, `Admin Panel & Moderation UI`, `Community 104`, `Owner Dashboard & Card Editing`, `Admin Backend (Convex)`, `UI Shared Components & Detail Panel`, `Trending Feed UI`, `Home Page & Root Routes`, `Dashboard Signal & Wall App`?**
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
 - **Why does `WallCard` connect `Owner Dashboard & Card Editing` to `Geo-Routed Pages & RSS Feeds`, `Card Display & Embed Pages`, `UI Shared Components & Detail Panel`, `Trending Feed UI`, `Location Combobox & Seed Data`, `Composer Props & Placement Mode`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Why does `BugReportLink()` connect `Dashboard Signal & Wall App` to `Location Combobox & Seed Data`, `Home Page & Root Routes`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `parseCountrySlug()` (e.g. with `GET()` and `GET()`) actually correct?**
   _`parseCountrySlug()` has 5 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `npx`, `Props`, `Props` to the rest of the system?**
-  _808 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `metadata`, `AdminPanel`, `allowedImageTypes` to the rest of the system?**
+  _807 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Rate Limiting & API Utilities` be split into smaller, more focused modules?**
   _Cohesion score 0.0797979797979798 - nodes in this community are weakly interconnected._
 - **Should `Billing, Admin & Test Infrastructure` be split into smaller, more focused modules?**

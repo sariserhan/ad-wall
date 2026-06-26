@@ -187,7 +187,7 @@ function userButtonAppearance(isDark: boolean) {
       // Built-in items (manageAccount, signOut)
       userButtonPopoverActionButton: actionBtn,
       userButtonPopoverActionButtonIconBox: iconBox,
-      // Custom items (My board, Dark mode)
+      // Custom items (My board, account actions)
       userButtonPopoverCustomItemButton: actionBtn,
       userButtonPopoverCustomItemButtonIconBox: iconBox,
       userButtonPopoverFooter: { display: "none" },

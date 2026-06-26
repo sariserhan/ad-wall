@@ -1,7 +1,7 @@
 "use client";
 
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
-import { CreditCard, Download, LayoutDashboard, Moon, Sun, TrendingUp } from "lucide-react";
+import { CreditCard, Download, LayoutDashboard, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/lib/use-theme";
@@ -12,7 +12,7 @@ import { ClerkMyDataPage } from "../wall/clerk-my-data-page";
 
 export function HomeNav() {
   const { isSignedIn } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const isTrending = pathname === "/trending";
@@ -53,11 +53,6 @@ export function HomeNav() {
                 onClick={() => router.push("/billing")}
               />
               <UserButton.Action label="manageAccount" />
-              <UserButton.Action
-                label={isDark ? "Light mode" : "Dark mode"}
-                labelIcon={isDark ? <Sun size={16} /> : <Moon size={16} />}
-                onClick={toggleTheme}
-              />
               <UserButton.Action label="signOut" />
             </UserButton.MenuItems>
           </UserButton>

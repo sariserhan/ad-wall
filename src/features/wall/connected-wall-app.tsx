@@ -3,7 +3,7 @@
 import { UserButton, useAuth, useClerk } from "@clerk/nextjs";
 import { useAction, useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CreditCard, Download, LayoutDashboard, Moon, Sun, TrendingUp } from "lucide-react";
+import { CreditCard, Download, LayoutDashboard, TrendingUp } from "lucide-react";
 import { ClerkMyDataPage } from "./clerk-my-data-page";
 import { useTheme } from "@/lib/use-theme";
 import { getClerkUserButtonAppearance, getClerkUserProfileAppearance } from "@/lib/clerk-appearance";
@@ -82,7 +82,7 @@ export function ConnectedWallApp({
   }, [pathname, searchParams]);
   const { isAuthenticated, isLoading: isConvexAuthLoading } = useConvexAuth();
   const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn, userId } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const [layoutCards, setLayoutCards] = useState<WallCard[] | null>(null);
   const [hasAppliedInitialServerSnapshot, setHasAppliedInitialServerSnapshot] = useState(false);
   const queryCountry = initialLocation?.country || undefined;
@@ -563,20 +563,15 @@ export function ConnectedWallApp({
               labelIcon={<TrendingUp size={16} />}
               onClick={() => router.push("/trending")}
             />
-            <UserButton.Action
-              label="Manage billing"
-              labelIcon={<CreditCard size={16} />}
-              onClick={() => router.push("/billing")}
-            />
-            <UserButton.Action label="manageAccount" />
-            <UserButton.Action
-              label={isDark ? "Light mode" : "Dark mode"}
-              labelIcon={isDark ? <Sun size={16} /> : <Moon size={16} />}
-              onClick={toggleTheme}
-            />
-            <UserButton.Action label="signOut" />
-          </UserButton.MenuItems>
-        </UserButton>
+              <UserButton.Action
+                label="Manage billing"
+                labelIcon={<CreditCard size={16} />}
+                onClick={() => router.push("/billing")}
+              />
+              <UserButton.Action label="manageAccount" />
+              <UserButton.Action label="signOut" />
+            </UserButton.MenuItems>
+          </UserButton>
       ) : null}
       notice={checkoutMessage}
       ownerCards={isAuthenticated ? (ownerCards ?? []) : undefined}
