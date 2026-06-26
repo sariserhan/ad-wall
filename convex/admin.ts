@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { action, env, mutation, query } from "./_generated/server";
 import { api } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 
 function configuredAdminEmails() {
   return new Set(
@@ -384,6 +385,217 @@ const PG_DURATIONS: Record<number, number> = {
   24.99: 365 * 24 * 60 * 60 * 1000,
 };
 
+const PG_ADMIN_STATUS = v.union(v.literal("published"), v.literal("hidden"), v.literal("expired"));
+const PG_ADMIN_CATEGORY = v.union(
+  v.literal("Services"),
+  v.literal("Repairs"),
+  v.literal("Home & Garden"),
+  v.literal("Food & Catering"),
+  v.literal("Pets"),
+  v.literal("Classes & Education"),
+  v.literal("Shops & Retail"),
+  v.literal("Automotive"),
+  v.literal("Health & Fitness"),
+  v.literal("Beauty & Personal Care"),
+  v.literal("Professional Services"),
+  v.literal("Technology"),
+  v.literal("Events & Entertainment"),
+  v.literal("Real Estate"),
+  v.literal("Child & Family"),
+  v.literal("Community"),
+  v.literal("Jobs"),
+  v.literal("Dating"),
+  v.literal("Buy & Sell Marketplace"),
+  v.literal("Vehicles"),
+);
+const PG_ADMIN_THEME = v.union(v.literal("yellow"), v.literal("paper"), v.literal("pink"), v.literal("cyan"), v.literal("dark"), v.literal("cream"), v.literal("biz"), v.literal("kraft"), v.literal("blueprint"), v.literal("photo"), v.literal("ticket"));
+const PG_ADMIN_IMAGE_MODE = v.union(v.literal("photo"), v.literal("business-card"));
+const PG_ADMIN_FEATURED_TIER = v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold")));
+const PG_ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+const PG_ADMIN_CARD_ARGS = {
+  name: v.string(),
+  category: PG_ADMIN_CATEGORY,
+  subcategory: v.optional(v.string()),
+  line: v.string(),
+  message: v.optional(v.string()),
+  area: v.optional(v.string()),
+  city: v.string(),
+  state: v.string(),
+  country: v.string(),
+  zipcode: v.optional(v.string()),
+  neighborhood: v.optional(v.string()),
+  price: v.optional(v.string()),
+  phone: v.optional(v.string()),
+  email: v.optional(v.string()),
+  website: v.optional(v.string()),
+  location: v.optional(v.string()),
+  instagram: v.optional(v.string()),
+  facebook: v.optional(v.string()),
+  tiktok: v.optional(v.string()),
+  linkedin: v.optional(v.string()),
+  whatsapp: v.optional(v.string()),
+  telegram: v.optional(v.string()),
+  ownerName: v.optional(v.string()),
+  theme: PG_ADMIN_THEME,
+  imageMode: v.optional(PG_ADMIN_IMAGE_MODE),
+  imageX: v.optional(v.number()),
+  imageY: v.optional(v.number()),
+  imageWidth: v.optional(v.number()),
+  paidAmount: v.number(),
+  featuredTier: PG_ADMIN_FEATURED_TIER,
+  status: v.optional(PG_ADMIN_STATUS),
+  durationDays: v.optional(v.number()),
+  expiresAt: v.optional(v.number()),
+  clicks: v.optional(v.number()),
+  likes: v.optional(v.number()),
+  reviewCount: v.optional(v.number()),
+  websiteClicks: v.optional(v.number()),
+  phoneClicks: v.optional(v.number()),
+  emailClicks: v.optional(v.number()),
+  socialClicks: v.optional(v.number()),
+  saves: v.optional(v.number()),
+  shares: v.optional(v.number()),
+  x: v.optional(v.number()),
+  y: v.optional(v.number()),
+  rotation: v.optional(v.number()),
+  width: v.optional(v.number()),
+  pending: v.optional(v.boolean()),
+};
+
+type PlaygroundCardArgs = {
+  name: string;
+  category: string;
+  subcategory?: string;
+  line: string;
+  message?: string;
+  area?: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode?: string;
+  neighborhood?: string;
+  price?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  location?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+  linkedin?: string;
+  whatsapp?: string;
+  telegram?: string;
+  ownerName?: string;
+  theme: string;
+  imageMode?: "photo" | "business-card";
+  imageX?: number;
+  imageY?: number;
+  imageWidth?: number;
+  paidAmount: number;
+  featuredTier?: "bronze" | "silver" | "gold";
+  status?: "published" | "hidden" | "expired";
+  durationDays?: number;
+  expiresAt?: number;
+  clicks?: number;
+  likes?: number;
+  reviewCount?: number;
+  websiteClicks?: number;
+  phoneClicks?: number;
+  emailClicks?: number;
+  socialClicks?: number;
+  saves?: number;
+  shares?: number;
+  x?: number;
+  y?: number;
+  rotation?: number;
+  width?: number;
+  pending?: boolean;
+};
+
+async function createPlaygroundCard(ctx: MutationCtx, userId: Id<"users">, args: PlaygroundCardArgs) {
+  const now = Date.now();
+  const baseArea = (args.area?.trim() || args.neighborhood?.trim() || args.city.trim());
+  const rotation = args.rotation ?? 0;
+  const cardWidth = args.width ?? (args.imageMode === "business-card" ? 300 : 220);
+  const x = args.x ?? (4 + Math.random() * 82);
+  const y = args.y ?? (40 + Math.random() * 1400);
+  const status = args.status ?? (args.pending ? "hidden" : "published");
+  const expiresAt = args.expiresAt ?? (
+    args.durationDays !== undefined
+      ? now + Math.max(0, args.durationDays) * PG_ONE_DAY_MS
+      : now + (PG_DURATIONS[args.paidAmount] ?? PG_DURATIONS[0])
+  );
+  const clicks = Math.max(0, Math.floor(args.clicks ?? 0));
+  const likes = Math.max(0, Math.floor(args.likes ?? 0));
+  const reviewCount = Math.max(0, Math.floor(args.reviewCount ?? 0));
+  const websiteClicks = Math.max(0, Math.floor(args.websiteClicks ?? 0));
+  const phoneClicks = Math.max(0, Math.floor(args.phoneClicks ?? 0));
+  const emailClicks = Math.max(0, Math.floor(args.emailClicks ?? 0));
+  const socialClicks = Math.max(0, Math.floor(args.socialClicks ?? 0));
+  const saves = Math.max(0, Math.floor(args.saves ?? 0));
+  const shares = Math.max(0, Math.floor(args.shares ?? 0));
+
+  const cardId = await ctx.db.insert("cards", {
+    ownerId: userId,
+    name: args.name.trim(),
+    category: args.category as any,
+    subcategory: args.subcategory?.trim() || undefined,
+    line: args.line.trim(),
+    message: args.message?.trim() || undefined,
+    area: baseArea.trim(),
+    city: args.city.trim(),
+    state: args.state.trim(),
+    country: args.country.trim(),
+    zipcode: args.zipcode?.trim() || undefined,
+    neighborhood: args.neighborhood?.trim() || undefined,
+    ownerName: args.ownerName?.trim() || undefined,
+    price: args.price?.trim() || undefined,
+    phone: args.phone?.trim() || undefined,
+    email: args.email?.trim() || undefined,
+    website: args.website?.trim() || undefined,
+    location: args.location?.trim() || undefined,
+    instagram: args.instagram?.trim() || undefined,
+    facebook: args.facebook?.trim() || undefined,
+    tiktok: args.tiktok?.trim() || undefined,
+    linkedin: args.linkedin?.trim() || undefined,
+    whatsapp: args.whatsapp?.trim() || undefined,
+    telegram: args.telegram?.trim() || undefined,
+    theme: args.theme as any,
+    imageMode: args.imageMode,
+    imageIds: [],
+    x,
+    y,
+    rotation,
+    width: cardWidth,
+    zIndex: now,
+    status,
+    paidAmount: args.paidAmount,
+    expiresAt,
+    positionLockedAt: now,
+    updatedAt: now,
+    createdAt: now,
+    clicks,
+    reviewCount,
+    ...(args.featuredTier ? { featuredTier: args.featuredTier } : {}),
+  });
+
+  await ctx.db.insert("cardStats", {
+    cardId,
+    clicks,
+    websiteClicks,
+    phoneClicks,
+    emailClicks,
+    socialClicks,
+    saves,
+    shares,
+    likes,
+    updatedAt: now,
+  });
+
+  return { cardId, expiresAt, status, likes, clicks, reviewCount };
+}
+
 export const playgroundGetMyCards = query({
   args: {},
   handler: async (ctx) => {
@@ -391,6 +603,11 @@ export const playgroundGetMyCards = query({
     const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
     if (!user) return { cards: [], verified: false };
     const cards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", user._id)).collect();
+    const stats = await Promise.all(cards.map(async (card) => ({
+      cardId: card._id,
+      stats: await ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", card._id)).unique(),
+    })));
+    const statsMap = new Map(stats.map(({ cardId, stats }) => [String(cardId), stats]));
     const now = Date.now();
     return {
       cards: cards.map((c) => ({
@@ -403,6 +620,9 @@ export const playgroundGetMyCards = query({
         city: c.city,
         country: c.country,
         createdAt: c.createdAt,
+        clicks: statsMap.get(String(c._id))?.clicks ?? c.clicks ?? 0,
+        likes: statsMap.get(String(c._id))?.likes ?? 0,
+        reviewCount: c.reviewCount ?? 0,
       })),
       verified: user.verified ?? false,
     };
@@ -410,50 +630,13 @@ export const playgroundGetMyCards = query({
 });
 
 export const playgroundCreateCard = mutation({
-  args: {
-    name: v.string(),
-    category: v.string(),
-    line: v.string(),
-    country: v.string(),
-    state: v.string(),
-    city: v.string(),
-    theme: v.string(),
-    paidAmount: v.number(),
-    featuredTier: v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold"))),
-    pending: v.optional(v.boolean()),
-  },
+  args: PG_ADMIN_CARD_ARGS,
   handler: async (ctx, args) => {
     const identity = await requireAdmin(ctx);
     const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
     if (!user) throw new Error("Admin user not found in database.");
-    const now = Date.now();
-    const duration = PG_DURATIONS[args.paidAmount] ?? PG_DURATIONS[0];
-    const status = args.pending ? "hidden" : "published";
-    const cardId = await ctx.db.insert("cards", {
-      ownerId: user._id,
-      name: args.name,
-      category: args.category as any,
-      line: args.line,
-      area: args.city,
-      country: args.country,
-      state: args.state,
-      city: args.city,
-      theme: args.theme as any,
-      imageIds: [],
-      x: 4 + Math.random() * 82,
-      y: 40 + Math.random() * 1400,
-      rotation: (Math.random() - 0.5) * 10,
-      width: 220,
-      zIndex: now,
-      status,
-      paidAmount: args.paidAmount,
-      expiresAt: now + duration,
-      positionLockedAt: now,
-      clicks: 0,
-      createdAt: now,
-      ...(args.featuredTier ? { featuredTier: args.featuredTier } : {}),
-    });
-    return { cardId };
+    const result = await createPlaygroundCard(ctx, user._id, args as PlaygroundCardArgs);
+    return result;
   },
 });
 

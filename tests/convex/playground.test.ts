@@ -1,6 +1,7 @@
 import { expect, test, describe, beforeAll, afterAll } from "vitest";
 import type { Id } from "../../convex/_generated/dataModel";
 import { api } from "../../convex/_generated/api";
+import type { CardCategory, CardTheme } from "../../src/features/wall/types";
 import { makeT, adminIdentity, adminEnv, applyEnv, seedAdminUser } from "./helpers";
 
 let cleanupEnv: () => void;
@@ -9,18 +10,18 @@ afterAll(() => cleanupEnv());
 
 const pgCard = {
   name: "Playground Test Biz",
-  category: "Services",
+  category: "Services" as CardCategory,
   line: "Testing the playground feature",
   country: "xx",
   state: "test",
   city: "Playground",
-  theme: "yellow",
+  theme: "yellow" as CardTheme,
   paidAmount: 0,
 };
 
 async function createPgCard(t: ReturnType<typeof makeT>, overrides: Record<string, unknown> = {}) {
   await seedAdminUser(t);
-  const result = await t.withIdentity(adminIdentity).mutation(api.admin.playgroundCreateCard, { ...pgCard, ...overrides }) as { cardId: Id<"cards"> };
+  const result = await t.withIdentity(adminIdentity).mutation(api.admin.playgroundCreateCard, { ...pgCard, ...overrides } as any) as { cardId: Id<"cards"> };
   return result.cardId;
 }
 
@@ -95,6 +96,32 @@ describe("playgroundCreateCard", () => {
     const oneDayMs = 24 * 60 * 60 * 1000;
     expect(card!.expiresAt).toBeGreaterThanOrEqual(before + oneDayMs);
     expect(card!.expiresAt).toBeLessThanOrEqual(after + oneDayMs + 100);
+  });
+
+  test("accepts custom duration, metrics, and owner label", async () => {
+    const t = makeT();
+    const cardId = await createPgCard(t, {
+      ownerName: "Sunrise Dental Group",
+      durationDays: 7,
+      likes: 27,
+      clicks: 190,
+      reviewCount: 11,
+      status: "hidden",
+      featuredTier: "silver",
+    });
+    const data = await t.withIdentity(adminIdentity).query(api.admin.playgroundGetMyCards, {}) as { cards: Array<{ id: Id<"cards">; expiresAt: number; featuredTier: string | null; clicks: number; likes: number; reviewCount: number; status: string }> };
+    const card = data.cards.find((c) => c.id === cardId);
+    expect(card).toBeDefined();
+    expect(card!.featuredTier).toBe("silver");
+    expect(card!.clicks).toBe(190);
+    expect(card!.likes).toBe(27);
+    expect(card!.reviewCount).toBe(11);
+    expect(card!.status).toBe("hidden");
+    expect(card!.expiresAt - Date.now()).toBeGreaterThan(5 * 24 * 60 * 60 * 1000);
+    await t.run(async (ctx) => {
+      const stored = await ctx.db.get(cardId);
+      expect(stored?.ownerName).toBe("Sunrise Dental Group");
+    });
   });
 });
 
