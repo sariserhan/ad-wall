@@ -252,6 +252,10 @@ export function csvPick(data: Record<string, string>, key: string, values: reado
   return raw && values.includes(raw) ? raw : undefined;
 }
 
+export function getCsvImageMode(imageUrl?: string, imageMode?: "photo" | "business-card") {
+  return imageMode || (imageUrl ? "photo" : undefined);
+}
+
 function csvEscape(value: string) {
   return /[",\n\r]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }

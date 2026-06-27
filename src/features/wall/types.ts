@@ -51,21 +51,30 @@ export type CardTheme = (typeof cardThemes)[number];
 export type CardImageMode = "photo" | "business-card";
 
 export const cardFormats: Record<CardTheme, { width: number; minHeight: number }> = {
-  yellow: { width: 205, minHeight: 205 },
-  paper: { width: 220, minHeight: 245 },
-  pink: { width: 220, minHeight: 245 },
-  cyan: { width: 220, minHeight: 245 },
-  dark: { width: 220, minHeight: 245 },
-  cream: { width: 220, minHeight: 245 },
-  biz: { width: 300, minHeight: 180 },
-  kraft: { width: 215, minHeight: 255 },
-  blueprint: { width: 235, minHeight: 235 },
-  photo: { width: 205, minHeight: 285 },
-  ticket: { width: 300, minHeight: 180 },
+  yellow: { width: 214, minHeight: 210 },
+  paper: { width: 234, minHeight: 250 },
+  pink: { width: 234, minHeight: 250 },
+  cyan: { width: 234, minHeight: 250 },
+  dark: { width: 234, minHeight: 250 },
+  cream: { width: 234, minHeight: 250 },
+  biz: { width: 318, minHeight: 184 },
+  kraft: { width: 225, minHeight: 260 },
+  blueprint: { width: 246, minHeight: 242 },
+  photo: { width: 218, minHeight: 300 },
+  ticket: { width: 318, minHeight: 184 },
 };
 
 export function getCardFormat(theme: CardTheme) {
   return cardFormats[theme];
+}
+
+export function getImageCardFormat(theme: CardTheme, imageMode?: CardImageMode) {
+  const format = getCardFormat(theme);
+  if (imageMode !== "photo") return format;
+  return {
+    width: format.width + 18,
+    minHeight: format.minHeight,
+  };
 }
 
 import type { Id } from "../../../convex/_generated/dataModel";

@@ -44,6 +44,7 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
   const displayTheme = card.imageMode === "business-card" ? "biz" : card.theme;
   const cardImage = card.thumbnailImages?.[0] ?? card.images[0];
   const format = getCardFormat(displayTheme);
+  const imageTopLayout = Boolean(cardImage && card.imageMode !== "business-card" && displayTheme !== "biz" && displayTheme !== "ticket");
 
   useEffect(() => {
     setRotationDraft(card.rotation);
@@ -85,7 +86,6 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
     "--tape-l": `${tapeLeft}%`,
     zIndex,
   };
-
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -119,7 +119,7 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
 
   return (
     <article
-      className={`wall-card theme-${displayTheme} ${card.imageMode === "business-card" && cardImage ? "image-business-card" : ""} ${active ? "is-active" : ""} ${ownerDraggable ? "is-owner-card" : ""} ${dragging ? "is-owner-dragging" : ""} ${card.featuredTier ? `featured-${card.featuredTier}` : ""} ${expiringSoon ? "is-expiring-soon" : ""}`}
+      className={`wall-card theme-${displayTheme} ${imageTopLayout ? "image-top-layout" : ""} ${card.imageMode === "business-card" && cardImage ? "image-business-card" : ""} ${active ? "is-active" : ""} ${ownerDraggable ? "is-owner-card" : ""} ${dragging ? "is-owner-dragging" : ""} ${card.featuredTier ? `featured-${card.featuredTier}` : ""} ${expiringSoon ? "is-expiring-soon" : ""}`}
       data-card-id={card.id}
       style={style}
       onPointerDown={handlePointerDown}
@@ -159,14 +159,31 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
           <RotateCcw size={12} />
         </button>
       ) : null}
-      <div className="card-copy">
-        <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
-        {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
-        <h2>{card.name}</h2>
-        <p className="card-line">{card.line}</p>
-        {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
-      </div>
-      {cardImage ? (
+      {imageTopLayout ? (
+        <>
+          <div className="wall-card-image-top-wrap">
+            <img src={cardImage} alt="" draggable={false} className="wall-card-image-top" />
+          </div>
+          <div className="wall-card-content">
+            <div className="card-copy">
+              <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
+              {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
+              <h2>{card.name}</h2>
+              <p className="card-line">{card.line}</p>
+              {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="card-copy">
+          <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
+          {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
+          <h2>{card.name}</h2>
+          <p className="card-line">{card.line}</p>
+          {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
+        </div>
+      )}
+      {!imageTopLayout && cardImage ? (
         card.imageMode === "business-card" ? (
           <div className="wall-card-biz-wrap"><Image src={cardImage} alt="" fill sizes="280px" className="wall-card-biz-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} /></div>
         ) : (

@@ -2,7 +2,7 @@
 
 import { RotateCcw, Save, X } from "lucide-react";
 import { useRef, useState, type CSSProperties, type FormEvent, type PointerEvent } from "react";
-import { cardThemes, categories, SUBCATEGORY_OPTIONS, type CardTheme, type CardUpdate, type OwnerCard } from "./types";
+import { cardThemes, categories, getCardFormat, getImageCardFormat, SUBCATEGORY_OPTIONS, type CardTheme, type CardUpdate, type OwnerCard } from "./types";
 
 const themeLabels: Record<CardTheme, string> = {
   yellow: "Sticky note", paper: "Flyer", pink: "Neon flyer", cyan: "Color card", dark: "Night card", cream: "Cream paper", biz: "Business card", kraft: "Kraft note", blueprint: "Blueprint", photo: "Photo print", ticket: "Ticket",
@@ -35,6 +35,9 @@ export function EditCardModal({ card, onClose, onSave }: { card: OwnerCard; onCl
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const tiltPointerRef = useRef<{ id: number; x: number; y: number; rotation: number } | null>(null);
+  const previewImage = card.thumbnailImages?.[0] ?? card.images[0];
+  const previewImageTopLayout = Boolean(previewImage && card.imageMode !== "business-card" && card.theme !== "biz" && card.theme !== "ticket");
+  const format = card.imageMode === "business-card" ? getCardFormat("biz") : getImageCardFormat(form.theme, card.imageMode);
 
   const setField = <Key extends keyof CardUpdate>(field: Key, value: CardUpdate[Key]) => setForm((current) => ({ ...current, [field]: value }));
 
@@ -92,7 +95,7 @@ export function EditCardModal({ card, onClose, onSave }: { card: OwnerCard; onCl
         <div className="edit-card-body">
           {error ? <div className="dashboard-error" role="alert">{error}</div> : null}
           <div className="edit-card-preview">
-            <article className={`wall-card edit-card-preview-card theme-${form.theme}`} style={{ "--w": "220px", "--h": "245px", "--r": `${form.rotation ?? 0}deg` } as CSSProperties}>
+            <article className={`wall-card edit-card-preview-card theme-${form.theme} ${previewImageTopLayout ? "image-top-layout" : ""} ${card.imageMode === "business-card" && previewImage ? "image-business-card" : ""}`} style={{ "--w": `${format.width}px`, "--h": `${format.minHeight}px`, "--r": `${form.rotation ?? 0}deg` } as CSSProperties}>
               <button
                 type="button"
                 className="wall-card-tilt-handle"
@@ -106,11 +109,26 @@ export function EditCardModal({ card, onClose, onSave }: { card: OwnerCard; onCl
                 <RotateCcw size={12} />
               </button>
               <span className="card-tape" aria-hidden="true" />
-              <div className="card-copy">
-                <p className="card-category">{form.category}{form.subcategory ? <> · {form.subcategory}</> : null}</p>
-                <h2>{form.name || "Your card"}</h2>
-                <p className="card-line">{form.line || "Preview your card here."}</p>
-              </div>
+              {previewImageTopLayout ? (
+                <>
+                  <div className="wall-card-image-top-wrap">
+                    <img src={previewImage} alt="" draggable={false} className="wall-card-image-top" />
+                  </div>
+                  <div className="wall-card-content">
+                    <div className="card-copy">
+                      <p className="card-category">{form.category}{form.subcategory ? <> · {form.subcategory}</> : null}</p>
+                      <h2>{form.name || "Your card"}</h2>
+                      <p className="card-line">{form.line || "Preview your card here."}</p>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="card-copy">
+                  <p className="card-category">{form.category}{form.subcategory ? <> · {form.subcategory}</> : null}</p>
+                  <h2>{form.name || "Your card"}</h2>
+                  <p className="card-line">{form.line || "Preview your card here."}</p>
+                </div>
+              )}
               <footer>
                 <span>{form.area || "Neighborhood"}</span>
                 {form.price ? <strong className="card-price-right">{form.price}</strong> : null}

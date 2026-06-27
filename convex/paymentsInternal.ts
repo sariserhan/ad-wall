@@ -25,11 +25,12 @@ export const completePaidCard = internalMutation({
     if (existingReceipt) {
       const existingCard = await ctx.db.get(existingReceipt.cardId);
       if (!existingCard) throw new Error("The completed card could not be found.");
+      const owner = await ctx.db.get(existingCard.ownerId);
       const [existingUrls, existingThumbnailUrls] = await Promise.all([
         Promise.all(existingCard.imageIds.map((imageId) => ctx.storage.getUrl(imageId))),
         Promise.all((existingCard.thumbnailImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
       ]);
-      return { id: existingCard._id, ...existingCard, images: existingUrls.filter((url): url is string => url !== null), thumbnailImages: existingThumbnailUrls.filter((url): url is string => url !== null) };
+      return { id: existingCard._id, ...existingCard, images: existingUrls.filter((url): url is string => url !== null), thumbnailImages: existingThumbnailUrls.filter((url): url is string => url !== null), verified: owner?.verified ?? false };
     }
     const pending = await ctx.db.get(args.pendingCardId);
     if (!pending || pending.status !== "pending" || pending.expiresAt <= Date.now()) throw new Error("This pending card is no longer available.");
@@ -98,7 +99,7 @@ export const completePaidCard = internalMutation({
       Promise.all(imageIds.map((imageId) => ctx.storage.getUrl(imageId))),
       Promise.all(thumbnailImageIds.map((imageId) => ctx.storage.getUrl(imageId))),
     ]);
-    return { id: cardId, ...payload, rotation: payload.rotation ?? 0, ownerId: pending.ownerId, images: urls.filter((url): url is string => url !== null), thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null), zIndex: createdAt, status: "published" as const, paidAmount: basePaidAmount, featuredTier, reviewCount: 0, expiresAt: createdAt + packageDurations[basePaidAmount], positionLockedAt: createdAt, updatedAt: createdAt, createdAt, clicks: 0 };
+    return { id: cardId, ...payload, rotation: payload.rotation ?? 0, ownerId: pending.ownerId, images: urls.filter((url): url is string => url !== null), thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null), zIndex: createdAt, status: "published" as const, paidAmount: basePaidAmount, featuredTier, reviewCount: 0, expiresAt: createdAt + packageDurations[basePaidAmount], positionLockedAt: createdAt, updatedAt: createdAt, createdAt, clicks: 0, verified: owner.verified ?? false };
   },
 });
 
@@ -225,8 +226,9 @@ export const completeBundlePosting = internalMutation({
     if (existingReceipt) {
       const card = await ctx.db.get(existingReceipt.cardId);
       if (!card) throw new Error("Bundle card not found.");
+      const owner = await ctx.db.get(card.ownerId);
       const urls = await Promise.all(card.imageIds.map((id) => ctx.storage.getUrl(id)));
-      return [{ id: card._id, ...card, images: urls.filter((u): u is string => u !== null) }];
+      return [{ id: card._id, ...card, images: urls.filter((u): u is string => u !== null), verified: owner?.verified ?? false }];
     }
 
     const pending = await ctx.db.get(args.pendingCardId);
@@ -323,6 +325,7 @@ export const completeBundlePosting = internalMutation({
       reviewCount: 0,
       clicks: 0,
       zIndex: Date.now(),
+      verified: owner.verified ?? false,
     }));
   },
 });

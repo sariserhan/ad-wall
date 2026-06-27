@@ -3,6 +3,7 @@ import {
   buildPlaygroundCsvTemplate,
   parseCsv,
   resolveLocationFields,
+  getCsvImageMode,
   type LocationCatalog,
 } from "../../src/features/wall/admin-playground-csv";
 
@@ -49,6 +50,11 @@ describe("admin playground csv template", () => {
 
     expect(records).toHaveLength(1);
     expect(records[0].data.image).toBe("https://example.com/photo.jpg?x=1&y=2");
+  });
+
+  test("defaults image rows to photo layout when no image mode is set", () => {
+    expect(getCsvImageMode("https://example.com/photo.jpg")).toBe("photo");
+    expect(getCsvImageMode("https://example.com/photo.jpg", "business-card")).toBe("business-card");
   });
 
   test("normalizes USA and state codes", () => {

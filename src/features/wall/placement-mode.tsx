@@ -2,7 +2,7 @@
 
 import { Check, RotateCcw, Sparkles, X } from "lucide-react";
 import { useRef, type CSSProperties, type PointerEvent } from "react";
-import { getCardFormat, type CardDraft, type Placement } from "./types";
+import { getCardFormat, getImageCardFormat, type CardDraft, type Placement } from "./types";
 
 interface PlacementModeProps {
   card: CardDraft;
@@ -20,7 +20,8 @@ interface PlacementModeProps {
 
 export function PlacementMode({ card, position, dragging, onDragStart, onMove, onDragEnd, onCancel, onRandom, onConfirm, onRotate, isSaving }: PlacementModeProps) {
   const displayTheme = card.imageMode === "business-card" ? "biz" : card.theme;
-  const format = getCardFormat(displayTheme);
+  const format = card.imageMode === "business-card" ? getCardFormat("biz") : getImageCardFormat(card.theme, card.imageMode);
+  const imageTopLayout = Boolean(card.previews[0] && card.imageMode !== "business-card" && displayTheme !== "biz" && displayTheme !== "ticket");
   const tiltPointerRef = useRef<{ id: number; x: number; y: number; rotation: number } | null>(null);
 
   const handleTiltPointerDown = (event: PointerEvent<HTMLButtonElement>) => {
@@ -54,7 +55,7 @@ export function PlacementMode({ card, position, dragging, onDragStart, onMove, o
         <button className="icon-btn" onClick={onCancel} disabled={isSaving} aria-label="Cancel placement"><X /></button>
       </div>
       <article
-        className={`wall-card placement-card theme-${displayTheme} ${card.imageMode === "business-card" && card.previews[0] ? "image-business-card" : ""} ${dragging ? "is-dragging" : ""}`}
+        className={`wall-card placement-card theme-${displayTheme} ${imageTopLayout ? "image-top-layout" : ""} ${card.imageMode === "business-card" && card.previews[0] ? "image-business-card" : ""} ${dragging ? "is-dragging" : ""}`}
         style={{ left: `${position.x}%`, top: `${position.y}px`, "--w": `${format.width}px`, "--h": `${format.minHeight}px`, "--r": `${card.rotation ?? 0}deg` } as CSSProperties}
         onPointerDown={onDragStart}
       >
@@ -71,8 +72,21 @@ export function PlacementMode({ card, position, dragging, onDragStart, onMove, o
           <RotateCcw size={12} />
         </button>
         <span className="card-tape" aria-hidden="true" />
-        <div className="card-copy"><p className="card-category">{card.category}</p><h2>{card.name}</h2><p className="card-line">{card.line}</p></div>
-        {card.previews[0] ? <img src={card.previews[0]} alt="" draggable="false" /> : null}
+        {imageTopLayout ? (
+          <>
+            <div className="wall-card-image-top-wrap">
+              <img src={card.previews[0]} alt="" draggable={false} className="wall-card-image-top" />
+            </div>
+            <div className="wall-card-content">
+              <div className="card-copy"><p className="card-category">{card.category}</p><h2>{card.name}</h2><p className="card-line">{card.line}</p></div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="card-copy"><p className="card-category">{card.category}</p><h2>{card.name}</h2><p className="card-line">{card.line}</p></div>
+            {card.previews[0] ? <img src={card.previews[0]} alt="" draggable="false" /> : null}
+          </>
+        )}
         <footer><span>{card.area}</span>{card.price ? <strong>{card.price}</strong> : null}</footer>
         <div className="drag-label">DRAG ME</div>
       </article>

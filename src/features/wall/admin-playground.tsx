@@ -6,8 +6,8 @@ import { useRef, useState, type DragEvent } from "react";
 import { City, Country, State } from "country-state-city";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { categories, cardThemes, SUBCATEGORY_OPTIONS, type CardCategory } from "./types";
-import { buildPlaygroundCsvTemplate, resolveLocationFields } from "./admin-playground-csv";
+import { categories, cardThemes, SUBCATEGORY_OPTIONS, getImageCardFormat, type CardCategory, type CardTheme } from "./types";
+import { buildPlaygroundCsvTemplate, getCsvImageMode, resolveLocationFields } from "./admin-playground-csv";
 
 const PG_WALL_URL = "/admin/wall";
 const PG_DEFAULTS = { country: "xx", state: "test", city: "Playground" };
@@ -749,8 +749,8 @@ function BulkCsvImportSection() {
       telegram: csvString(data, "telegram") || undefined,
       ownerName: csvString(data, "ownerName") || undefined,
       theme: themeValue,
-      imageUrl: csvString(data, "image") || undefined,
-      imageMode,
+      imageUrl,
+      imageMode: getCsvImageMode(imageUrl, imageMode),
       imageX: imageXField.value,
       imageY: imageYField.value,
       imageWidth: imageWidthField.value,
@@ -771,7 +771,7 @@ function BulkCsvImportSection() {
       x: xField.value,
       y: yField.value,
       rotation: rotationField.value,
-      width: widthField.value,
+      width: widthField.value ?? getImageCardFormat(themeValue as CardTheme, imageMode).width,
       ...(imageUrl ? { imageUrl } : {}),
     };
 

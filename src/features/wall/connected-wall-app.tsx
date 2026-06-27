@@ -15,7 +15,7 @@ import type { AdminDashboardData } from "./admin-panel";
 import { WallApp } from "./wall-app";
 
 const AdminPanel = dynamic(() => import("./admin-panel").then((m) => ({ default: m.AdminPanel })), { ssr: false, loading: () => null });
-import { getCardFormat, type CardDraft, type CardUpdate, type OwnerCard, type Placement, type RenewalAmount, type SavedWall, type WallCard } from "./types";
+import { getCardFormat, getImageCardFormat, type CardDraft, type CardUpdate, type OwnerCard, type Placement, type RenewalAmount, type SavedWall, type WallCard } from "./types";
 import { buildWallPath } from "@/lib/wall-slug";
 import { openDashboard } from "@/lib/dashboard-signal";
 import { captureAnalytics, identifyAnalytics, resetAnalytics } from "@/lib/analytics";
@@ -449,7 +449,7 @@ export function ConnectedWallApp({
       x: placement.x,
       y: placement.y,
       rotation: draft.rotation ?? 0,
-      width: getCardFormat(draft.imageMode === "business-card" ? "biz" : draft.theme).width,
+      width: draft.imageMode === "business-card" ? getCardFormat("biz").width : getImageCardFormat(draft.theme, draft.imageMode).width,
     };
     const result = await createCard(cardPayload) as WallCard | { pendingCardId: Id<"pendingCards"> };
     if (totalPaidAmount > 0) {

@@ -40,7 +40,7 @@ import { seedCards } from "./seed-cards";
 import { WallCard } from "./wall-card";
 import { WallMinimap } from "./wall-minimap";
 import { WallSkeletons } from "./wall-skeletons";
-import { categories, SUBCATEGORY_OPTIONS, getCardFormat, type CardCategory, type CardDraft, type CardUpdate, type CreateCard, type OwnerCard, type Placement, type RenewalAmount, type WallCard as WallCardModel } from "./types";
+import { categories, SUBCATEGORY_OPTIONS, getCardFormat, getImageCardFormat, type CardCategory, type CardDraft, type CardUpdate, type CreateCard, type OwnerCard, type Placement, type RenewalAmount, type WallCard as WallCardModel } from "./types";
 import { buildWallPath, toCategorySlug } from "@/lib/wall-slug";
 import { BugReportLink } from "@/components/bug-report-link";
 import { ContactLink } from "@/components/contact-link";
@@ -96,6 +96,7 @@ interface WallAppProps {
 const MAX_CARD_Y = 1500;
 
 function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): WallCardModel {
+  const format = getImageCardFormat(draft.theme, draft.imageMode);
   return {
     id: `demo-${Date.now()}`,
     name: draft.name,
@@ -122,7 +123,7 @@ function makeDemoCard(draft: CardDraft, placement: Placement, zIndex: number): W
     x: placement.x,
     y: placement.y,
     rotation: draft.rotation ?? 0,
-    width: getCardFormat(draft.imageMode === "business-card" ? "biz" : draft.theme).width,
+    width: draft.imageMode === "business-card" ? getCardFormat("biz").width : format.width,
     zIndex,
     positionLockedAt: Date.now(),
     createdAt: Date.now(),
@@ -932,7 +933,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     const wallRect = wallRef.current?.getBoundingClientRect();
     const wallWidth = wallRect?.width ?? window.innerWidth;
     const wallHeight = wallRect?.height ?? Math.max(500, window.innerHeight - 66);
-    const format = getCardFormat(draft.theme);
+    const format = draft.imageMode === "business-card" ? getCardFormat("biz") : getImageCardFormat(draft.theme, draft.imageMode);
     const margin = 18;
     const maxLeft = Math.max(margin, wallWidth - format.width - margin);
     const maxTop = Math.max(36, wallHeight - format.minHeight - 36);
@@ -944,7 +945,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const movePlacement = (event: PointerEvent<HTMLDivElement>) => {
     if (!dragging || !wallRef.current) return;
     const rect = wallRef.current.getBoundingClientRect();
-    const cardWidth = window.innerWidth < 780 ? 182 : 220;
+    const cardWidth = pendingCard ? (pendingCard.imageMode === "business-card" ? getCardFormat("biz").width : getImageCardFormat(pendingCard.theme, pendingCard.imageMode).width) : (window.innerWidth < 780 ? 182 : 220);
     const maxLeft = Math.max(12, rect.width - cardWidth - 12);
     const left = Math.min(maxLeft, Math.max(12, event.clientX - rect.left - cardWidth / 2));
     const top = Math.min(rect.height - 250, Math.max(28, event.clientY - rect.top - 90));
@@ -1768,7 +1769,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
           cardDailyStats={cardDailyStats}
         />
       ) : null}
-      {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} initialLocation={{ country: selectedCountry, state: selectedState, city: selectedCity }} /> : null}
+      {composer ? <Composer onClose={() => setComposer(false)} onReady={beginPlacement} initialLocation={{ country: selectedCountry, state: selectedState, city: selectedCity }} isVerified={profile?.verified ?? false} /> : null}
       {showTip && <div className="onboard-tip" onAnimationEnd={() => setShowTip(false)}>Tap a card to open it · Drag to move it</div>}
     </main>
   );

@@ -850,6 +850,7 @@ export const create = mutation({
       reviewCount: 0,
       expiresAt,
       clicks: 0,
+      verified: user.verified ?? false,
     };
   },
 });
