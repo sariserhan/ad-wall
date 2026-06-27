@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { AppProviders } from "@/components/app-providers";
 import { BugReportLink } from "@/components/bug-report-link";
 import { ContactLink } from "@/components/contact-link";
+import { PrivacySettingsLink } from "@/components/privacy-settings-link";
 import { HomeNav } from "@/features/home/home-nav";
 import { TrendingTabs } from "@/features/home/trending-tabs";
 import { fetchTopWalls, fetchTopCards } from "@/lib/server-cards";
@@ -53,6 +54,7 @@ export default async function TrendingPage() {
             <Suspense fallback={null}>
               <BugReportLink />
             </Suspense>
+            <PrivacySettingsLink />
             <Suspense fallback={null}>
               <ContactLink />
             </Suspense>

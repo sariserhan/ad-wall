@@ -44,6 +44,7 @@ import { categories, SUBCATEGORY_OPTIONS, getCardFormat, type CardCategory, type
 import { buildWallPath, toCategorySlug } from "@/lib/wall-slug";
 import { BugReportLink } from "@/components/bug-report-link";
 import { ContactLink } from "@/components/contact-link";
+import { PrivacySettingsLink } from "@/components/privacy-settings-link";
 import type { SavedWall } from "./types";
 import { toast } from "@/lib/toast";
 import { pushDashboardHandler } from "@/lib/dashboard-signal";
@@ -1626,6 +1627,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
             <Link href="/terms-and-conditions">Terms & Conditions</Link>
             <Link href="/privacy-policy">Privacy Policy</Link>
             <BugReportLink />
+            <PrivacySettingsLink />
             <ContactLink />
           </nav>
 

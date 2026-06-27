@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PrivacySettingsLink } from "@/components/privacy-settings-link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | WALL",
@@ -16,8 +17,9 @@ export default function PrivacyPolicyPage() {
           This policy explains what information WALL may collect, how it may be used, and the choices available to people who browse or post on the platform.
         </p>
         <div className="legal-page__actions">
-          <Link href="/">Back to localwall</Link>
+          <Link href="/" className="legal-page__back-link">Back to localwall</Link>
           <Link href="/terms-and-conditions">Terms & Conditions</Link>
+          <PrivacySettingsLink className="legal-page__privacy-settings" variant="text" />
         </div>
       </div>
 

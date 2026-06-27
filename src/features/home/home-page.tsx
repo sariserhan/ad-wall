@@ -5,6 +5,7 @@ import { HomeHowItWorksModal } from "./home-how-it-works-modal";
 import Link from "next/link";
 import { BugReportLink } from "@/components/bug-report-link";
 import { ContactLink } from "@/components/contact-link";
+import { PrivacySettingsLink } from "@/components/privacy-settings-link";
 
 export function HomePage() {
   return (
@@ -34,6 +35,7 @@ export function HomePage() {
               <Suspense fallback={null}>
                 <BugReportLink />
               </Suspense>
+              <PrivacySettingsLink />
               <Suspense fallback={null}>
                 <ContactLink />
               </Suspense>

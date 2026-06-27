@@ -5,27 +5,36 @@ type AnalyticsEventProps = Record<string, string | number | boolean | null | und
 type PostHogClient = typeof import("posthog-js").default;
 
 const CONSENT_KEY = "localwall-analytics-consent-v1";
+const CONSENT_COOKIE = "localwall_analytics_consent_v1";
 
 let consentState: AnalyticsConsent = "unknown";
 let clientPromise: Promise<{ default: PostHogClient }> | null = null;
 let client: PostHogClient | null = null;
 let initPromise: Promise<void> | null = null;
 let pendingDistinctId: string | null = null;
-const listeners = new Set<() => void>();
 
 function readStoredConsent(): AnalyticsConsent {
   if (typeof window === "undefined") return "unknown";
-  const stored = window.localStorage.getItem(CONSENT_KEY);
-  return stored === "accepted" || stored === "declined" ? stored : "unknown";
+  let stored: string | null = null;
+  try {
+    stored = window.localStorage.getItem(CONSENT_KEY);
+  } catch {
+    stored = null;
+  }
+  if (stored === "accepted" || stored === "declined") return stored;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${CONSENT_COOKIE}=([^;]+)`));
+  const cookieValue = match ? decodeURIComponent(match[1]) : "unknown";
+  return cookieValue === "accepted" || cookieValue === "declined" ? cookieValue : "unknown";
 }
 
 function persistConsent(next: AnalyticsConsent) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(CONSENT_KEY, next);
-}
-
-function notifyListeners() {
-  for (const listener of listeners) listener();
+  try {
+    window.localStorage.setItem(CONSENT_KEY, next);
+  } catch {
+    // If storage is blocked, keep the UI working and fall back to in-memory consent.
+  }
+  document.cookie = `${CONSENT_COOKIE}=${encodeURIComponent(next)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
 
 function getPostHogConfig() {
@@ -58,12 +67,6 @@ export function setAnalyticsConsent(next: Exclude<AnalyticsConsent, "unknown">) 
   } else if (client) {
     client.reset();
   }
-  notifyListeners();
-}
-
-export function subscribeAnalyticsConsent(listener: () => void) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
 }
 
 export async function initAnalytics() {

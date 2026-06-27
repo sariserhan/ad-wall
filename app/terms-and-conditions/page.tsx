@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PrivacySettingsLink } from "@/components/privacy-settings-link";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions | WALL",
@@ -16,8 +17,9 @@ export default function TermsAndConditionsPage() {
           These terms govern access to and use of WALL, including browsing local ads, posting cards, and interacting with content on the platform.
         </p>
         <div className="legal-page__actions">
-          <Link href="/">Back to localwall</Link>
+          <Link href="/" className="legal-page__back-link">Back to localwall</Link>
           <Link href="/privacy-policy">Privacy Policy</Link>
+          <PrivacySettingsLink className="legal-page__privacy-settings" variant="text" />
         </div>
       </div>
 

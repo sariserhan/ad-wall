@@ -8,8 +8,6 @@ import { Toaster } from "@/lib/toast";
 import { GlobalOwnerDashboard } from "./global-owner-dashboard";
 import { GlobalBugReportModal } from "./global-bug-report-modal";
 import { GlobalContactModal } from "./global-contact-modal";
-import { AnalyticsConsentToast } from "./analytics-consent-toast";
-import { AnalyticsTracker } from "./analytics-tracker";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -48,8 +46,6 @@ function ConnectedProviders({ children, convexUrl }: { children: React.ReactNode
   return (
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       {children}
-      <AnalyticsTracker />
-      <AnalyticsConsentToast />
       <GlobalBugReportModal />
       <GlobalContactModal />
       <GlobalOwnerDashboard />

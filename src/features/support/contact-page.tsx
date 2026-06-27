@@ -82,17 +82,17 @@ export function ContactPage({ from, onClose }: { from?: string; onClose: () => v
     <div className="dashboard-confirm-backdrop bug-report-page contact-page" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div className="dashboard-confirm report-modal bug-report-modal contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-title">
         <Mail size={34} />
-        <h3 id="contact-title">Contact the admin</h3>
+        <h3 id="contact-title">Contact</h3>
         {done ? (
           <>
-            <p style={{ textAlign: "center" }}>Thanks, your message is in. The admin will see it in the contact inbox.</p>
+            <p style={{ textAlign: "center" }}>Thanks, your message is in. We will see it in the contact inbox.</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
               <button style={{ width: "50%", margin: "auto", padding: "0.5rem 1rem" }} className="primary" onClick={onClose}>Close</button>
             </div>
           </>
         ) : (
           <>
-            <p style={{ textAlign: "center" }}>Tell us what you need. Keep it short or long, we’ll save the full message for admin review.</p>
+            <p style={{ textAlign: "center" }}>Tell us what you need. Keep it short or long, we’ll save the full message for review.</p>
             <label className="report-details-label">
               Topic
               <span>(what is this about?)</span>
@@ -106,7 +106,7 @@ export function ContactPage({ from, onClose }: { from?: string; onClose: () => v
             </label>
             <div className="contact-details-summary" aria-label="Attached account details">
               <strong>Attached automatically</strong>
-              <p>We include whatever account details are available so admin can respond faster.</p>
+              <p>We include whatever account details are available so we can respond faster.</p>
               <div className="contact-details-list">
                 {contactSummary.length ? contactSummary.map((item) => <span key={item}>{item}</span>) : <span>No profile details are available yet.</span>}
               </div>
