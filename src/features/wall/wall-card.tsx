@@ -1,7 +1,7 @@
 "use client";
 
-import { RotateCcw } from "lucide-react";
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import { FlipHorizontal2, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent } from "react";
 import Image from "next/image";
 import { getCardFormat, type WallCard as WallCardModel } from "./types";
 import { BLUR_PLACEHOLDER } from "@/lib/blur-placeholder";
@@ -11,6 +11,8 @@ interface WallCardProps {
   active: boolean;
   onOpen: (card: WallCardModel) => void;
   onFront: (id: string) => void;
+  flipped?: boolean;
+  onFlip?: (card: WallCardModel) => void;
   ownerDraggable?: boolean;
   onRotate?: (card: WallCardModel, rotation: number) => void;
   expiringSoon?: boolean;
@@ -32,7 +34,7 @@ function hashString(value: string): number {
   return Math.abs(hash);
 }
 
-export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false, onRotate, expiringSoon = false, dragging = false, onDragStart, onDragMove, onDragEnd, zIndex }: WallCardProps) {
+export function WallCard({ card, active, onOpen, onFront, flipped = false, onFlip, ownerDraggable = false, onRotate, expiringSoon = false, dragging = false, onDragStart, onDragMove, onDragEnd, zIndex }: WallCardProps) {
   const pointerRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const tiltPointerRef = useRef<{ id: number; x: number; y: number; rotation: number } | null>(null);
   const didDragRef = useRef(false);
@@ -43,6 +45,7 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
   const tapeLeft = 22 + ((seed >> 6) % 48); // 22% to 69%
   const displayTheme = card.imageMode === "business-card" ? "biz" : card.theme;
   const cardImage = card.thumbnailImages?.[0] ?? card.images[0];
+  const backImage = card.backThumbnailImages?.[0] ?? card.backImages?.[0];
   const format = getCardFormat(displayTheme);
   const imageTopLayout = Boolean(cardImage && card.imageMode !== "business-card" && displayTheme !== "biz" && displayTheme !== "ticket");
 
@@ -86,6 +89,61 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
     "--tape-l": `${tapeLeft}%`,
     zIndex,
   };
+  const frontFace = (
+    <div className="wall-card-face wall-card-face-front">
+      {imageTopLayout ? (
+        <>
+          <div className="wall-card-image-top-wrap">
+            <img src={cardImage} alt="" draggable={false} className="wall-card-image-top" />
+          </div>
+          <div className="wall-card-content">
+            <div className="card-copy">
+              <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
+              {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
+              <h2>{card.name}</h2>
+              <p className="card-line">{card.line}</p>
+              {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="card-copy">
+          <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
+          {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
+          <h2>{card.name}</h2>
+          <p className="card-line">{card.line}</p>
+          {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
+        </div>
+      )}
+      {!imageTopLayout && cardImage ? (
+        card.imageMode === "business-card" ? (
+          <div className="wall-card-biz-wrap"><Image src={cardImage} alt="" fill sizes="280px" className="wall-card-biz-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} /></div>
+        ) : (
+          <div className="wall-card-clip">
+            {/* ponytail: plain img — position is user-defined (%, %) */}
+            <img src={cardImage} alt="" draggable={false} className="wall-card-img-free" style={{ left: `${card.imageX ?? 50}%`, top: `${card.imageY ?? 35}%`, width: `${card.imageWidth ?? 90}%` }} />
+          </div>
+        )
+      ) : null}
+      {card.imageMode === "business-card" ? <span className="verified-badge card-biz-verified" aria-label="Verified business">✓ Verified</span> : null}
+      <footer>
+        <span>{card.area}</span>
+        {card.price ? <strong className="card-price-right">{card.price}</strong> : null}
+      </footer>
+    </div>
+  );
+  const backFace = (
+    <div className="wall-card-face wall-card-face-back">
+      {backImage ? (
+        <img src={backImage} alt="" draggable={false} className="wall-card-back-image" />
+      ) : (
+        <div className={`wall-card-back-empty theme-${displayTheme}`}>
+          <strong>Back side</strong>
+          <span>No back image yet.</span>
+        </div>
+      )}
+    </div>
+  );
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -100,6 +158,12 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
     didDragRef.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
     onDragStart?.(event, card);
+  };
+
+  const handleFlipClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onFront(card.id);
+    onFlip?.(card);
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
@@ -144,6 +208,18 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
       {expiringSoon ? <span className="card-expiry-warn" aria-label="This card is expiring soon — open your dashboard to renew">⚠ Renew</span> : null}
       {card.featuredTier === "gold" ? <span className="featured-ribbon" aria-label="Featured Gold">⭐ Featured</span> : null}
       {card.featuredTier === "silver" || card.featuredTier === "bronze" ? <span className="featured-badge" aria-label={`Featured ${card.featuredTier}`}>⭐</span> : null}
+      {onFlip ? (
+        <button
+          type="button"
+          className={`card-flip-button ${flipped ? "is-back" : "is-front"}`}
+          onClick={handleFlipClick}
+          aria-pressed={flipped}
+          aria-label={flipped ? `Show front of ${card.name}` : `Show back of ${card.name}`}
+          title={flipped ? "Show front" : "Show back"}
+        >
+          <FlipHorizontal2 size={12} aria-hidden="true" />
+        </button>
+      ) : null}
       {ownerDraggable && onRotate ? (
         <button
           type="button"
@@ -159,45 +235,10 @@ export function WallCard({ card, active, onOpen, onFront, ownerDraggable = false
           <RotateCcw size={12} />
         </button>
       ) : null}
-      {imageTopLayout ? (
-        <>
-          <div className="wall-card-image-top-wrap">
-            <img src={cardImage} alt="" draggable={false} className="wall-card-image-top" />
-          </div>
-          <div className="wall-card-content">
-            <div className="card-copy">
-              <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
-              {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
-              <h2>{card.name}</h2>
-              <p className="card-line">{card.line}</p>
-              {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="card-copy">
-          <p className="card-category">{card.category}{card.subcategory ? <> · {card.subcategory}</> : null}</p>
-          {card.verified ? <span className="verified-badge" aria-label="Verified business">✓ Verified</span> : null}
-          <h2>{card.name}</h2>
-          <p className="card-line">{card.line}</p>
-          {card.ownerName ? <span className="card-owner-inline">by {card.ownerName}</span> : null}
-        </div>
-      )}
-      {!imageTopLayout && cardImage ? (
-        card.imageMode === "business-card" ? (
-          <div className="wall-card-biz-wrap"><Image src={cardImage} alt="" fill sizes="280px" className="wall-card-biz-photo" priority={false} placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} /></div>
-        ) : (
-          <div className="wall-card-clip">
-            {/* ponytail: plain img — position is user-defined (%, %) */}
-            <img src={cardImage} alt="" draggable={false} className="wall-card-img-free" style={{ left: `${card.imageX ?? 50}%`, top: `${card.imageY ?? 35}%`, width: `${card.imageWidth ?? 90}%` }} />
-          </div>
-        )
-      ) : null}
-      {card.imageMode === "business-card" ? <span className="verified-badge card-biz-verified" aria-label="Verified business">✓ Verified</span> : null}
-      <footer>
-        <span>{card.area}</span>
-        {card.price ? <strong className="card-price-right">{card.price}</strong> : null}
-      </footer>
-    </article>
+      <div className={`wall-card-face-stack ${flipped ? "is-flipped" : ""}`}>
+        {frontFace}
+        {backFace}
+      </div>
+      </article>
   );
 }

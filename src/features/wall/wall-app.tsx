@@ -196,6 +196,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const [movingCardId, setMovingCardId] = useState<string | null>(null);
   const [stackPickerCards, setStackPickerCards] = useState<WallCardModel[] | null>(null);
   const [layers, setLayers] = useState<string[]>(seedCards.map((card) => card.id));
+  const [flippedCardIds, setFlippedCardIds] = useState<Set<string>>(() => new Set());
 
   // Keep layers in sync with new cards arriving from Convex (e.g. other users posting).
   // New IDs are appended so they appear on top of older cards by default.
@@ -206,6 +207,25 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       return incoming.length ? [...prev, ...incoming] : prev;
     });
   }, [cards]);
+  const flipUserKey = profile?.username ?? profile?.businessName ?? profile?.displayName ?? "anon";
+  const flipStorageKey = `wall-card-flips-v1:${flipUserKey}`;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(flipStorageKey) ?? "null") as string[] | null;
+      setFlippedCardIds(new Set(stored ?? []));
+    } catch {
+      setFlippedCardIds(new Set());
+    }
+  }, [flipStorageKey]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(flipStorageKey, JSON.stringify([...flippedCardIds]));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [flipStorageKey, flippedCardIds]);
   const [listView, setListView] = useState(false);
   const [pendingCard, setPendingCard] = useState<CardDraft | null>(null);
   const [placement, setPlacement] = useState<Placement>({ x: 40, y: 170 });
@@ -751,11 +771,21 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   };
 
   const front = (id: string) => setLayers((current) => [...current.filter((item) => item !== id), id]);
+  const flipCard = (card: WallCardModel) => {
+    setFlippedCardIds((current) => {
+      const next = new Set(current);
+      const key = String(card.id);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const estimateCardHeight = (card: WallCardModel) => {
-    if (card.imageMode === "business-card") return getCardFormat("biz").minHeight;
-    if (card.images.length > 0) return 300;
-    return 220;
+    const format = getCardFormat(card.imageMode === "business-card" ? "biz" : card.theme);
+    if (card.imageMode === "business-card") return format.minHeight;
+    if (card.images.length > 0) return Math.max(format.minHeight, 300);
+    return format.minHeight;
   };
 
   const getCardRect = (card: WallCardModel) => {
@@ -1536,6 +1566,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                     active={selected?.id === card.id}
                     onOpen={openCard}
                     onFront={front}
+                    flipped={flippedCardIds.has(String(card.id))}
+                    onFlip={flipCard}
                     zIndex={index + 1}
                   />
                 ))}
@@ -1564,6 +1596,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                     active={selected?.id === card.id}
                     onOpen={handleCardClick}
                     onFront={front}
+                    flipped={flippedCardIds.has(String(card.id))}
+                    onFlip={flipCard}
                     ownerDraggable={ownerDraggable}
                     onRotate={ownerDraggable ? rotateOwnedCard : undefined}
                     expiringSoon={expiringSoon}

@@ -111,9 +111,12 @@ type PlaygroundCardArgs = {
   telegram?: string;
   ownerName?: string;
   imageUrl?: string;
+  backImageUrl?: string;
   theme: string;
   imageIds?: Id<"_storage">[];
   thumbnailImageIds?: Id<"_storage">[];
+  backImageIds?: Id<"_storage">[];
+  backThumbnailImageIds?: Id<"_storage">[];
   imageMode?: "photo" | "business-card";
   imageX?: number;
   imageY?: number;
@@ -183,6 +186,7 @@ const CSV_ALLOWED_HEADERS = new Set([
   "rating",
   "googleMapsUrl",
   "image",
+  "backImage",
 ]);
 
 function parseCsv(text: string) {
@@ -638,6 +642,7 @@ function BulkCsvImportSection() {
     const imageYField = csvMaybeNumber(data, "imageY");
     const imageWidthField = csvMaybeNumber(data, "imageWidth");
     const imageUrl = csvString(data, "image");
+    const backImageUrl = csvString(data, "backImage");
     const durationDaysField = csvMaybeInteger(data, "durationDays");
     const expiresAtField = csvMaybeNumber(data, "expiresAt");
     const clicksField = csvMaybeInteger(data, "clicks");
@@ -689,6 +694,7 @@ function BulkCsvImportSection() {
     if (imageYField.provided && !imageYField.valid) errors.push(`imageY must be a number: ${imageYField.raw}`);
     if (imageWidthField.provided && !imageWidthField.valid) errors.push(`imageWidth must be a number: ${imageWidthField.raw}`);
     if (imageUrl && !/^https?:\/\//i.test(imageUrl)) errors.push(`image must be an http or https URL: ${imageUrl}`);
+    if (backImageUrl && !/^https?:\/\//i.test(backImageUrl)) errors.push(`backImage must be an http or https URL: ${backImageUrl}`);
     if (durationDaysField.provided && !durationDaysField.valid) errors.push(`durationDays must be a whole number: ${durationDaysField.raw}`);
     if (durationDaysField.provided && durationDaysField.value !== undefined && durationDaysField.value < 0) errors.push(`durationDays must be zero or greater: ${durationDaysField.raw}`);
     if (expiresAtField.provided && !expiresAtField.valid) errors.push(`expiresAt must be a number: ${expiresAtField.raw}`);
@@ -750,6 +756,7 @@ function BulkCsvImportSection() {
       ownerName: csvString(data, "ownerName") || undefined,
       theme: themeValue,
       imageUrl,
+      backImageUrl,
       imageMode: getCsvImageMode(imageUrl, imageMode),
       imageX: imageXField.value,
       imageY: imageYField.value,
@@ -773,6 +780,7 @@ function BulkCsvImportSection() {
       rotation: rotationField.value,
       width: widthField.value ?? getImageCardFormat(themeValue as CardTheme, imageMode).width,
       ...(imageUrl ? { imageUrl } : {}),
+      ...(backImageUrl ? { backImageUrl } : {}),
     };
 
     return { payload, errors };
@@ -835,9 +843,14 @@ function BulkCsvImportSection() {
         const { resolved } = readyRows[index];
         if (!resolved.payload) continue;
         const imageUrl = resolved.payload.imageUrl;
-        const { imageUrl: _imageUrl, ...payload } = resolved.payload;
+        const backImageUrl = resolved.payload.backImageUrl;
+        const { imageUrl: _imageUrl, backImageUrl: _backImageUrl, ...payload } = resolved.payload;
         const imageIds = imageUrl ? [ (await storeImageFromUrl({ imageUrl })).storageId ] : undefined;
-        await createCard(imageIds ? { ...payload, imageIds } : payload);
+        const backImageIds = backImageUrl ? [ (await storeImageFromUrl({ imageUrl: backImageUrl })).storageId ] : undefined;
+        await createCard({
+          ...(imageIds ? { ...payload, imageIds } : payload),
+          ...(backImageIds ? { backImageIds } : {}),
+        });
         setProgress({ done: index + 1, total: readyRows.length });
       }
       setOk(`Imported ${readyRows.length} card${readyRows.length === 1 ? "" : "s"}.`);

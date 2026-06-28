@@ -6113,7 +6113,7 @@
       "label": "Composer()",
       "file_type": "code",
       "source_file": "src/features/wall/composer.tsx",
-      "source_location": "L364",
+      "source_location": "L375",
       "_origin": "ast",
       "id": "wall_composer_composer",
       "community": 14,

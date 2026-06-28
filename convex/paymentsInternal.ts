@@ -26,11 +26,13 @@ export const completePaidCard = internalMutation({
       const existingCard = await ctx.db.get(existingReceipt.cardId);
       if (!existingCard) throw new Error("The completed card could not be found.");
       const owner = await ctx.db.get(existingCard.ownerId);
-      const [existingUrls, existingThumbnailUrls] = await Promise.all([
+      const [existingUrls, existingThumbnailUrls, existingBackUrls, existingBackThumbnailUrls] = await Promise.all([
         Promise.all(existingCard.imageIds.map((imageId) => ctx.storage.getUrl(imageId))),
         Promise.all((existingCard.thumbnailImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
+        Promise.all((existingCard.backImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
+        Promise.all((existingCard.backThumbnailImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
       ]);
-      return { id: existingCard._id, ...existingCard, images: existingUrls.filter((url): url is string => url !== null), thumbnailImages: existingThumbnailUrls.filter((url): url is string => url !== null), verified: owner?.verified ?? false };
+      return { id: existingCard._id, ...existingCard, images: existingUrls.filter((url): url is string => url !== null), thumbnailImages: existingThumbnailUrls.filter((url): url is string => url !== null), backImages: existingBackUrls.filter((url): url is string => url !== null), backThumbnailImages: existingBackThumbnailUrls.filter((url): url is string => url !== null), verified: owner?.verified ?? false };
     }
     const pending = await ctx.db.get(args.pendingCardId);
     if (!pending || pending.status !== "pending" || pending.expiresAt <= Date.now()) throw new Error("This pending card is no longer available.");
@@ -72,6 +74,8 @@ export const completePaidCard = internalMutation({
       imageMode: payload.imageMode,
       imageIds: payload.imageIds,
       thumbnailImageIds: payload.thumbnailImageIds,
+      backImageIds: payload.backImageIds,
+      backThumbnailImageIds: payload.backThumbnailImageIds,
       x: payload.x,
       y: payload.y,
       rotation: payload.rotation ?? 0,
@@ -95,11 +99,15 @@ export const completePaidCard = internalMutation({
     if (args.stripeCustomerId) await ctx.db.patch(owner._id, { stripeCustomerId: args.stripeCustomerId });
     const imageIds = payload.imageIds as Id<"_storage">[];
     const thumbnailImageIds = (payload.thumbnailImageIds ?? []) as Id<"_storage">[];
-    const [urls, thumbnailUrls] = await Promise.all([
+    const backImageIds = (payload.backImageIds ?? []) as Id<"_storage">[];
+    const backThumbnailImageIds = (payload.backThumbnailImageIds ?? []) as Id<"_storage">[];
+    const [urls, thumbnailUrls, backUrls, backThumbnailUrls] = await Promise.all([
       Promise.all(imageIds.map((imageId) => ctx.storage.getUrl(imageId))),
       Promise.all(thumbnailImageIds.map((imageId) => ctx.storage.getUrl(imageId))),
+      Promise.all(backImageIds.map((imageId) => ctx.storage.getUrl(imageId))),
+      Promise.all(backThumbnailImageIds.map((imageId) => ctx.storage.getUrl(imageId))),
     ]);
-    return { id: cardId, ...payload, rotation: payload.rotation ?? 0, ownerId: pending.ownerId, images: urls.filter((url): url is string => url !== null), thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null), zIndex: createdAt, status: "published" as const, paidAmount: basePaidAmount, featuredTier, reviewCount: 0, expiresAt: createdAt + packageDurations[basePaidAmount], positionLockedAt: createdAt, updatedAt: createdAt, createdAt, clicks: 0, verified: owner.verified ?? false };
+    return { id: cardId, ...payload, rotation: payload.rotation ?? 0, ownerId: pending.ownerId, images: urls.filter((url): url is string => url !== null), thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null), backImages: backUrls.filter((url): url is string => url !== null), backThumbnailImages: backThumbnailUrls.filter((url): url is string => url !== null), zIndex: createdAt, status: "published" as const, paidAmount: basePaidAmount, featuredTier, reviewCount: 0, expiresAt: createdAt + packageDurations[basePaidAmount], positionLockedAt: createdAt, updatedAt: createdAt, createdAt, clicks: 0, verified: owner.verified ?? false };
   },
 });
 
@@ -227,8 +235,13 @@ export const completeBundlePosting = internalMutation({
       const card = await ctx.db.get(existingReceipt.cardId);
       if (!card) throw new Error("Bundle card not found.");
       const owner = await ctx.db.get(card.ownerId);
-      const urls = await Promise.all(card.imageIds.map((id) => ctx.storage.getUrl(id)));
-      return [{ id: card._id, ...card, images: urls.filter((u): u is string => u !== null), verified: owner?.verified ?? false }];
+      const [urls, thumbnailUrls, backUrls, backThumbnailUrls] = await Promise.all([
+        Promise.all(card.imageIds.map((id) => ctx.storage.getUrl(id))),
+        Promise.all((card.thumbnailImageIds ?? []).map((id) => ctx.storage.getUrl(id))),
+        Promise.all((card.backImageIds ?? []).map((id) => ctx.storage.getUrl(id))),
+        Promise.all((card.backThumbnailImageIds ?? []).map((id) => ctx.storage.getUrl(id))),
+      ]);
+      return [{ id: card._id, ...card, images: urls.filter((u): u is string => u !== null), thumbnailImages: thumbnailUrls.filter((u): u is string => u !== null), backImages: backUrls.filter((u): u is string => u !== null), backThumbnailImages: backThumbnailUrls.filter((u): u is string => u !== null), verified: owner?.verified ?? false }];
     }
 
     const pending = await ctx.db.get(args.pendingCardId);
@@ -245,12 +258,18 @@ export const completeBundlePosting = internalMutation({
     const featuredTier = payload.featuredTier as "bronze" | "silver" | "gold" | undefined;
     const imageIds = payload.imageIds as Id<"_storage">[];
     const thumbnailImageIds = (payload.thumbnailImageIds ?? []) as Id<"_storage">[];
-    const [urls, thumbUrls] = await Promise.all([
+    const backImageIds = (payload.backImageIds ?? []) as Id<"_storage">[];
+    const backThumbnailImageIds = (payload.backThumbnailImageIds ?? []) as Id<"_storage">[];
+    const [urls, thumbUrls, backUrls, backThumbUrls] = await Promise.all([
       Promise.all(imageIds.map((id) => ctx.storage.getUrl(id))),
       Promise.all(thumbnailImageIds.map((id) => ctx.storage.getUrl(id))),
+      Promise.all(backImageIds.map((id) => ctx.storage.getUrl(id))),
+      Promise.all(backThumbnailImageIds.map((id) => ctx.storage.getUrl(id))),
     ]);
     const images = urls.filter((u): u is string => u !== null);
     const thumbnailImages = thumbUrls.filter((u): u is string => u !== null);
+    const backImages = backUrls.filter((u): u is string => u !== null);
+    const backThumbnailImages = backThumbUrls.filter((u): u is string => u !== null);
 
     const cities = args.bundleCities.slice(0, 3);
     const createdCards: Array<{ id: Id<"cards"> }> = [];
@@ -286,6 +305,8 @@ export const completeBundlePosting = internalMutation({
         imageMode: payload.imageMode,
         imageIds,
         thumbnailImageIds,
+        backImageIds,
+        backThumbnailImageIds,
         x: payload.x,
         y: payload.y,
         rotation: payload.rotation ?? 0,
@@ -314,11 +335,13 @@ export const completeBundlePosting = internalMutation({
     });
     await ctx.db.patch(pending._id, { status: "completed" });
 
-    return createdCards.map(({ id }) => ({
+      return createdCards.map(({ id }) => ({
       id,
       ...payload,
       images,
       thumbnailImages,
+      backImages,
+      backThumbnailImages,
       status: "published" as const,
       paidAmount: 19.99,
       featuredTier,

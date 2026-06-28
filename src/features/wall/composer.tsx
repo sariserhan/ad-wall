@@ -122,6 +122,7 @@ const DRAFT_STORAGE_KEY = "wall-card-draft-v1";
 const DRAFT_IMAGES_DB = "wall-draft-images-v1";
 const DRAFT_IMAGES_STORE = "blobs";
 const DRAFT_IMAGES_KEY = "draft";
+const DRAFT_BACK_IMAGES_KEY = "draft-back";
 
 function openImagesDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -132,12 +133,12 @@ function openImagesDB(): Promise<IDBDatabase> {
   });
 }
 
-async function saveImagesToIDB(blobs: Blob[]): Promise<void> {
+async function saveImagesToIDB(key: string, blobs: Blob[]): Promise<void> {
   try {
     const db = await openImagesDB();
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction(DRAFT_IMAGES_STORE, "readwrite");
-      tx.objectStore(DRAFT_IMAGES_STORE).put(blobs, DRAFT_IMAGES_KEY);
+      tx.objectStore(DRAFT_IMAGES_STORE).put(blobs, key);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
@@ -145,12 +146,12 @@ async function saveImagesToIDB(blobs: Blob[]): Promise<void> {
   } catch { /* storage unavailable */ }
 }
 
-async function loadImagesFromIDB(): Promise<Blob[] | null> {
+async function loadImagesFromIDB(key: string): Promise<Blob[] | null> {
   try {
     const db = await openImagesDB();
     const blobs = await new Promise<Blob[] | null>((resolve, reject) => {
       const tx = db.transaction(DRAFT_IMAGES_STORE, "readonly");
-      const req = tx.objectStore(DRAFT_IMAGES_STORE).get(DRAFT_IMAGES_KEY);
+      const req = tx.objectStore(DRAFT_IMAGES_STORE).get(key);
       req.onsuccess = () => resolve((req.result as Blob[]) ?? null);
       req.onerror = () => reject(req.error);
     });
@@ -159,12 +160,12 @@ async function loadImagesFromIDB(): Promise<Blob[] | null> {
   } catch { return null; }
 }
 
-async function clearImagesFromIDB(): Promise<void> {
+async function clearImagesFromIDB(key: string): Promise<void> {
   try {
     const db = await openImagesDB();
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction(DRAFT_IMAGES_STORE, "readwrite");
-      tx.objectStore(DRAFT_IMAGES_STORE).delete(DRAFT_IMAGES_KEY);
+      tx.objectStore(DRAFT_IMAGES_STORE).delete(key);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
@@ -372,6 +373,62 @@ function ExpandedCardPreview({ form, image, isVerified }: { form: ComposerForm; 
   );
 }
 
+function BackCardPreview({ form, image }: { form: ComposerForm; image?: string }) {
+  const format = getCardFormat(form.theme);
+  const location = form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall";
+  return (
+    <article className="details-back-card" style={{ "--w": `${format.width}px`, "--h": `${format.minHeight}px` } as CSSProperties} aria-label="Back card preview">
+      <div className="details-back-image-wrap">
+        {image ? <img src={image} alt="" draggable={false} className="details-back-image" /> : <div className="details-back-empty">Upload a back image</div>}
+      </div>
+      <div className="details-back-overlay">
+        <span className="details-back-card-label">Back side</span>
+        <div className="sheet-meta"><span>{location}</span><span>BACK #PREVIEW</span></div>
+      </div>
+    </article>
+  );
+}
+
+function CardSidesPreview({
+  form,
+  frontImage,
+  backImage,
+  isVerified,
+  mode,
+  onFrontImageChange,
+  onFrontRotate,
+}: {
+  form: ComposerForm;
+  frontImage?: string;
+  backImage?: string;
+  isVerified?: boolean;
+  mode: "live" | "expanded";
+  onFrontImageChange?: (height: number) => void;
+  onFrontRotate?: (rotation: number) => void;
+}) {
+  return (
+    <div className="card-sides-preview">
+      <div className="card-side-preview">
+        <span>Front</span>
+        <div className="card-side-preview-canvas">
+          {mode === "live" ? (
+            <LiveCardPreview form={form} image={frontImage} onImageChange={onFrontImageChange} onRotate={onFrontRotate} isVerified={isVerified} />
+          ) : (
+            <ExpandedCardPreview form={form} image={frontImage} isVerified={isVerified} />
+          )}
+        </div>
+      </div>
+      <div className="card-side-divider" aria-hidden="true" />
+      <div className="card-side-preview">
+        <span>Back</span>
+        <div className="card-side-preview-canvas">
+          <BackCardPreview form={form} image={backImage} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Composer({ onClose, onReady, initialLocation, isVerified = false }: ComposerProps) {
   const [form, setForm] = useState<ComposerForm>(() => {
     const baseCountry = initialLocation?.country ?? defaultCountry;
@@ -395,6 +452,9 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [backFiles, setBackFiles] = useState<File[]>([]);
+  const [backPreviews, setBackPreviews] = useState<string[]>([]);
+  const backFileInputRef = useRef<HTMLInputElement>(null);
   const [autoRenew, setAutoRenew] = useState(false);
   const [bundleCities, setBundleCities] = useState<BundleCity[]>(() => {
     const base: BundleCity = initialLocation
@@ -556,7 +616,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
   }, [form]);
 
   useEffect(() => {
-    void loadImagesFromIDB().then((blobs) => {
+    void loadImagesFromIDB(DRAFT_IMAGES_KEY).then((blobs) => {
       if (!blobs?.length) return;
       const restored = blobs.map((blob, i) => new File([blob], `draft-${i}.${blob.type.split("/")[1] ?? "jpg"}`, { type: blob.type }));
       setFiles(restored);
@@ -565,9 +625,32 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => { void saveImagesToIDB(files); }, 500);
+    const timer = window.setTimeout(() => { void saveImagesToIDB(DRAFT_IMAGES_KEY, files); }, 500);
     return () => window.clearTimeout(timer);
   }, [files]);
+
+  useEffect(() => {
+    void loadImagesFromIDB(DRAFT_BACK_IMAGES_KEY).then((blobs) => {
+      if (!blobs?.length) return;
+      const restored = blobs.map((blob, i) => new File([blob], `draft-back-${i}.${blob.type.split("/")[1] ?? "jpg"}`, { type: blob.type }));
+      setBackFiles(restored);
+      setBackPreviews(restored.map((f) => URL.createObjectURL(f)));
+    });
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void saveImagesToIDB(DRAFT_BACK_IMAGES_KEY, backFiles); }, 500);
+    return () => window.clearTimeout(timer);
+  }, [backFiles]);
+
+  useEffect(() => {
+    if (form.theme !== "biz" && form.theme !== "ticket") return;
+    if (!files.length) return;
+    previews.forEach(URL.revokeObjectURL);
+    setFiles([]);
+    setPreviews([]);
+    setForm((value) => ({ ...value, imageMode: "photo", imageHeight: 156 }));
+  }, [form.theme, files.length, previews]);
 
   useEffect(() => {
     if (!form.phone.trim() && !form.email.trim()) return;
@@ -594,13 +677,29 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
     event.currentTarget.value = "";
   };
 
+  const onBackImages = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextFiles = Array.from(event.target.files ?? []).slice(0, 1);
+    backPreviews.forEach(URL.revokeObjectURL);
+    setBackFiles(nextFiles);
+    setBackPreviews(nextFiles.map((file) => URL.createObjectURL(file)));
+    event.currentTarget.value = "";
+  };
+
   const clearImages = () => {
     previews.forEach(URL.revokeObjectURL);
     setFiles([]);
     setPreviews([]);
     setForm((value) => ({ ...value, imageMode: "photo", imageHeight: 156 }));
     fileInputRef.current?.value && (fileInputRef.current.value = "");
-    void clearImagesFromIDB();
+    void clearImagesFromIDB(DRAFT_IMAGES_KEY);
+  };
+
+  const clearBackImages = () => {
+    backPreviews.forEach(URL.revokeObjectURL);
+    setBackFiles([]);
+    setBackPreviews([]);
+    backFileInputRef.current?.value && (backFileInputRef.current.value = "");
+    void clearImagesFromIDB(DRAFT_BACK_IMAGES_KEY);
   };
 
   const chooseImageMode = (imageMode: CardImageMode) => {
@@ -655,10 +754,15 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
       bundleCities: form.paymentOption === "bundle" ? bundleCities : undefined,
       files,
       previews,
+      backFiles,
+      backPreviews,
     });
     try { window.localStorage.removeItem(DRAFT_STORAGE_KEY); } catch { /* storage unavailable */ }
-    void clearImagesFromIDB();
+    void clearImagesFromIDB(DRAFT_IMAGES_KEY);
+    void clearImagesFromIDB(DRAFT_BACK_IMAGES_KEY);
   };
+
+  const canUseFrontImages = form.theme !== "biz" && form.theme !== "ticket";
 
   return (
     <div className="composer-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
@@ -754,44 +858,79 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
                 </div>
               </div>
               <span><small>Updates as you type</small></span>
-              <span>Your card on the wall</span>
-              <div className="details-preview-canvas"><LiveCardPreview form={form} image={previews[0]} isVerified={isVerified} /></div>              
+              <div className="details-preview-block">
+                <span>Live card</span>
+                <div className="details-preview-canvas">
+                  <LiveCardPreview form={form} image={previews[0]} isVerified={isVerified} />
+                </div>
+              </div>
               <div className="details-preview-divider" aria-hidden="true" />
-              <div className="details-expanded-preview">                
+              <div className="details-expanded-preview">
+                <span>Expanded card</span>
                 <div className="details-expanded-canvas">
                   <ExpandedCardPreview form={form} image={previews[0]} isVerified={isVerified} />
                 </div>
               </div>
-
+              <div className="details-preview-divider" aria-hidden="true" />
+              <div className="details-expanded-preview">
+                <span>Back card</span>
+                <div className="details-expanded-canvas">
+                  <BackCardPreview form={form} image={backPreviews[0]} />
+                </div>
+              </div>
             </aside>
           </div>
         ) : step === 1 ? (
           <div className="composer-body design-step">
-            <div className="upload-zone-wrap">
-              <label className="upload-zone">
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={onImages} />
-                {previews.length ? <div className="preview-row">{previews.map((src) => <img src={src} key={src} alt="Upload preview" />)}</div> : <><ImagePlus /><strong>Upload pictures or your finished card</strong><span>JPG, PNG or WEBP · 8MB each</span></>}
-              </label>
-              {previews.length ? (
-                <button type="button" className="upload-zone-clear" onClick={clearImages} aria-label="Delete uploaded image">
-                  <Trash2 size={13} />
-                  <span>Delete image</span>
-                </button>
-              ) : null}
-            </div>
-            {previews.length ? (
-              <fieldset className="image-use-picker">
-                <legend>How should we use your upload?</legend>
-                <div role="radiogroup" aria-label="Choose how to display the uploaded image">
-                  <button type="button" role="radio" aria-checked={form.imageMode === "photo"} className={form.imageMode === "photo" ? "selected" : ""} onClick={() => chooseImageMode("photo")}>
-                    <ImagePlus /><span><strong>Picture in a WALL style</strong><small>Place the picture inside any card style below.</small></span>{form.imageMode === "photo" ? <Check /> : null}
-                  </button>
-                  <button type="button" role="radio" aria-checked={form.imageMode === "business-card"} className={form.imageMode === "business-card" ? "selected" : ""} onClick={() => chooseImageMode("business-card")}>
-                    <span className="business-card-icon" aria-hidden="true" /><span><strong>My finished business card</strong><small>Use the whole image at our standard 300 × 180 size.</small></span>{form.imageMode === "business-card" ? <Check /> : null}
-                  </button>
+            <div className="upload-grid">
+              {canUseFrontImages ? (
+                <div className="upload-zone-wrap">
+                  <label className="upload-zone">
+                    <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={onImages} />
+                    {previews.length ? <div className="preview-row">{previews.map((src) => <img src={src} key={src} alt="Front upload preview" />)}</div> : <><ImagePlus /><strong>Upload front image</strong><span>JPG, PNG or WEBP · 8MB each</span></>}
+                  </label>
+                  {previews.length ? (
+                    <button type="button" className="upload-zone-clear" onClick={clearImages} aria-label="Delete front image">
+                      <Trash2 size={13} />
+                      <span>Delete image</span>
+                    </button>
+                  ) : null}
+                  {previews.length ? (
+                    <fieldset className="image-use-picker">
+                      <legend>How should we use the front upload?</legend>
+                      <div role="radiogroup" aria-label="Choose how to display the uploaded image">
+                        <button type="button" role="radio" aria-checked={form.imageMode === "photo"} className={form.imageMode === "photo" ? "selected" : ""} onClick={() => chooseImageMode("photo")}>
+                          <ImagePlus /><span><strong>Picture in a WALL style</strong><small>Place the picture inside any card style below.</small></span>{form.imageMode === "photo" ? <Check /> : null}
+                        </button>
+                        <button type="button" role="radio" aria-checked={form.imageMode === "business-card"} className={form.imageMode === "business-card" ? "selected" : ""} onClick={() => chooseImageMode("business-card")}>
+                          <span className="business-card-icon" aria-hidden="true" /><span><strong>My finished business card</strong><small>Use the whole image at our standard 300 × 180 size.</small></span>{form.imageMode === "business-card" ? <Check /> : null}
+                        </button>
+                      </div>
+                    </fieldset>
+                  ) : null}
                 </div>
-              </fieldset>
-            ) : null}
+              ) : (
+                <div className="upload-zone-wrap upload-zone-locked">
+                  <div className="upload-zone upload-zone-disabled">
+                    <ImagePlus />
+                    <strong>Front image is disabled for this card type</strong>
+                    <span>Biz and ticket cards use the back image only.</span>
+                  </div>
+                </div>
+              )}
+              <div className="upload-zone-wrap">
+                <label className="upload-zone upload-zone-back">
+                  <input ref={backFileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={onBackImages} />
+                  {backPreviews.length ? <div className="preview-row">{backPreviews.map((src) => <img src={src} key={src} alt="Back upload preview" />)}</div> : <><ImagePlus /><strong>Upload back image</strong><span>Shown when the card flips</span></>}
+                </label>
+                {backPreviews.length ? (
+                  <button type="button" className="upload-zone-clear" onClick={clearBackImages} aria-label="Delete back image">
+                    <Trash2 size={13} />
+                    <span>Delete image</span>
+                  </button>
+                ) : null}
+              </div>
+            </div>
             <div className="safety-status" data-status={moderationStatus}>{moderationStatus === "checking" ? "Checking images and text for unsafe content…" : moderationError ?? "Images are checked for nudity and adult content before publishing."}</div>
             <fieldset className={form.imageMode === "business-card" ? "styles-disabled" : ""}>
               <legend>Card style</legend>
@@ -817,12 +956,14 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
             <div className="preview-stage">
               <span>Live preview</span>
               <div className="preview-canvas">
-                <LiveCardPreview
+                <CardSidesPreview
+                  mode="live"
                   form={form}
-                  image={previews[0]}
+                  frontImage={previews[0]}
+                  backImage={backPreviews[0]}
                   isVerified={isVerified}
-                  onImageChange={previews[0] && form.imageMode === "photo" ? (imageHeight) => setForm((f) => ({ ...f, imageHeight })) : undefined}
-                  onRotate={(rotation) => setForm((value) => ({ ...value, rotation }))}
+                  onFrontImageChange={previews[0] && form.imageMode === "photo" ? (imageHeight) => setForm((f) => ({ ...f, imageHeight })) : undefined}
+                  onFrontRotate={(rotation) => setForm((value) => ({ ...value, rotation }))}
                 />
               </div>
               {previews[0] && form.imageMode === "photo" ? <small className="img-drag-hint">Drag to reposition · drag corner to resize · hold the corner icon to tilt</small> : null}

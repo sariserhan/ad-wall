@@ -403,8 +403,11 @@ export function ConnectedWallApp({
   const handleCreate = async (draft: CardDraft, placement: Placement): Promise<WallCard | void> => {
     if (!isAuthenticated) throw new Error("Please finish signing in before posting a card.");
     const uploadedImages = await Promise.all(draft.files.slice(0, 2).map(uploadImageVariants));
+    const uploadedBackImages = await Promise.all(draft.backFiles.slice(0, 1).map(uploadImageVariants));
     const imageIds = uploadedImages.map((image) => image.imageId);
     const thumbnailImageIds = uploadedImages.map((image) => image.thumbnailImageId);
+    const backImageIds = uploadedBackImages.map((image) => image.imageId);
+    const backThumbnailImageIds = uploadedBackImages.map((image) => image.thumbnailImageId);
     const isBundle = draft.paymentOption === "bundle";
     const basePaidAmount = isBundle ? 19.99 : draft.paymentOption === "free" ? 0 : Number(draft.paymentOption);
     const featuredPrices: Record<string, number> = { bronze: 2.99, silver: 4.99, gold: 9.99 };
@@ -446,6 +449,8 @@ export function ConnectedWallApp({
       imageWidth: draft.imageWidth,
       imageIds,
       thumbnailImageIds,
+      backImageIds,
+      backThumbnailImageIds,
       x: placement.x,
       y: placement.y,
       rotation: draft.rotation ?? 0,

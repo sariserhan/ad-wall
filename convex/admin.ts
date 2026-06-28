@@ -350,7 +350,7 @@ export const removeCard = mutation({
     const card = await ctx.db.get(args.cardId);
     if (!card) throw new Error("That card no longer exists.");
     await audit(ctx, identity, "removeCard", args.cardId, { name: card.name, ownerId: card.ownerId });
-    const storedImages = new Set([...card.imageIds, ...(card.thumbnailImageIds ?? [])]);
+    const storedImages = new Set([...card.imageIds, ...(card.thumbnailImageIds ?? []), ...(card.backImageIds ?? []), ...(card.backThumbnailImageIds ?? [])]);
     await Promise.all([...storedImages].map((imageId) => ctx.storage.delete(imageId)));
     await ctx.db.delete(card._id);
     return { success: true };
@@ -364,7 +364,7 @@ export const deleteCardsByOwnerBatch = internalMutation({
   handler: async (ctx, args) => {
     const cards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId)).take(DELETE_OWNER_BATCH_SIZE);
     for (const card of cards) {
-      const storedImages = new Set([...card.imageIds, ...(card.thumbnailImageIds ?? [])]);
+      const storedImages = new Set([...card.imageIds, ...(card.thumbnailImageIds ?? []), ...(card.backImageIds ?? []), ...(card.backThumbnailImageIds ?? [])]);
       for (const imageId of storedImages) {
         await ctx.storage.delete(imageId);
       }
@@ -529,6 +529,8 @@ const PG_ADMIN_CARD_ARGS = {
   ownerName: v.optional(v.string()),
   imageIds: v.optional(v.array(v.id("_storage"))),
   thumbnailImageIds: v.optional(v.array(v.id("_storage"))),
+  backImageIds: v.optional(v.array(v.id("_storage"))),
+  backThumbnailImageIds: v.optional(v.array(v.id("_storage"))),
   theme: PG_ADMIN_THEME,
   imageMode: v.optional(PG_ADMIN_IMAGE_MODE),
   imageX: v.optional(v.number()),
@@ -582,6 +584,8 @@ type PlaygroundCardArgs = {
   theme: string;
   imageIds?: Id<"_storage">[];
   thumbnailImageIds?: Id<"_storage">[];
+  backImageIds?: Id<"_storage">[];
+  backThumbnailImageIds?: Id<"_storage">[];
   imageMode?: "photo" | "business-card";
   imageX?: number;
   imageY?: number;
@@ -661,6 +665,8 @@ async function createPlaygroundCard(ctx: MutationCtx, userId: Id<"users">, args:
     imageWidth: args.imageWidth,
     imageIds: args.imageIds ?? [],
     thumbnailImageIds: args.thumbnailImageIds,
+    backImageIds: args.backImageIds,
+    backThumbnailImageIds: args.backThumbnailImageIds,
     x,
     y,
     rotation,
@@ -796,7 +802,7 @@ export const playgroundDeleteCard = mutation({
     await requireAdmin(ctx);
     const card = await ctx.db.get(args.cardId);
     if (!card) throw new Error("Card not found.");
-    const storedImages = new Set([...card.imageIds, ...(card.thumbnailImageIds ?? [])]);
+    const storedImages = new Set([...card.imageIds, ...(card.thumbnailImageIds ?? []), ...(card.backImageIds ?? []), ...(card.backThumbnailImageIds ?? [])]);
     await Promise.all([...storedImages].map((id) => ctx.storage.delete(id)));
     await ctx.db.delete(args.cardId);
     return { success: true };
@@ -812,7 +818,7 @@ export const playgroundDeleteAllMyCards = mutation({
     const cards = await ctx.db.query("cards").withIndex("by_owner", (q) => q.eq("ownerId", user._id)).collect();
     let deleted = 0;
     for (const card of cards) {
-      const storedImages = [...card.imageIds, ...(card.thumbnailImageIds ?? [])];
+      const storedImages = [...card.imageIds, ...(card.thumbnailImageIds ?? []), ...(card.backImageIds ?? []), ...(card.backThumbnailImageIds ?? [])];
       for (const id of storedImages) await ctx.storage.delete(id);
       await ctx.db.delete(card._id);
       deleted++;

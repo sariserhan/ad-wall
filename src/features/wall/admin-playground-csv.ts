@@ -47,6 +47,7 @@ export const CSV_OPTIONAL_HEADERS = [
   "rating",
   "googleMapsUrl",
   "image",
+  "backImage",
 ] as const;
 
 export const CSV_ALLOWED_HEADERS = new Set([

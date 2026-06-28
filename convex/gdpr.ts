@@ -78,6 +78,8 @@ export const _deleteMyData = internalMutation({
     const allStorageIds = cards.flatMap((c) => [
       ...(c.imageIds ?? []),
       ...(c.thumbnailImageIds ?? []),
+      ...(c.backImageIds ?? []),
+      ...(c.backThumbnailImageIds ?? []),
     ]);
     await Promise.all(allStorageIds.map((id) => ctx.storage.delete(id).catch(() => {})));
 

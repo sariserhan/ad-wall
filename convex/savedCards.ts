@@ -30,9 +30,11 @@ async function ensureActiveUser(ctx: MutationCtx) {
 }
 
 async function toSavedCard(ctx: QueryCtx, card: Doc<"cards">) {
-  const [urls, thumbnailUrls, stats] = await Promise.all([
+  const [urls, thumbnailUrls, backUrls, backThumbnailUrls, stats] = await Promise.all([
     Promise.all(card.imageIds.map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
     Promise.all((card.thumbnailImageIds ?? []).map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
+    Promise.all((card.backImageIds ?? []).map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
+    Promise.all((card.backThumbnailImageIds ?? []).map((imageId: Id<"_storage">) => ctx.storage.getUrl(imageId))),
     ctx.db.query("cardStats").withIndex("by_card", (q) => q.eq("cardId", card._id)).unique(),
   ]);
   return {
@@ -60,6 +62,8 @@ async function toSavedCard(ctx: QueryCtx, card: Doc<"cards">) {
     imageMode: card.imageMode,
     images: urls.filter((url): url is string => url !== null),
     thumbnailImages: thumbnailUrls.filter((url): url is string => url !== null),
+    backImages: backUrls.filter((url): url is string => url !== null),
+    backThumbnailImages: backThumbnailUrls.filter((url): url is string => url !== null),
     x: card.x,
     y: card.y,
     rotation: card.rotation,

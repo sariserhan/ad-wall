@@ -111,6 +111,8 @@ export interface WallCard {
   imageWidth?: number;
   images: string[];
   thumbnailImages?: string[];
+  backImages?: string[];
+  backThumbnailImages?: string[];
   x: number;
   y: number;
   rotation: number;
@@ -176,6 +178,8 @@ export interface CardDraft {
   imageX?: number;
   imageY?: number;
   imageWidth?: number;
+  backFiles: File[];
+  backPreviews: string[];
   rotation?: number;
   paymentOption: "free" | "2.99" | "7.99" | "24.99" | "bundle";
   bundleCities?: Array<{ country: string; state: string; city: string }>;
