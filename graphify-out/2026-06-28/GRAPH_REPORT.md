@@ -2,9 +2,9 @@
 
 ## Corpus Check
 <<<<<<< HEAD
-- 214 files · ~435,390 words
+- 214 files · ~435,341 words
 =======
-- 214 files · ~435,686 words
+- 214 files · ~435,390 words
 >>>>>>> a0103297 (fix backside card live view)
 - Verdict: corpus is large enough that graph structure adds value.
 
@@ -15,9 +15,9 @@
 
 ## Graph Freshness
 <<<<<<< HEAD
-- Built from commit: `6d57de72`
+- Built from commit: `70f858f2`
 =======
-- Built from commit: `a7f88e12`
+- Built from commit: `6d57de72`
 >>>>>>> a0103297 (fix backside card live view)
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
@@ -545,7 +545,11 @@ Cohesion: 0.50
 Nodes (4): EmailTestSection(), SubscriptionSection(), useAsync(), VerificationSection()
 
 ## Knowledge Gaps
+<<<<<<< HEAD
+- **842 isolated node(s):** `npx`, `Props`, `Props`, `Props`, `Props` (+837 more)
+=======
 - **842 isolated node(s):** `BundleCity`, `countries`, `defaultStates`, `initialForm`, `themeOptions` (+837 more)
+>>>>>>> a0103297 (fix backside card live view)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -553,12 +557,20 @@ Nodes (4): EmailTestSection(), SubscriptionSection(), useAsync(), VerificationSe
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `api` connect `Billing, Admin & Test Infrastructure` to `Rate Limiting & API Utilities`, `Geo-Routed Pages & RSS Feeds`, `Card Data Layer (Convex)`, `Admin Panel & Moderation UI`, `Community 104`, `UI Shared Components & Detail Panel`, `Admin Backend (Convex)`, `Home Page & Root Routes`, `Community 19`, `Community 20`, `Community 115`, `Community 94`, `Community 31`?**
+<<<<<<< HEAD
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
+=======
   _High betweenness centrality (0.050) - this node is a cross-community bridge._
+>>>>>>> a0103297 (fix backside card live view)
 - **Why does `WallCard` connect `Card Display & Embed Pages` to `Geo-Routed Pages & RSS Feeds`, `UI Shared Components & Detail Panel`, `Owner Dashboard & Card Editing`, `Location Combobox & Seed Data`, `Community 20`, `Community 94`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `parseCountrySlug()` (e.g. with `GET()` and `GET()`) actually correct?**
   _`parseCountrySlug()` has 5 INFERRED edges - model-reasoned connections that need verification._
+<<<<<<< HEAD
+- **What connects `npx`, `Props`, `Props` to the rest of the system?**
+=======
 - **What connects `BundleCity`, `countries`, `defaultStates` to the rest of the system?**
+>>>>>>> a0103297 (fix backside card live view)
   _843 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Rate Limiting & API Utilities` be split into smaller, more focused modules?**
   _Cohesion score 0.07678075855689177 - nodes in this community are weakly interconnected._

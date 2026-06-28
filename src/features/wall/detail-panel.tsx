@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { WallCard } from "./types";
+import { ImageSwapViewer } from "./image-compare-slider";
 import { SocialLinks } from "./social-links";
 import { ReviewsSection } from "./reviews-section";
 import { toast } from "@/lib/toast";
@@ -70,6 +71,8 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
   const [reportDone, setReportDone] = useState(false);
   const reportFirstRef = useRef<HTMLButtonElement>(null);
   const phoneRevealed = revealedPhoneFor === String(card.id);
+  const frontImage = card.thumbnailImages?.[0] ?? card.images[0];
+  const backImage = card.backThumbnailImages?.[0] ?? card.backImages?.[0];
 
   useEffect(() => setOptimisticSaved(saved), [saved]);
   useEffect(() => { setOptimisticLiked(liked); }, [liked]);
@@ -229,16 +232,13 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
       <h2>{card.name}</h2>
       <div className="rule" />
       <p className="sheet-service">{card.line}</p>
-      {card.images.length ? (
-        <div className={card.images.length > 1 ? "sheet-images sheet-images-double" : "sheet-images"}>
-          {card.images.map((image, index) => (
-            <button className="sheet-image-button" type="button" onClick={() => setExpandedImage(image)} aria-label={`View ${card.name} image ${index + 1} full screen`} key={image}>
-              <Image className="sheet-image" src={card.thumbnailImages?.[index] ?? image} alt={`${card.name} service ${index + 1}`} fill sizes="(max-width: 600px) calc(100vw - 48px), 380px" placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} />
-              <span>View full screen</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <ImageSwapViewer
+        frontSrc={frontImage}
+        backSrc={backImage}
+        frontAlt={`${card.name} front image`}
+        backAlt={`${card.name} back image`}
+        className="sheet-image-swap-wrap"
+      />
       {card.message ? <div className="note-copy">{card.message}</div> : null}
       {card.price ? <div className="sheet-price">Starting at <strong>{card.price}</strong></div> : null}
       {hasContact ? (

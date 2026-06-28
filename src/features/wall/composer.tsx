@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, Clock3, ImagePlus, MapPin, RotateCcw, Sparkles, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock3, ImagePlus, MapPin, Sparkles, Trash2, X } from "lucide-react";
 import { useState, useEffect, useRef, type ChangeEvent, type CSSProperties, type FormEvent, type PointerEvent } from "react";
 import { Country, State, City } from "country-state-city";
 import { categories, SUBCATEGORY_OPTIONS, getCardFormat, type CardCategory, type CardDraft, type CardImageMode, type CardTheme } from "./types";
+import { ImageSwapViewer } from "./image-compare-slider";
 
 interface ComposerProps {
   onClose: () => void;
@@ -194,36 +195,42 @@ function validSocialProfile(value: string) {
   return /^@?[A-Za-z0-9._-]{2,100}$/.test(value) || /^(https?:\/\/)?(www\.)?[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/\S*)?$/.test(value);
 }
 
-function LiveCardPreview({ form, image, onImageChange, onRotate, isVerified }: { form: ComposerForm; image?: string; onImageChange?: (height: number) => void; onRotate?: (rotation: number) => void; isVerified?: boolean }) {
-  const tiltRef = useRef<{ id: number; x: number; y: number; rotation: number } | null>(null);
+function LiveCardPreview({ form, image, onImageChange, isVerified }: { form: ComposerForm; image?: string; onImageChange?: (height: number) => void; isVerified?: boolean }) {
   const resizeRef = useRef<{ startY: number; startH: number } | null>(null);
+  const panRef = useRef<{ id: number; x: number; y: number; originX: number; originY: number } | null>(null);
+  const [imagePan, setImagePan] = useState({ x: 50, y: 35 });
   const format = getCardFormat(form.theme);
-  const previewWidth = form.imageMode === "photo" ? format.width + 18 : format.width;
+  const previewWidth = format.width;
   const location = form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall";
   const imageTopLayout = Boolean(image && form.imageMode !== "business-card" && form.theme !== "biz" && form.theme !== "ticket");
   const categoryLabel = form.category ? `${form.category}${form.subcategory ? ` · ${form.subcategory}` : ""}` : "Category";
   const messageLabel = form.message.trim() || "Your message";
   const priceLabel = form.price.trim() || "Your price";
 
-  const handleTiltPointerDown = (event: PointerEvent<HTMLButtonElement>) => {
-    if (!onRotate || event.button !== 0) return;
+  useEffect(() => {
+    setImagePan({ x: 50, y: 35 });
+  }, [image]);
+
+  const handlePanPointerDown = (event: PointerEvent<HTMLImageElement>) => {
+    if (!imageTopLayout || !image) return;
     event.stopPropagation();
     event.preventDefault();
-    tiltRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, rotation: form.rotation };
+    panRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: imagePan.x, originY: imagePan.y };
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
-  const handleTiltPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
-    const start = tiltRef.current;
-    if (!start || start.id !== event.pointerId || !onRotate) return;
-    const delta = (event.clientX - start.x) * 0.45 - (event.clientY - start.y) * 0.18;
-    onRotate(Math.max(-90, Math.min(90, Math.round(start.rotation + delta))));
+  const handlePanPointerMove = (event: PointerEvent<HTMLImageElement>) => {
+    const start = panRef.current;
+    if (!start || start.id !== event.pointerId || !imageTopLayout || !image) return;
+    const nextX = Math.max(0, Math.min(100, Number((start.originX + ((event.clientX - start.x) / 4)).toFixed(1))));
+    const nextY = Math.max(0, Math.min(100, Number((start.originY + ((event.clientY - start.y) / 4)).toFixed(1))));
+    setImagePan({ x: nextX, y: nextY });
   };
 
-  const handleTiltPointerEnd = (event: PointerEvent<HTMLButtonElement>) => {
-    const start = tiltRef.current;
+  const handlePanPointerEnd = (event: PointerEvent<HTMLImageElement>) => {
+    const start = panRef.current;
     if (!start || start.id !== event.pointerId) return;
-    tiltRef.current = null;
+    panRef.current = null;
     try { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); } catch { /* pointer already released by browser */ }
   };
 
@@ -239,25 +246,21 @@ function LiveCardPreview({ form, image, onImageChange, onRotate, isVerified }: {
   const style = { "--w": `${previewWidth}px`, "--h": `${format.minHeight}px`, "--r": `${form.rotation}deg`, "--x": "0", "--y": "0" } as CSSProperties;
   return (
     <article className={`wall-card composer-live-card theme-${form.theme} ${imageTopLayout ? "image-top-layout" : ""}`} style={style} aria-label="Live card preview">
-      {onRotate ? (
-        <button
-          type="button"
-          className="wall-card-tilt-handle"
-          onPointerDown={handleTiltPointerDown}
-          onPointerMove={handleTiltPointerMove}
-          onPointerUp={handleTiltPointerEnd}
-          onPointerCancel={handleTiltPointerEnd}
-          aria-label="Tilt card preview"
-          title="Hold and drag to tilt"
-        >
-          <RotateCcw size={12} />
-        </button>
-      ) : null}
       <span className="card-tape" aria-hidden="true" />
       {imageTopLayout ? (
         <>
           <div className="wall-card-image-top-wrap">
-            <img src={image} alt="" draggable={false} className="wall-card-image-top" style={{ "--image-h": `${form.imageHeight}px` } as CSSProperties} />
+            <img
+              src={image}
+              alt=""
+              draggable={false}
+              className="wall-card-image-top"
+              style={{ "--image-h": `${form.imageHeight}px`, objectPosition: `${imagePan.x}% ${imagePan.y}%` } as CSSProperties}
+              onPointerDown={handlePanPointerDown}
+              onPointerMove={handlePanPointerMove}
+              onPointerUp={handlePanPointerEnd}
+              onPointerCancel={handlePanPointerEnd}
+            />
             {onImageChange ? (
               <div
                 className="img-resize-handle"
@@ -303,7 +306,7 @@ function LiveCardPreview({ form, image, onImageChange, onRotate, isVerified }: {
   );
 }
 
-function ExpandedCardPreview({ form, image, isVerified }: { form: ComposerForm; image?: string; isVerified?: boolean }) {
+function ExpandedCardPreview({ form, image, backImage, isVerified }: { form: ComposerForm; image?: string; backImage?: string; isVerified?: boolean }) {
   const location = form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall";
   const categoryLabel = form.category ? `${form.category}${form.subcategory ? ` · ${form.subcategory}` : ""}` : "Category";
   const titleLabel = form.name.trim() || "Your business";
@@ -331,12 +334,15 @@ function ExpandedCardPreview({ form, image, isVerified }: { form: ComposerForm; 
 
   return (
     <section className="details-expanded-preview" aria-label="Expanded card preview">
-      <span>Your expanded card</span>
-      <article className={`details-expanded-card ${image ? "image-top-layout" : ""}`}>
-        {image ? (
-          <div className="details-expanded-image-wrap">
-            <img src={image} alt="" draggable={false} className="details-expanded-image" />
-          </div>
+      <article className={`details-expanded-card ${image || backImage ? "image-top-layout" : ""}`}>
+        {image || backImage ? (
+          <ImageSwapViewer
+            frontSrc={image}
+            backSrc={backImage}
+            frontAlt="Expanded card front image"
+            backAlt="Expanded card back image"
+            className="details-expanded-image-wrap"
+          />
         ) : null}
         <div className="details-expanded-copy">
           <p className="sheet-category">{categoryLabel}</p>
@@ -373,17 +379,116 @@ function ExpandedCardPreview({ form, image, isVerified }: { form: ComposerForm; 
   );
 }
 
-function BackCardPreview({ form, image }: { form: ComposerForm; image?: string }) {
+function BackCardPreview({
+  form,
+  image,
+  matchHeight,
+  imageScale = 1,
+  isVerified,
+  onImageScaleChange,
+}: {
+  form: ComposerForm;
+  image?: string;
+  matchHeight?: number;
+  imageScale?: number;
+  isVerified?: boolean;
+  onImageScaleChange?: (scale: number) => void;
+}) {
   const format = getCardFormat(form.theme);
-  const location = form.area.trim() || [form.city.trim(), form.state.trim(), form.country.trim()].filter(Boolean).join(", ") || "Selected wall";
+  const zoomRef = useRef<{ id: number; y: number; scale: number } | null>(null);
+  const panRef = useRef<{ id: number; x: number; y: number; originX: number; originY: number } | null>(null);
+  const [backPan, setBackPan] = useState({ x: 50, y: 35 });
+
+  useEffect(() => {
+    setBackPan({ x: 50, y: 35 });
+  }, [image]);
+
+  const handleZoomPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (!onImageScaleChange || event.button !== 0) return;
+    event.stopPropagation();
+    event.preventDefault();
+    zoomRef.current = { id: event.pointerId, y: event.clientY, scale: imageScale };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleZoomPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const start = zoomRef.current;
+    if (!start || start.id !== event.pointerId || !onImageScaleChange) return;
+    const next = Math.max(0.75, Math.min(1.8, Number((start.scale + ((start.y - event.clientY) * 0.006)).toFixed(2))));
+    onImageScaleChange(next);
+  };
+
+  const handleZoomPointerEnd = (event: PointerEvent<HTMLDivElement>) => {
+    const start = zoomRef.current;
+    if (!start || start.id !== event.pointerId) return;
+    zoomRef.current = null;
+    try { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); } catch { /* pointer already released by browser */ }
+  };
+
+  const handlePanPointerDown = (event: PointerEvent<HTMLImageElement>) => {
+    if (!image) return;
+    event.stopPropagation();
+    event.preventDefault();
+    panRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: backPan.x, originY: backPan.y };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePanPointerMove = (event: PointerEvent<HTMLImageElement>) => {
+    const start = panRef.current;
+    if (!start || start.id !== event.pointerId || !image) return;
+    const nextX = Math.max(0, Math.min(100, Number((start.originX + ((event.clientX - start.x) / 4)).toFixed(1))));
+    const nextY = Math.max(0, Math.min(100, Number((start.originY + ((event.clientY - start.y) / 4)).toFixed(1))));
+    setBackPan({ x: nextX, y: nextY });
+  };
+
+  const handlePanPointerEnd = (event: PointerEvent<HTMLImageElement>) => {
+    const start = panRef.current;
+    if (!start || start.id !== event.pointerId) return;
+    panRef.current = null;
+    try { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); } catch { /* pointer already released by browser */ }
+  };
+
   return (
-    <article className="details-back-card" style={{ "--w": `${format.width}px`, "--h": `${format.minHeight}px` } as CSSProperties} aria-label="Back card preview">
-      <div className="details-back-image-wrap">
-        {image ? <img src={image} alt="" draggable={false} className="details-back-image" /> : <div className="details-back-empty">Upload a back image</div>}
-      </div>
-      <div className="details-back-overlay">
-        <span className="details-back-card-label">Back side</span>
-        <div className="sheet-meta"><span>{location}</span><span>BACK #PREVIEW</span></div>
+    <article
+      className={`wall-card composer-live-card details-back-card theme-${form.theme} image-top-layout`}
+      style={{
+        "--w": `${format.width}px`,
+        "--back-scale": String(imageScale),
+        "--image-h": `${form.imageHeight}px`,
+        width: `${format.width}px`,
+        height: matchHeight ? `${matchHeight}px` : undefined,
+        minHeight: matchHeight ? `${matchHeight}px` : undefined,
+      } as CSSProperties}
+      aria-label="Back card preview"
+    >
+      <span className="card-tape" aria-hidden="true" />
+      <div className="details-back-frame">
+        {image ? (
+          <img
+            src={image}
+            alt=""
+            draggable={false}
+            className="details-back-image"
+            style={{ transform: "scale(var(--back-scale, 1))", objectPosition: `${backPan.x}% ${backPan.y}%` } as CSSProperties}
+            onPointerDown={handlePanPointerDown}
+            onPointerMove={handlePanPointerMove}
+            onPointerUp={handlePanPointerEnd}
+            onPointerCancel={handlePanPointerEnd}
+          />
+        ) : (
+          <div className="details-back-empty" aria-hidden="true" />
+        )}
+        {image && onImageScaleChange ? (
+          <div
+            className="img-resize-handle details-back-zoom-handle"
+            onPointerDown={handleZoomPointerDown}
+            onPointerMove={handleZoomPointerMove}
+            onPointerUp={handleZoomPointerEnd}
+            onPointerCancel={handleZoomPointerEnd}
+            aria-label="Zoom back image"
+            title="Drag to zoom back image"
+          />
+        ) : null}
       </div>
     </article>
   );
@@ -393,36 +498,56 @@ function CardSidesPreview({
   form,
   frontImage,
   backImage,
+  backImageScale,
   isVerified,
   mode,
+  stacked = false,
   onFrontImageChange,
-  onFrontRotate,
+  onBackImageScaleChange,
 }: {
   form: ComposerForm;
   frontImage?: string;
   backImage?: string;
+  backImageScale?: number;
   isVerified?: boolean;
   mode: "live" | "expanded";
+  stacked?: boolean;
   onFrontImageChange?: (height: number) => void;
-  onFrontRotate?: (rotation: number) => void;
+  onBackImageScaleChange?: (scale: number) => void;
 }) {
+  const frontCanvasRef = useRef<HTMLDivElement | null>(null);
+  const [matchedFrontHeight, setMatchedFrontHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const node = frontCanvasRef.current;
+    if (!node) return;
+    const update = () => {
+      const next = Math.ceil(node.getBoundingClientRect().height);
+      setMatchedFrontHeight((current) => (current === next ? current : next));
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [form.theme, form.imageMode, form.imageHeight, form.rotation, form.name, form.line, form.message, form.price, form.category, form.subcategory, form.area, form.city, form.state, form.country, form.zipcode, frontImage, mode, isVerified]);
+
   return (
-    <div className="card-sides-preview">
+    <div className={`card-sides-preview${stacked ? " is-stacked" : ""}`}>
       <div className="card-side-preview">
-        <span>Front</span>
-        <div className="card-side-preview-canvas">
+        <span>Front Card</span>
+        <div className="card-side-preview-canvas" ref={frontCanvasRef}>
           {mode === "live" ? (
-            <LiveCardPreview form={form} image={frontImage} onImageChange={onFrontImageChange} onRotate={onFrontRotate} isVerified={isVerified} />
+            <LiveCardPreview form={form} image={frontImage} onImageChange={onFrontImageChange} isVerified={isVerified} />
           ) : (
-            <ExpandedCardPreview form={form} image={frontImage} isVerified={isVerified} />
+            <ExpandedCardPreview form={form} image={frontImage} backImage={backImage} isVerified={isVerified} />
           )}
         </div>
       </div>
       <div className="card-side-divider" aria-hidden="true" />
       <div className="card-side-preview">
-        <span>Back</span>
+        <span>Back Card</span>
         <div className="card-side-preview-canvas">
-          <BackCardPreview form={form} image={backImage} />
+          <BackCardPreview form={form} image={backImage} matchHeight={matchedFrontHeight} imageScale={backImageScale} isVerified={isVerified} onImageScaleChange={onBackImageScaleChange} />
         </div>
       </div>
     </div>
@@ -455,6 +580,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
   const [backFiles, setBackFiles] = useState<File[]>([]);
   const [backPreviews, setBackPreviews] = useState<string[]>([]);
   const backFileInputRef = useRef<HTMLInputElement>(null);
+  const [backImageScale, setBackImageScale] = useState(1);
   const [autoRenew, setAutoRenew] = useState(false);
   const [bundleCities, setBundleCities] = useState<BundleCity[]>(() => {
     const base: BundleCity = initialLocation
@@ -682,6 +808,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
     backPreviews.forEach(URL.revokeObjectURL);
     setBackFiles(nextFiles);
     setBackPreviews(nextFiles.map((file) => URL.createObjectURL(file)));
+    setBackImageScale(1);
     event.currentTarget.value = "";
   };
 
@@ -698,6 +825,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
     backPreviews.forEach(URL.revokeObjectURL);
     setBackFiles([]);
     setBackPreviews([]);
+    setBackImageScale(1);
     backFileInputRef.current?.value && (backFileInputRef.current.value = "");
     void clearImagesFromIDB(DRAFT_BACK_IMAGES_KEY);
   };
@@ -858,24 +986,27 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
                 </div>
               </div>
               <span><small>Updates as you type</small></span>
-              <div className="details-preview-block">
-                <span>Live card</span>
-                <div className="details-preview-canvas">
-                  <LiveCardPreview form={form} image={previews[0]} isVerified={isVerified} />
-                </div>
-              </div>
-              <div className="details-preview-divider" aria-hidden="true" />
               <div className="details-expanded-preview">
                 <span>Expanded card</span>
                 <div className="details-expanded-canvas">
-                  <ExpandedCardPreview form={form} image={previews[0]} isVerified={isVerified} />
+                  <ExpandedCardPreview form={form} image={previews[0]} backImage={backPreviews[0]} isVerified={isVerified} />
                 </div>
               </div>
               <div className="details-preview-divider" aria-hidden="true" />
-              <div className="details-expanded-preview">
-                <span>Back card</span>
-                <div className="details-expanded-canvas">
-                  <BackCardPreview form={form} image={backPreviews[0]} />
+              <div className="details-preview-block">
+                <span>Front and back card</span>
+                <div className="details-preview-canvas">
+                  <CardSidesPreview
+                    stacked
+                    form={form}
+                    frontImage={previews[0]}
+                    backImage={backPreviews[0]}
+                    backImageScale={backImageScale}
+                    isVerified={isVerified}
+                    mode="live"
+                    onFrontImageChange={(height) => setForm((value) => ({ ...value, imageHeight: height }))}
+                    onBackImageScaleChange={backPreviews[0] ? setBackImageScale : undefined}
+                  />
                 </div>
               </div>
             </aside>
@@ -885,6 +1016,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
             <div className="upload-grid">
               {canUseFrontImages ? (
                 <div className="upload-zone-wrap">
+                  <span className="upload-zone-label">Front image</span>
                   <label className="upload-zone">
                     <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={onImages} />
                     {previews.length ? <div className="preview-row">{previews.map((src) => <img src={src} key={src} alt="Front upload preview" />)}</div> : <><ImagePlus /><strong>Upload front image</strong><span>JPG, PNG or WEBP · 8MB each</span></>}
@@ -892,25 +1024,12 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
                   {previews.length ? (
                     <button type="button" className="upload-zone-clear" onClick={clearImages} aria-label="Delete front image">
                       <Trash2 size={13} />
-                      <span>Delete image</span>
                     </button>
-                  ) : null}
-                  {previews.length ? (
-                    <fieldset className="image-use-picker">
-                      <legend>How should we use the front upload?</legend>
-                      <div role="radiogroup" aria-label="Choose how to display the uploaded image">
-                        <button type="button" role="radio" aria-checked={form.imageMode === "photo"} className={form.imageMode === "photo" ? "selected" : ""} onClick={() => chooseImageMode("photo")}>
-                          <ImagePlus /><span><strong>Picture in a WALL style</strong><small>Place the picture inside any card style below.</small></span>{form.imageMode === "photo" ? <Check /> : null}
-                        </button>
-                        <button type="button" role="radio" aria-checked={form.imageMode === "business-card"} className={form.imageMode === "business-card" ? "selected" : ""} onClick={() => chooseImageMode("business-card")}>
-                          <span className="business-card-icon" aria-hidden="true" /><span><strong>My finished business card</strong><small>Use the whole image at our standard 300 × 180 size.</small></span>{form.imageMode === "business-card" ? <Check /> : null}
-                        </button>
-                      </div>
-                    </fieldset>
                   ) : null}
                 </div>
               ) : (
                 <div className="upload-zone-wrap upload-zone-locked">
+                  <span className="upload-zone-label">Front image</span>
                   <div className="upload-zone upload-zone-disabled">
                     <ImagePlus />
                     <strong>Front image is disabled for this card type</strong>
@@ -919,6 +1038,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
                 </div>
               )}
               <div className="upload-zone-wrap">
+                <span className="upload-zone-label">Back image</span>
                 <label className="upload-zone upload-zone-back">
                   <input ref={backFileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={onBackImages} />
                   {backPreviews.length ? <div className="preview-row">{backPreviews.map((src) => <img src={src} key={src} alt="Back upload preview" />)}</div> : <><ImagePlus /><strong>Upload back image</strong><span>Shown when the card flips</span></>}
@@ -926,10 +1046,21 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
                 {backPreviews.length ? (
                   <button type="button" className="upload-zone-clear" onClick={clearBackImages} aria-label="Delete back image">
                     <Trash2 size={13} />
-                    <span>Delete image</span>
                   </button>
                 ) : null}
               </div>
+              {previews.length ? (
+                <fieldset className="image-use-picker upload-grid-actions">
+                  <div role="radiogroup" aria-label="Choose how to display the uploaded image">
+                    <button type="button" role="radio" aria-checked={form.imageMode === "photo"} className={form.imageMode === "photo" ? "selected" : ""} onClick={() => chooseImageMode("photo")}>
+                      <ImagePlus /><span><strong>Place image in a card template</strong><small>Choose this if your upload is just a photo, logo, artwork, or picture. You’ll pick a card style below, and place your image into that design.</small></span>{form.imageMode === "photo" ? <Check /> : null}
+                    </button>
+                    <button type="button" role="radio" aria-checked={form.imageMode === "business-card"} className={form.imageMode === "business-card" ? "selected" : ""} onClick={() => chooseImageMode("business-card")}>
+                      <span className="business-card-icon" aria-hidden="true" /><span><strong>My upload is already the card</strong><small>Choose this if your upload is already a complete business card, flyer, ID-style card, or finished design. We’ll use the full image exactly as the card, so you won’t need to choose a style below.</small></span>{form.imageMode === "business-card" ? <Check /> : null}
+                    </button>
+                  </div>
+                </fieldset>
+              ) : null}
             </div>
             <div className="safety-status" data-status={moderationStatus}>{moderationStatus === "checking" ? "Checking images and text for unsafe content…" : moderationError ?? "Images are checked for nudity and adult content before publishing."}</div>
             <fieldset className={form.imageMode === "business-card" ? "styles-disabled" : ""}>
@@ -961,12 +1092,13 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
                   form={form}
                   frontImage={previews[0]}
                   backImage={backPreviews[0]}
+                  backImageScale={backImageScale}
                   isVerified={isVerified}
                   onFrontImageChange={previews[0] && form.imageMode === "photo" ? (imageHeight) => setForm((f) => ({ ...f, imageHeight })) : undefined}
-                  onFrontRotate={(rotation) => setForm((value) => ({ ...value, rotation }))}
+                  onBackImageScaleChange={backPreviews[0] ? setBackImageScale : undefined}
                 />
               </div>
-              {previews[0] && form.imageMode === "photo" ? <small className="img-drag-hint">Drag to reposition · drag corner to resize · hold the corner icon to tilt</small> : null}
+              {previews[0] && form.imageMode === "photo" ? <small className="img-drag-hint">Drag to reposition · drag corner to resize</small> : null}
             </div>
           </div>
         ) : (
