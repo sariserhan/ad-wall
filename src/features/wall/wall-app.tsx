@@ -152,7 +152,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   useEffect(() => pushDashboardHandler(() => setDashboard(true)), []);
 
   useEffect(() => {
-    const locked = !!selected || dashboard || composer;
+    const locked = dashboard || composer;
     if (!locked) return;
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";

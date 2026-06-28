@@ -191,6 +191,7 @@ export function WallCard({ card, active, onOpen, onFront, flipped = false, onFli
       onPointerUp={finishDrag}
       onPointerCancel={finishDrag}
       onClick={(event) => {
+        if ((event.target as HTMLElement | null)?.closest("button")) return;
         if (didDragRef.current) {
           event.preventDefault();
           didDragRef.current = false;
@@ -212,6 +213,7 @@ export function WallCard({ card, active, onOpen, onFront, flipped = false, onFli
         <button
           type="button"
           className={`card-flip-button ${flipped ? "is-back" : "is-front"}`}
+          onPointerDown={(event) => event.stopPropagation()}
           onClick={handleFlipClick}
           aria-pressed={flipped}
           aria-label={flipped ? `Show front of ${card.name}` : `Show back of ${card.name}`}
