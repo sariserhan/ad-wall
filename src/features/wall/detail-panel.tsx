@@ -69,6 +69,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
   const [reportDetails, setReportDetails] = useState("");
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportDone, setReportDone] = useState(false);
+  const sheetRef = useRef<HTMLElement>(null);
   const reportFirstRef = useRef<HTMLButtonElement>(null);
   const phoneRevealed = revealedPhoneFor === String(card.id);
   const frontImage = card.thumbnailImages?.[0] ?? card.images[0];
@@ -98,6 +99,12 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
     document.addEventListener("keydown", handleEscape);
     return () => { document.removeEventListener("mousedown", handleClick); document.removeEventListener("keydown", handleEscape); };
   }, [shareMenuOpen]);
+
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+    sheet.scrollTop = 0;
+  }, [card.id]);
 
   const handleToggleLike = async () => {
     if (!onToggleLike || liking) return;
@@ -210,6 +217,7 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
 
   return (
     <aside
+      ref={sheetRef}
       className="detail-sheet"
       aria-label={`${card.name} details`}
       onTouchStart={(e) => { swipeX.current = e.touches[0].clientX; swipeY.current = e.touches[0].clientY; }}

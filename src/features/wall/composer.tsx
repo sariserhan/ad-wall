@@ -627,12 +627,12 @@ function CardSidesPreview({
 export function Composer({ onClose, onReady, initialLocation, isVerified = false }: ComposerProps) {
   const [form, setForm] = useState<ComposerForm>(() => {
     const baseCountry = initialLocation?.country ?? defaultCountry;
-    const baseState = initialLocation?.state ?? defaultState;
-    const baseCity = initialLocation?.city ?? defaultCity;
+    const baseState = initialLocation ? (initialLocation.state ?? "") : defaultState;
+    const baseCity = initialLocation ? (initialLocation.city ?? "") : defaultCity;
     const states = State.getStatesOfCountry(baseCountry);
-    const state = states.some((s) => s.isoCode === baseState) ? baseState : states[0]?.isoCode ?? "";
+    const state = baseState && states.some((s) => s.isoCode === baseState) ? baseState : (initialLocation ? "" : states[0]?.isoCode ?? "");
     const cities = state ? City.getCitiesOfState(baseCountry, state) : [];
-    const city = cities.some((c) => c.name === baseCity) ? baseCity : cities[0]?.name ?? "";
+    const city = baseCity && cities.some((c) => c.name === baseCity) ? baseCity : (initialLocation ? "" : cities[0]?.name ?? "");
     if (typeof window === "undefined") return { ...initialForm, country: baseCountry, state, city };
     try {
       const saved = JSON.parse(window.localStorage.getItem(DRAFT_STORAGE_KEY) ?? "null") as Partial<ComposerForm> | null;
@@ -788,11 +788,18 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
     if (!initialLocation) return;
     const country = initialLocation.country;
     const states = State.getStatesOfCountry(country);
-    const state = states.some((s) => s.isoCode === initialLocation.state) ? initialLocation.state : states[0]?.isoCode ?? "";
+    const state = initialLocation.state && states.some((s) => s.isoCode === initialLocation.state) ? initialLocation.state : "";
     const cities = state ? City.getCitiesOfState(country, state) : [];
-    const city = cities.some((c) => c.name === initialLocation.city) ? initialLocation.city : cities[0]?.name ?? "";
+    const city = initialLocation.city && cities.some((c) => c.name === initialLocation.city) ? initialLocation.city : "";
     setForm((value) => ({ ...value, country, state, city }));
   }, [initialLocation]);
+
+  useEffect(() => {
+    if (step !== 2) return;
+    window.requestAnimationFrame(() => {
+      formRef.current?.scrollTo({ top: 0, left: 0 });
+    });
+  }, [step]);
 
   useEffect(() => {
     moderationRequestRef.current?.abort();

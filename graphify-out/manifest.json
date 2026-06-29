@@ -560,8 +560,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/composer.tsx": {
-    "mtime": 1782664825.9177375,
-    "ast_hash": "27e954560635a1883208d264edfbc0ce",
+    "mtime": 1782707224.9042475,
+    "ast_hash": "89ff58d2b1a0abed0207635ea5005fa6",
     "semantic_hash": ""
   },
   "src/features/wall/connected-wall-app.tsx": {
