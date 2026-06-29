@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type PointerEvent } from "react";
+import type { BusinessCardShape } from "./types";
 
 type ImageSwapViewerProps = {
   frontSrc?: string;
@@ -8,7 +9,7 @@ type ImageSwapViewerProps = {
   frontAlt: string;
   backAlt: string;
   className?: string;
-  layout?: "full" | "horizontal" | "photo";
+  layout?: "full" | "horizontal" | "photo" | BusinessCardShape;
 };
 
 export function ImageSwapViewer({

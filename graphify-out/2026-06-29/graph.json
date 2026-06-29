@@ -4439,7 +4439,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_bug_report_link",
-      "community": 106,
+      "community": 107,
       "norm_label": "bug-report-link.tsx"
     },
     {
@@ -4449,7 +4449,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_bug_report_link_bugreportlink",
-      "community": 106,
+      "community": 107,
       "norm_label": "bugreportlink()"
     },
     {
@@ -4479,7 +4479,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contact_link",
-      "community": 107,
+      "community": 106,
       "norm_label": "contact-link.tsx"
     },
     {
@@ -4489,7 +4489,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_contact_link_contactlink",
-      "community": 107,
+      "community": 106,
       "norm_label": "contactlink()"
     },
     {
@@ -7306,7 +7306,7 @@
       "label": "readStoredConsent()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "lib_analytics_readstoredconsent",
       "community": 9,
@@ -7316,7 +7316,7 @@
       "label": "persistConsent()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "lib_analytics_persistconsent",
       "community": 9,
@@ -7326,7 +7326,7 @@
       "label": "getPostHogConfig()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L40",
+      "source_location": "L41",
       "_origin": "ast",
       "id": "lib_analytics_getposthogconfig",
       "community": 9,
@@ -7336,7 +7336,7 @@
       "label": "loadPostHog()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "lib_analytics_loadposthog",
       "community": 9,
@@ -7346,7 +7346,7 @@
       "label": "getAnalyticsConsent()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L55",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "lib_analytics_getanalyticsconsent",
       "community": 9,
@@ -7356,7 +7356,7 @@
       "label": "setAnalyticsConsent()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L62",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "lib_analytics_setanalyticsconsent",
       "community": 9,
@@ -7366,7 +7366,7 @@
       "label": "initAnalytics()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L72",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "lib_analytics_initanalytics",
       "community": 9,
@@ -7376,7 +7376,7 @@
       "label": "captureAnalytics()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L102",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "lib_analytics_captureanalytics",
       "community": 9,
@@ -7386,7 +7386,7 @@
       "label": "identifyAnalytics()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L110",
+      "source_location": "L114",
       "_origin": "ast",
       "id": "lib_analytics_identifyanalytics",
       "community": 9,
@@ -7396,7 +7396,7 @@
       "label": "resetAnalytics()",
       "file_type": "code",
       "source_file": "src/lib/analytics.ts",
-      "source_location": "L119",
+      "source_location": "L123",
       "_origin": "ast",
       "id": "lib_analytics_resetanalytics",
       "community": 9,
@@ -7459,7 +7459,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_bug_report_signal_openbugreport",
-      "community": 106,
+      "community": 107,
       "norm_label": "openbugreport()"
     },
     {
@@ -7589,7 +7589,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_contact_signal_opencontact",
-      "community": 107,
+      "community": 106,
       "norm_label": "opencontact()"
     },
     {
@@ -25868,9 +25868,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "wall_composer",
-      "target": "wall_composer_formatwalllocation",
-      "confidence_score": 1.0
+      "target": "wall_composer_formatwalllocation"
     },
     {
       "relation": "contains",
@@ -26143,9 +26143,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L1072",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "wall_composer_composer",
-      "target": "wall_composer_formatwalllocation",
-      "confidence_score": 1.0
+      "target": "wall_composer_formatwalllocation"
     },
     {
       "relation": "calls",
@@ -26154,9 +26154,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L365",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "wall_composer_expandedcardpreview",
-      "target": "wall_composer_formatwalllocation",
-      "confidence_score": 1.0
+      "target": "wall_composer_formatwalllocation"
     },
     {
       "relation": "calls",
@@ -26165,9 +26165,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L263",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "wall_composer_livecardpreview",
-      "target": "wall_composer_formatwalllocation",
-      "confidence_score": 1.0
+      "target": "wall_composer_formatwalllocation"
     },
     {
       "relation": "calls",
@@ -36748,5 +36748,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "760db71af7ab72034bd743e41724bf164af78332"
+  "built_at_commit": "027eb175cc32aab7e2cb065881e843a14d990ea4"
 }

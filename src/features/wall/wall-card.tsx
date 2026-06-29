@@ -48,7 +48,7 @@ export function WallCard({ card, active, onOpen, onFront, flipped = false, onFli
   const backImage = card.backImages?.[0] ?? card.backThumbnailImages?.[0];
   const format = card.imageMode === "business-card" ? getCardFormat("biz", card.cardShape) : getCardFormat(displayTheme);
   const imageTopLayout = Boolean(cardImage && card.imageMode !== "business-card" && displayTheme !== "biz" && displayTheme !== "ticket");
-  const backLayout = displayTheme === "photo" ? "photo" : (displayTheme === "biz" || displayTheme === "ticket" ? "horizontal" : "full");
+  const backLayout = card.imageMode === "business-card" ? (card.cardShape ?? "horizontal") : (displayTheme === "photo" ? "photo" : (displayTheme === "biz" || displayTheme === "ticket" ? "horizontal" : "full"));
   const frontObjectPosition = `${card.imageX ?? 50}% ${card.imageY ?? 35}%`;
 
   useEffect(() => {
@@ -136,7 +136,11 @@ export function WallCard({ card, active, onOpen, onFront, flipped = false, onFli
   );
   const backFace = (
     <div className="wall-card-face wall-card-face-back">
-      {backImage ? (
+      {card.imageMode === "business-card" && backImage ? (
+        <div className="wall-card-biz-wrap">
+          <img src={backImage} alt="" draggable={false} className="wall-card-biz-photo wall-card-back-photo" />
+        </div>
+      ) : backImage ? (
         <div className="wall-card-back-wrap">
           <div className={`wall-card-back-art backside-art layout-${backLayout}`}>
             <img

@@ -1,7 +1,7 @@
 # Graph Report - local-wall  (2026-06-29)
 
 ## Corpus Check
-- 221 files · ~439,722 words
+- 221 files · ~439,740 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `760db71a`
+- Built from commit: `027eb175`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -432,11 +432,11 @@ Nodes (4): CardStyle, hashString(), WallCard(), WallCardProps
 
 ### Community 106 - "Community 106"
 Cohesion: 0.36
-Nodes (6): BugReportLink(), openBugReport(), fetchTopCards(), fetchTopWalls(), metadata, TrendingPage()
+Nodes (6): ContactLink(), openContact(), fetchTopCards(), fetchTopWalls(), metadata, TrendingPage()
 
 ### Community 107 - "Community 107"
 Cohesion: 0.32
-Nodes (5): ContactLink(), HomeHowItWorksModal(), STEPS, HomePage(), openContact()
+Nodes (5): BugReportLink(), HomeHowItWorksModal(), STEPS, HomePage(), openBugReport()
 
 ### Community 108 - "Community 108"
 Cohesion: 0.29

@@ -266,6 +266,13 @@ button { color: inherit; }
   object-fit: cover !important;
   filter: none !important;
 }
+.wall-card.image-business-card .wall-card-back-photo,
+.composer-live-card.image-business-card .composer-biz-back-img {
+  object-fit: cover !important;
+  background: #fff;
+  filter: none !important;
+  transform-origin: center center;
+}
 .composer-biz-empty {
   position: absolute;
   inset: 0;
@@ -731,14 +738,14 @@ button { color: inherit; }
   box-sizing: border-box;
 }
 .wall-card.theme-biz .wall-card-face-back {
-  inset: -17px -15px 0 -15px;
-  overflow: visible;
+  inset: 0;
+  overflow: hidden;
 }
 .wall-card.theme-biz .wall-card-back-wrap {
   position: absolute;
-  inset: 0 0 24px 0;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   margin: 0;
   overflow: hidden;
 }

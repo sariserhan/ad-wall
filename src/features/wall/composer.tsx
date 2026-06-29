@@ -380,7 +380,7 @@ function LiveCardPreview({
 
 function ExpandedCardPreview({ form, image, backImage, isVerified }: { form: ComposerForm; image?: string; backImage?: string; isVerified?: boolean }) {
   const location = formatWallLocation(form.area, form.city, form.state, form.country);
-  const backLayout = form.theme === "photo" ? "photo" : "full";
+  const backLayout = form.imageMode === "business-card" ? form.cardShape : (form.theme === "photo" ? "photo" : "full");
   const categoryLabel = form.category ? `${form.category}${form.subcategory ? ` · ${form.subcategory}` : ""}` : "Category";
   const titleLabel = form.name.trim() || "Your business";
   const lineLabel = form.line.trim() || "Your offer goes here.";
@@ -471,7 +471,7 @@ function BackCardPreview({
   onImagePanChange?: (x: number, y: number) => void;
 }) {
   const format = form.imageMode === "business-card" ? getCardFormat("biz", form.cardShape) : getCardFormat(form.theme);
-  const backLayout = form.theme === "photo" ? "photo" : "full";
+  const backLayout = form.imageMode === "business-card" ? form.cardShape : (form.theme === "photo" ? "photo" : "full");
   const zoomRef = useRef<{ id: number; y: number; scale: number } | null>(null);
   const panRef = useRef<{ id: number; x: number; y: number; originX: number; originY: number } | null>(null);
 
@@ -519,6 +519,56 @@ function BackCardPreview({
     panRef.current = null;
     try { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); } catch { /* pointer already released by browser */ }
   };
+
+  if (form.imageMode === "business-card") {
+    return (
+      <article
+        className={`wall-card composer-live-card theme-biz image-business-card biz-shape-${form.cardShape}`}
+        style={{
+          "--w": `${format.width}px`,
+          "--h": `${format.minHeight}px`,
+          "--back-scale": String(imageScale),
+          width: `${format.width}px`,
+          height: matchHeight ? `${matchHeight}px` : undefined,
+          minHeight: matchHeight ? `${matchHeight}px` : undefined,
+        } as CSSProperties}
+        aria-label="Back card preview"
+      >
+        <span className="card-tape" aria-hidden="true" />
+        <div className="wall-card-biz-wrap">
+          {image ? (
+            <img
+              src={image}
+              alt=""
+              draggable={false}
+              className="wall-card-biz-photo composer-biz-img composer-biz-back-img"
+              style={{ transform: `scale(${imageScale})`, objectPosition: `${form.backImageX}% ${form.backImageY}%` } as CSSProperties}
+              onPointerDown={handlePanPointerDown}
+              onPointerMove={handlePanPointerMove}
+              onPointerUp={handlePanPointerEnd}
+              onPointerCancel={handlePanPointerEnd}
+            />
+          ) : (
+            <div className="composer-biz-empty" aria-hidden="true">
+              <strong>{businessCardShapeOptions.find((option) => option.value === form.cardShape)?.label ?? "Card"}</strong>
+              <span>Upload your finished card</span>
+            </div>
+          )}
+        </div>
+        {image && onImageScaleChange ? (
+          <div
+            className="img-resize-handle details-back-zoom-handle"
+            onPointerDown={handleZoomPointerDown}
+            onPointerMove={handleZoomPointerMove}
+            onPointerUp={handleZoomPointerEnd}
+            onPointerCancel={handleZoomPointerEnd}
+            aria-label="Zoom back image"
+            title="Drag to zoom back image"
+          />
+        ) : null}
+      </article>
+    );
+  }
 
   return (
     <article
