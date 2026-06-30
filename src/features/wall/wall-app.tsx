@@ -1008,7 +1008,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         setLayers((current) => [...current, postedCard.id]);
         setSelected(postedCard);
       }
-      setFresh(true);
+      setFresh(false);
+      console.info("[localwall] post:complete", postedCard ? String(postedCard.id) : "none");
       toast("Card posted!");
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : "";

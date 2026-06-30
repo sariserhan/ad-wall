@@ -4,14 +4,424 @@
   "graph": {},
   "nodes": [
     {
+      "label": "cards.ts",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "convex_cards",
+      "community": 10,
+      "norm_label": "cards.ts"
+    },
+    {
+      "label": "category",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "convex_cards_category",
+      "community": 10,
+      "norm_label": "category"
+    },
+    {
+      "label": "theme",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "convex_cards_theme",
+      "community": 10,
+      "norm_label": "theme"
+    },
+    {
+      "label": "imageMode",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "convex_cards_imagemode",
+      "community": 10,
+      "norm_label": "imagemode"
+    },
+    {
+      "label": "cardShape",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "convex_cards_cardshape",
+      "community": 10,
+      "norm_label": "cardshape"
+    },
+    {
+      "label": "requireIdentity()",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "convex_cards_requireidentity",
+      "community": 10,
+      "norm_label": "requireidentity()"
+    },
+    {
+      "label": "requireUser()",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "convex_cards_requireuser",
+      "community": 10,
+      "norm_label": "requireuser()"
+    },
+    {
+      "label": "requireActiveUser()",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "convex_cards_requireactiveuser",
+      "community": 10,
+      "norm_label": "requireactiveuser()"
+    },
+    {
+      "label": "packageDurations",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "convex_cards_packagedurations",
+      "community": 10,
+      "norm_label": "packagedurations"
+    },
+    {
+      "label": "getExpiryDuration()",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "convex_cards_getexpiryduration",
+      "community": 10,
+      "norm_label": "getexpiryduration()"
+    },
+    {
+      "label": "paymentAmount",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "convex_cards_paymentamount",
+      "community": 10,
+      "norm_label": "paymentamount"
+    },
+    {
+      "label": "isValidWebUrl()",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "convex_cards_isvalidweburl",
+      "community": 10,
+      "norm_label": "isvalidweburl()"
+    },
+    {
+      "label": "syncDerivedProfileFields()",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "convex_cards_syncderivedprofilefields",
+      "community": 10,
+      "norm_label": "syncderivedprofilefields()"
+    },
+    {
+      "label": "getMyProfile",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "convex_cards_getmyprofile",
+      "community": 10,
+      "norm_label": "getmyprofile"
+    },
+    {
+      "label": "getMyCardDailyStats",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L128",
+      "_origin": "ast",
+      "id": "convex_cards_getmycarddailystats",
+      "community": 10,
+      "norm_label": "getmycarddailystats"
+    },
+    {
+      "label": "updateProfile",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L154",
+      "_origin": "ast",
+      "id": "convex_cards_updateprofile",
+      "community": 10,
+      "norm_label": "updateprofile"
+    },
+    {
+      "label": "syncClerkUsername",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L167",
+      "_origin": "ast",
+      "id": "convex_cards_syncclerkusername",
+      "community": 10,
+      "norm_label": "syncclerkusername"
+    },
+    {
+      "label": "backfillDerivedProfileFields",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L179",
+      "_origin": "ast",
+      "id": "convex_cards_backfillderivedprofilefields",
+      "community": 10,
+      "norm_label": "backfillderivedprofilefields"
+    },
+    {
+      "label": "listPublished",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L193",
+      "_origin": "ast",
+      "id": "convex_cards_listpublished",
+      "community": 10,
+      "norm_label": "listpublished"
+    },
+    {
+      "label": "getPublishedById",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L274",
+      "_origin": "ast",
+      "id": "convex_cards_getpublishedbyid",
+      "community": 10,
+      "norm_label": "getpublishedbyid"
+    },
+    {
+      "label": "getCardForEmbed",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L344",
+      "_origin": "ast",
+      "id": "convex_cards_getcardforembed",
+      "community": 10,
+      "norm_label": "getcardforembed"
+    },
+    {
+      "label": "getLiveViewCounts",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L385",
+      "_origin": "ast",
+      "id": "convex_cards_getliveviewcounts",
+      "community": 10,
+      "norm_label": "getliveviewcounts"
+    },
+    {
+      "label": "toggleLike",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L397",
+      "_origin": "ast",
+      "id": "convex_cards_togglelike",
+      "community": 10,
+      "norm_label": "togglelike"
+    },
+    {
+      "label": "getLikedCards",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L426",
+      "_origin": "ast",
+      "id": "convex_cards_getlikedcards",
+      "community": 10,
+      "norm_label": "getlikedcards"
+    },
+    {
+      "label": "generateUploadUrl",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L438",
+      "_origin": "ast",
+      "id": "convex_cards_generateuploadurl",
+      "community": 10,
+      "norm_label": "generateuploadurl"
+    },
+    {
+      "label": "listMine",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L446",
+      "_origin": "ast",
+      "id": "convex_cards_listmine",
+      "community": 10,
+      "norm_label": "listmine"
+    },
+    {
+      "label": "setVisibility",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L523",
+      "_origin": "ast",
+      "id": "convex_cards_setvisibility",
+      "community": 10,
+      "norm_label": "setvisibility"
+    },
+    {
+      "label": "renew",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L538",
+      "_origin": "ast",
+      "id": "convex_cards_renew",
+      "community": 10,
+      "norm_label": "renew"
+    },
+    {
+      "label": "markExpired",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L565",
+      "_origin": "ast",
+      "id": "convex_cards_markexpired",
+      "community": 10,
+      "norm_label": "markexpired"
+    },
+    {
+      "label": "update",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L587",
+      "_origin": "ast",
+      "id": "convex_cards_update",
+      "community": 10,
+      "norm_label": "update"
+    },
+    {
+      "label": "updatePosition",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L663",
+      "_origin": "ast",
+      "id": "convex_cards_updateposition",
+      "community": 10,
+      "norm_label": "updateposition"
+    },
+    {
+      "label": "remove",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L687",
+      "_origin": "ast",
+      "id": "convex_cards_remove",
+      "community": 10,
+      "norm_label": "remove"
+    },
+    {
+      "label": "create",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L701",
+      "_origin": "ast",
+      "id": "convex_cards_create",
+      "community": 10,
+      "norm_label": "create"
+    },
+    {
+      "label": "getMyCardForRenewal",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L984",
+      "_origin": "ast",
+      "id": "convex_cards_getmycardforrenewal",
+      "community": 10,
+      "norm_label": "getmycardforrenewal"
+    },
+    {
+      "label": "incrementClicks",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1003",
+      "_origin": "ast",
+      "id": "convex_cards_incrementclicks",
+      "community": 10,
+      "norm_label": "incrementclicks"
+    },
+    {
+      "label": "recordEvent",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1031",
+      "_origin": "ast",
+      "id": "convex_cards_recordevent",
+      "community": 10,
+      "norm_label": "recordevent"
+    },
+    {
+      "label": "recordSearch",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1048",
+      "_origin": "ast",
+      "id": "convex_cards_recordsearch",
+      "community": 10,
+      "norm_label": "recordsearch"
+    },
+    {
+      "label": "report",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1069",
+      "_origin": "ast",
+      "id": "convex_cards_report",
+      "community": 10,
+      "norm_label": "report"
+    },
+    {
+      "label": "listPublishedIds",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1082",
+      "_origin": "ast",
+      "id": "convex_cards_listpublishedids",
+      "community": 10,
+      "norm_label": "listpublishedids"
+    },
+    {
+      "label": "getStats",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1097",
+      "_origin": "ast",
+      "id": "convex_cards_getstats",
+      "community": 10,
+      "norm_label": "getstats"
+    },
+    {
+      "label": "getTopCards",
+      "file_type": "code",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1113",
+      "_origin": "ast",
+      "id": "convex_cards_gettopcards",
+      "community": 10,
+      "norm_label": "gettopcards"
+    },
+    {
       "label": "route.ts",
       "file_type": "code",
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "moderate_route",
       "community": 6,
-      "norm_label": "route.ts"
+      "norm_label": "route.ts",
+      "id": "moderate_route"
     },
     {
       "label": "allowedImageTypes",
@@ -19,9 +429,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "moderate_route_allowedimagetypes",
       "community": 6,
-      "norm_label": "allowedimagetypes"
+      "norm_label": "allowedimagetypes",
+      "id": "moderate_route_allowedimagetypes"
     },
     {
       "label": "ocrQueue",
@@ -29,9 +439,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L23",
       "_origin": "ast",
-      "id": "moderate_route_ocrqueue",
       "community": 6,
-      "norm_label": "ocrqueue"
+      "norm_label": "ocrqueue",
+      "id": "moderate_route_ocrqueue"
     },
     {
       "label": "findBlockedText()",
@@ -39,9 +449,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L28",
       "_origin": "ast",
-      "id": "moderate_route_findblockedtext",
       "community": 6,
-      "norm_label": "findblockedtext()"
+      "norm_label": "findblockedtext()",
+      "id": "moderate_route_findblockedtext"
     },
     {
       "label": "getSafetyModel()",
@@ -49,9 +459,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L32",
       "_origin": "ast",
-      "id": "moderate_route_getsafetymodel",
       "community": 6,
-      "norm_label": "getsafetymodel()"
+      "norm_label": "getsafetymodel()",
+      "id": "moderate_route_getsafetymodel"
     },
     {
       "label": "getOcrWorker()",
@@ -59,9 +469,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L50",
       "_origin": "ast",
-      "id": "moderate_route_getocrworker",
       "community": 6,
-      "norm_label": "getocrworker()"
+      "norm_label": "getocrworker()",
+      "id": "moderate_route_getocrworker"
     },
     {
       "label": "readImageText()",
@@ -69,9 +479,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L69",
       "_origin": "ast",
-      "id": "moderate_route_readimagetext",
       "community": 6,
-      "norm_label": "readimagetext()"
+      "norm_label": "readimagetext()",
+      "id": "moderate_route_readimagetext"
     },
     {
       "label": "classifyImage()",
@@ -79,9 +489,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L79",
       "_origin": "ast",
-      "id": "moderate_route_classifyimage",
       "community": 6,
-      "norm_label": "classifyimage()"
+      "norm_label": "classifyimage()",
+      "id": "moderate_route_classifyimage"
     },
     {
       "label": "moderateImage()",
@@ -89,9 +499,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L101",
       "_origin": "ast",
-      "id": "moderate_route_moderateimage",
       "community": 6,
-      "norm_label": "moderateimage()"
+      "norm_label": "moderateimage()",
+      "id": "moderate_route_moderateimage"
     },
     {
       "label": "handleModerate()",
@@ -99,9 +509,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L143",
       "_origin": "ast",
-      "id": "moderate_route_handlemoderate",
       "community": 6,
-      "norm_label": "handlemoderate()"
+      "norm_label": "handlemoderate()",
+      "id": "moderate_route_handlemoderate"
     },
     {
       "label": "POST",
@@ -109,9 +519,9 @@
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L204",
       "_origin": "ast",
-      "id": "moderate_route_post",
       "community": 6,
-      "norm_label": "post"
+      "norm_label": "post",
+      "id": "moderate_route_post"
     },
     {
       "label": "digest.ts",
@@ -2711,416 +3121,6 @@
       "community": 55,
       "norm_label": "deletecardowneddata()",
       "id": "convex_cardcleanup_deletecardowneddata"
-    },
-    {
-      "label": "cards.ts",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "cards.ts",
-      "id": "convex_cards"
-    },
-    {
-      "label": "category",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "category",
-      "id": "convex_cards_category"
-    },
-    {
-      "label": "theme",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L29",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "theme",
-      "id": "convex_cards_theme"
-    },
-    {
-      "label": "imageMode",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L30",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "imagemode",
-      "id": "convex_cards_imagemode"
-    },
-    {
-      "label": "cardShape",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L31",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "cardshape",
-      "id": "convex_cards_cardshape"
-    },
-    {
-      "label": "requireIdentity()",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L34",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "requireidentity()",
-      "id": "convex_cards_requireidentity"
-    },
-    {
-      "label": "requireUser()",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L40",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "requireuser()",
-      "id": "convex_cards_requireuser"
-    },
-    {
-      "label": "requireActiveUser()",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L47",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "requireactiveuser()",
-      "id": "convex_cards_requireactiveuser"
-    },
-    {
-      "label": "packageDurations",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L55",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "packagedurations",
-      "id": "convex_cards_packagedurations"
-    },
-    {
-      "label": "getExpiryDuration()",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L63",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getexpiryduration()",
-      "id": "convex_cards_getexpiryduration"
-    },
-    {
-      "label": "paymentAmount",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L67",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "paymentamount",
-      "id": "convex_cards_paymentamount"
-    },
-    {
-      "label": "isValidWebUrl()",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L72",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "isvalidweburl()",
-      "id": "convex_cards_isvalidweburl"
-    },
-    {
-      "label": "syncDerivedProfileFields()",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L82",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "syncderivedprofilefields()",
-      "id": "convex_cards_syncderivedprofilefields"
-    },
-    {
-      "label": "getMyProfile",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L110",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getmyprofile",
-      "id": "convex_cards_getmyprofile"
-    },
-    {
-      "label": "getMyCardDailyStats",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L128",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getmycarddailystats",
-      "id": "convex_cards_getmycarddailystats"
-    },
-    {
-      "label": "updateProfile",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L154",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "updateprofile",
-      "id": "convex_cards_updateprofile"
-    },
-    {
-      "label": "syncClerkUsername",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L167",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "syncclerkusername",
-      "id": "convex_cards_syncclerkusername"
-    },
-    {
-      "label": "backfillDerivedProfileFields",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L179",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "backfillderivedprofilefields",
-      "id": "convex_cards_backfillderivedprofilefields"
-    },
-    {
-      "label": "listPublished",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L193",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "listpublished",
-      "id": "convex_cards_listpublished"
-    },
-    {
-      "label": "getPublishedById",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L274",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getpublishedbyid",
-      "id": "convex_cards_getpublishedbyid"
-    },
-    {
-      "label": "getCardForEmbed",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L344",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getcardforembed",
-      "id": "convex_cards_getcardforembed"
-    },
-    {
-      "label": "getLiveViewCounts",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L385",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getliveviewcounts",
-      "id": "convex_cards_getliveviewcounts"
-    },
-    {
-      "label": "toggleLike",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L397",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "togglelike",
-      "id": "convex_cards_togglelike"
-    },
-    {
-      "label": "getLikedCards",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L426",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getlikedcards",
-      "id": "convex_cards_getlikedcards"
-    },
-    {
-      "label": "generateUploadUrl",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L438",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "generateuploadurl",
-      "id": "convex_cards_generateuploadurl"
-    },
-    {
-      "label": "listMine",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L446",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "listmine",
-      "id": "convex_cards_listmine"
-    },
-    {
-      "label": "setVisibility",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L523",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "setvisibility",
-      "id": "convex_cards_setvisibility"
-    },
-    {
-      "label": "renew",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L538",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "renew",
-      "id": "convex_cards_renew"
-    },
-    {
-      "label": "markExpired",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L565",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "markexpired",
-      "id": "convex_cards_markexpired"
-    },
-    {
-      "label": "update",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L587",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "update",
-      "id": "convex_cards_update"
-    },
-    {
-      "label": "updatePosition",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L663",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "updateposition",
-      "id": "convex_cards_updateposition"
-    },
-    {
-      "label": "remove",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L687",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "remove",
-      "id": "convex_cards_remove"
-    },
-    {
-      "label": "create",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L701",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "create",
-      "id": "convex_cards_create"
-    },
-    {
-      "label": "getMyCardForRenewal",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L969",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getmycardforrenewal",
-      "id": "convex_cards_getmycardforrenewal"
-    },
-    {
-      "label": "incrementClicks",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L988",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "incrementclicks",
-      "id": "convex_cards_incrementclicks"
-    },
-    {
-      "label": "recordEvent",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1016",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "recordevent",
-      "id": "convex_cards_recordevent"
-    },
-    {
-      "label": "recordSearch",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1033",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "recordsearch",
-      "id": "convex_cards_recordsearch"
-    },
-    {
-      "label": "report",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1054",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "report",
-      "id": "convex_cards_report"
-    },
-    {
-      "label": "listPublishedIds",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1067",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "listpublishedids",
-      "id": "convex_cards_listpublishedids"
-    },
-    {
-      "label": "getStats",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1082",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "getstats",
-      "id": "convex_cards_getstats"
-    },
-    {
-      "label": "getTopCards",
-      "file_type": "code",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1098",
-      "_origin": "ast",
-      "community": 10,
-      "norm_label": "gettopcards",
-      "id": "convex_cards_gettopcards"
     },
     {
       "label": "contactMessages.ts",
@@ -15208,6 +15208,538 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cardcleanup"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cardcleanup_deletecardowneddata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L176",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_backfillderivedprofilefields"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_cardshape"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_category"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L640",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_create"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L379",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_generateuploadurl"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L287",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getcardforembed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L62",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getexpiryduration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L367",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getlikedcards"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L326",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getliveviewcounts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L99",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getmycarddailystats"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L887",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getmycardforrenewal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L81",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getmyprofile"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L219",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getpublishedbyid"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1000",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_getstats"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L1016",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_gettopcards"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_imagemode"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L906",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_incrementclicks"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L71",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_isvalidweburl"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L387",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_listmine"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L140",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_listpublished"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L985",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_listpublishedids"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L504",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_markexpired"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_packagedurations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_paymentamount"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L934",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_recordevent"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L951",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_recordsearch"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L626",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_remove"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L477",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_renew"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L972",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_report"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_requireactiveuser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_requireidentity"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_requireuser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L462",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_setvisibility"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L140",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_syncclerkusername"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L81",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_syncderivedprofilefields"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_theme"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L338",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_togglelike"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L526",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_update"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L602",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_updateposition"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L125",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "convex_cards_updateprofile"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_api"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_api_api"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_api_internal"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_server"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_server_internalmutation"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_server_mutation"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards",
+      "target": "generated_server_query"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/_generated/api.d.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "generated_api_d",
+      "target": "convex_cards"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards_requireuser",
+      "target": "convex_cards_requireidentity"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "convex/cards.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "convex_cards_requireactiveuser",
+      "target": "convex_cards_requireuser"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "app/api/moderate/route.ts",
       "source_location": "L7",
       "weight": 1.0,
@@ -20401,17 +20933,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "convex/_generated/api.d.ts",
-      "source_location": "L15",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "generated_api_d",
-      "target": "convex_cards"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/_generated/api.d.ts",
       "source_location": "L16",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -20625,17 +21146,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "convex_bundle_test",
-      "target": "generated_api"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
       "target": "generated_api"
     },
     {
@@ -21076,17 +21586,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "convex_cardcleanup",
-      "target": "generated_server"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
       "target": "generated_server"
     },
     {
@@ -21827,17 +22326,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cardcleanup"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "convex/gdpr.ts",
       "source_location": "L4",
       "weight": 1.0,
@@ -21849,500 +22337,12 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cardcleanup_deletecardowneddata"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "convex/gdpr.ts",
       "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "convex_gdpr",
       "target": "convex_cardcleanup_deletecardowneddata"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L176",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_backfillderivedprofilefields"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_cardshape"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_category"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L640",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_create"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L379",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_generateuploadurl"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L287",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getcardforembed"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L62",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getexpiryduration"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L367",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getlikedcards"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L326",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getliveviewcounts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L99",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getmycarddailystats"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L887",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getmycardforrenewal"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L81",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getmyprofile"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L219",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getpublishedbyid"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1000",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_getstats"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L1016",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_gettopcards"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L30",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_imagemode"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L906",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_incrementclicks"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L71",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_isvalidweburl"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L387",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_listmine"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L140",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_listpublished"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L985",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_listpublishedids"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L504",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_markexpired"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L54",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_packagedurations"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L66",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_paymentamount"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L934",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_recordevent"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L951",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_recordsearch"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L626",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_remove"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L477",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_renew"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L972",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_report"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L46",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_requireactiveuser"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L33",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_requireidentity"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_requireuser"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L462",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_setvisibility"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L140",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_syncclerkusername"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L81",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_syncderivedprofilefields"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L29",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_theme"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L338",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_togglelike"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L526",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_update"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L602",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_updateposition"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L125",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "convex_cards_updateprofile"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "generated_api_api"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "generated_api_internal"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "generated_server_internalmutation"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "generated_server_mutation"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards",
-      "target": "generated_server_query"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L40",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards_requireuser",
-      "target": "convex_cards_requireidentity"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "convex/cards.ts",
-      "source_location": "L47",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "convex_cards_requireactiveuser",
-      "target": "convex_cards_requireuser"
     },
     {
       "relation": "contains",
@@ -38212,5 +38212,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "15b1cc70e34c19118cd0c4438acd18687b6f608d"
+  "built_at_commit": "5f9401e035df8d5ce6aeb0435d3d391467790e48"
 }

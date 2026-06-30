@@ -1175,6 +1175,7 @@ button { color: inherit; }
 .composer input, .composer textarea, .composer select { width: 100%; margin-top: 7px; border: 1px solid #777; border-radius: 0; background: var(--ui-bg-2); padding: 13px 14px; outline: 0; font: 600 17px var(--font-barlow-condensed); }
 .composer select { cursor: pointer; }
 .composer select option { cursor: pointer; }
+.composer .field-locked select:disabled { opacity: .6; cursor: not-allowed; background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(0,0,0,.03)), var(--ui-bg-2); }
 .composer input:focus, .composer textarea:focus, .composer select:focus { border-color: #f43d38; box-shadow: inset 4px 0 #f43d38; }
 .composer input:user-invalid, .composer textarea:user-invalid { border-color: #b42318; box-shadow: inset 4px 0 #b42318; }
 .composer textarea { min-height: 90px; resize: vertical; }

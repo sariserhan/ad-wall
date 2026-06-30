@@ -4,14 +4,124 @@
   "graph": {},
   "nodes": [
     {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "moderate_route",
+      "community": 6,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "allowedImageTypes",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "moderate_route_allowedimagetypes",
+      "community": 6,
+      "norm_label": "allowedimagetypes"
+    },
+    {
+      "label": "ocrQueue",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "moderate_route_ocrqueue",
+      "community": 6,
+      "norm_label": "ocrqueue"
+    },
+    {
+      "label": "findBlockedText()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "moderate_route_findblockedtext",
+      "community": 6,
+      "norm_label": "findblockedtext()"
+    },
+    {
+      "label": "getSafetyModel()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "moderate_route_getsafetymodel",
+      "community": 6,
+      "norm_label": "getsafetymodel()"
+    },
+    {
+      "label": "getOcrWorker()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L50",
+      "_origin": "ast",
+      "id": "moderate_route_getocrworker",
+      "community": 6,
+      "norm_label": "getocrworker()"
+    },
+    {
+      "label": "readImageText()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L69",
+      "_origin": "ast",
+      "id": "moderate_route_readimagetext",
+      "community": 6,
+      "norm_label": "readimagetext()"
+    },
+    {
+      "label": "classifyImage()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "moderate_route_classifyimage",
+      "community": 6,
+      "norm_label": "classifyimage()"
+    },
+    {
+      "label": "moderateImage()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L101",
+      "_origin": "ast",
+      "id": "moderate_route_moderateimage",
+      "community": 6,
+      "norm_label": "moderateimage()"
+    },
+    {
+      "label": "handleModerate()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L143",
+      "_origin": "ast",
+      "id": "moderate_route_handlemoderate",
+      "community": 6,
+      "norm_label": "handlemoderate()"
+    },
+    {
+      "label": "POST",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L204",
+      "_origin": "ast",
+      "id": "moderate_route_post",
+      "community": 6,
+      "norm_label": "post"
+    },
+    {
       "label": "digest.ts",
       "file_type": "code",
       "source_file": "convex/digest.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "convex_digest",
       "community": 47,
-      "norm_label": "digest.ts"
+      "norm_label": "digest.ts",
+      "id": "convex_digest"
     },
     {
       "label": "subscribe",
@@ -19,9 +129,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "convex_digest_subscribe",
       "community": 47,
-      "norm_label": "subscribe"
+      "norm_label": "subscribe",
+      "id": "convex_digest_subscribe"
     },
     {
       "label": "unsubscribeByToken",
@@ -29,9 +139,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L45",
       "_origin": "ast",
-      "id": "convex_digest_unsubscribebytoken",
       "community": 47,
-      "norm_label": "unsubscribebytoken"
+      "norm_label": "unsubscribebytoken",
+      "id": "convex_digest_unsubscribebytoken"
     },
     {
       "label": "markDigestSent",
@@ -39,9 +149,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L58",
       "_origin": "ast",
-      "id": "convex_digest_markdigestsent",
       "community": 47,
-      "norm_label": "markdigestsent"
+      "norm_label": "markdigestsent",
+      "id": "convex_digest_markdigestsent"
     },
     {
       "label": "findCitiesWithSubscribers",
@@ -49,9 +159,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L65",
       "_origin": "ast",
-      "id": "convex_digest_findcitieswithsubscribers",
       "community": 47,
-      "norm_label": "findcitieswithsubscribers"
+      "norm_label": "findcitieswithsubscribers",
+      "id": "convex_digest_findcitieswithsubscribers"
     },
     {
       "label": "findNewCardsForLocation",
@@ -59,9 +169,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L84",
       "_origin": "ast",
-      "id": "convex_digest_findnewcardsforlocation",
       "community": 47,
-      "norm_label": "findnewcardsforlocation"
+      "norm_label": "findnewcardsforlocation",
+      "id": "convex_digest_findnewcardsforlocation"
     },
     {
       "label": "sendWeeklyDigests",
@@ -69,9 +179,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L130",
       "_origin": "ast",
-      "id": "convex_digest_sendweeklydigests",
       "community": 47,
-      "norm_label": "sendweeklydigests"
+      "norm_label": "sendweeklydigests",
+      "id": "convex_digest_sendweeklydigests"
     },
     {
       "label": "escapeHtml()",
@@ -79,9 +189,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L212",
       "_origin": "ast",
-      "id": "convex_digest_escapehtml",
       "community": 47,
-      "norm_label": "escapehtml()"
+      "norm_label": "escapehtml()",
+      "id": "convex_digest_escapehtml"
     },
     {
       "label": "DigestCard",
@@ -89,9 +199,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L216",
       "_origin": "ast",
-      "id": "convex_digest_digestcard",
       "community": 47,
-      "norm_label": "digestcard"
+      "norm_label": "digestcard",
+      "id": "convex_digest_digestcard"
     },
     {
       "label": "buildCardRow()",
@@ -99,9 +209,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L218",
       "_origin": "ast",
-      "id": "convex_digest_buildcardrow",
       "community": 47,
-      "norm_label": "buildcardrow()"
+      "norm_label": "buildcardrow()",
+      "id": "convex_digest_buildcardrow"
     },
     {
       "label": "buildDigestEmail()",
@@ -109,9 +219,9 @@
       "source_file": "convex/digest.ts",
       "source_location": "L236",
       "_origin": "ast",
-      "id": "convex_digest_builddigestemail",
       "community": 47,
-      "norm_label": "builddigestemail()"
+      "norm_label": "builddigestemail()",
+      "id": "convex_digest_builddigestemail"
     },
     {
       "label": "composer.tsx",
@@ -119,9 +229,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "wall_composer",
       "community": 0,
-      "norm_label": "composer.tsx"
+      "norm_label": "composer.tsx",
+      "id": "wall_composer"
     },
     {
       "label": "ComposerProps",
@@ -129,9 +239,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L10",
       "_origin": "ast",
-      "id": "wall_composer_composerprops",
       "community": 110,
-      "norm_label": "composerprops"
+      "norm_label": "composerprops",
+      "id": "wall_composer_composerprops"
     },
     {
       "label": "ComposerForm",
@@ -139,9 +249,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "wall_composer_composerform",
       "community": 0,
-      "norm_label": "composerform"
+      "norm_label": "composerform",
+      "id": "wall_composer_composerform"
     },
     {
       "label": "BundleCity",
@@ -149,9 +259,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L55",
       "_origin": "ast",
-      "id": "wall_composer_bundlecity",
       "community": 0,
-      "norm_label": "bundlecity"
+      "norm_label": "bundlecity",
+      "id": "wall_composer_bundlecity"
     },
     {
       "label": "countries",
@@ -159,9 +269,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L57",
       "_origin": "ast",
-      "id": "wall_composer_countries",
       "community": 0,
-      "norm_label": "countries"
+      "norm_label": "countries",
+      "id": "wall_composer_countries"
     },
     {
       "label": "defaultStates",
@@ -169,9 +279,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L59",
       "_origin": "ast",
-      "id": "wall_composer_defaultstates",
       "community": 0,
-      "norm_label": "defaultstates"
+      "norm_label": "defaultstates",
+      "id": "wall_composer_defaultstates"
     },
     {
       "label": "initialForm",
@@ -179,9 +289,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L64",
       "_origin": "ast",
-      "id": "wall_composer_initialform",
       "community": 0,
-      "norm_label": "initialform"
+      "norm_label": "initialform",
+      "id": "wall_composer_initialform"
     },
     {
       "label": "formatWallLocation()",
@@ -189,9 +299,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L102",
       "_origin": "ast",
-      "id": "wall_composer_formatwalllocation",
       "community": 0,
-      "norm_label": "formatwalllocation()"
+      "norm_label": "formatwalllocation()",
+      "id": "wall_composer_formatwalllocation"
     },
     {
       "label": "themeOptions",
@@ -199,9 +309,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L107",
       "_origin": "ast",
-      "id": "wall_composer_themeoptions",
       "community": 0,
-      "norm_label": "themeoptions"
+      "norm_label": "themeoptions",
+      "id": "wall_composer_themeoptions"
     },
     {
       "label": "businessCardShapeOptions",
@@ -209,9 +319,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L120",
       "_origin": "ast",
-      "id": "wall_composer_businesscardshapeoptions",
       "community": 0,
-      "norm_label": "businesscardshapeoptions"
+      "norm_label": "businesscardshapeoptions",
+      "id": "wall_composer_businesscardshapeoptions"
     },
     {
       "label": "paymentOptions",
@@ -219,9 +329,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L126",
       "_origin": "ast",
-      "id": "wall_composer_paymentoptions",
       "community": 0,
-      "norm_label": "paymentoptions"
+      "norm_label": "paymentoptions",
+      "id": "wall_composer_paymentoptions"
     },
     {
       "label": "featuredTierOptions",
@@ -229,9 +339,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L134",
       "_origin": "ast",
-      "id": "wall_composer_featuredtieroptions",
       "community": 0,
-      "norm_label": "featuredtieroptions"
+      "norm_label": "featuredtieroptions",
+      "id": "wall_composer_featuredtieroptions"
     },
     {
       "label": "stepLabels",
@@ -239,9 +349,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L142",
       "_origin": "ast",
-      "id": "wall_composer_steplabels",
       "community": 0,
-      "norm_label": "steplabels"
+      "norm_label": "steplabels",
+      "id": "wall_composer_steplabels"
     },
     {
       "label": "openImagesDB()",
@@ -249,9 +359,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L148",
       "_origin": "ast",
-      "id": "wall_composer_openimagesdb",
       "community": 0,
-      "norm_label": "openimagesdb()"
+      "norm_label": "openimagesdb()",
+      "id": "wall_composer_openimagesdb"
     },
     {
       "label": "saveImagesToIDB()",
@@ -259,9 +369,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L157",
       "_origin": "ast",
-      "id": "wall_composer_saveimagestoidb",
       "community": 0,
-      "norm_label": "saveimagestoidb()"
+      "norm_label": "saveimagestoidb()",
+      "id": "wall_composer_saveimagestoidb"
     },
     {
       "label": "loadImagesFromIDB()",
@@ -269,9 +379,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L170",
       "_origin": "ast",
-      "id": "wall_composer_loadimagesfromidb",
       "community": 0,
-      "norm_label": "loadimagesfromidb()"
+      "norm_label": "loadimagesfromidb()",
+      "id": "wall_composer_loadimagesfromidb"
     },
     {
       "label": "clearImagesFromIDB()",
@@ -279,9 +389,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L184",
       "_origin": "ast",
-      "id": "wall_composer_clearimagesfromidb",
       "community": 0,
-      "norm_label": "clearimagesfromidb()"
+      "norm_label": "clearimagesfromidb()",
+      "id": "wall_composer_clearimagesfromidb"
     },
     {
       "label": "ModerationMatch",
@@ -289,9 +399,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L197",
       "_origin": "ast",
-      "id": "wall_composer_moderationmatch",
       "community": 0,
-      "norm_label": "moderationmatch"
+      "norm_label": "moderationmatch",
+      "id": "wall_composer_moderationmatch"
     },
     {
       "label": "DetailField",
@@ -299,9 +409,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L198",
       "_origin": "ast",
-      "id": "wall_composer_detailfield",
       "community": 0,
-      "norm_label": "detailfield"
+      "norm_label": "detailfield",
+      "id": "wall_composer_detailfield"
     },
     {
       "label": "detailFieldLabels",
@@ -309,9 +419,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L200",
       "_origin": "ast",
-      "id": "wall_composer_detailfieldlabels",
       "community": 0,
-      "norm_label": "detailfieldlabels"
+      "norm_label": "detailfieldlabels",
+      "id": "wall_composer_detailfieldlabels"
     },
     {
       "label": "validWebUrl()",
@@ -319,9 +429,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L204",
       "_origin": "ast",
-      "id": "wall_composer_validweburl",
       "community": 0,
-      "norm_label": "validweburl()"
+      "norm_label": "validweburl()",
+      "id": "wall_composer_validweburl"
     },
     {
       "label": "validSocialProfile()",
@@ -329,9 +439,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L214",
       "_origin": "ast",
-      "id": "wall_composer_validsocialprofile",
       "community": 0,
-      "norm_label": "validsocialprofile()"
+      "norm_label": "validsocialprofile()",
+      "id": "wall_composer_validsocialprofile"
     },
     {
       "label": "bakeImageCrop()",
@@ -339,9 +449,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L218",
       "_origin": "ast",
-      "id": "wall_composer_bakeimagecrop",
       "community": 0,
-      "norm_label": "bakeimagecrop()"
+      "norm_label": "bakeimagecrop()",
+      "id": "wall_composer_bakeimagecrop"
     },
     {
       "label": "LiveCardPreview()",
@@ -349,9 +459,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L255",
       "_origin": "ast",
-      "id": "wall_composer_livecardpreview",
       "community": 0,
-      "norm_label": "livecardpreview()"
+      "norm_label": "livecardpreview()",
+      "id": "wall_composer_livecardpreview"
     },
     {
       "label": "ExpandedCardPreview()",
@@ -359,9 +469,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L430",
       "_origin": "ast",
-      "id": "wall_composer_expandedcardpreview",
       "community": 0,
-      "norm_label": "expandedcardpreview()"
+      "norm_label": "expandedcardpreview()",
+      "id": "wall_composer_expandedcardpreview"
     },
     {
       "label": "BackCardPreview()",
@@ -369,9 +479,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L509",
       "_origin": "ast",
-      "id": "wall_composer_backcardpreview",
       "community": 110,
-      "norm_label": "backcardpreview()"
+      "norm_label": "backcardpreview()",
+      "id": "wall_composer_backcardpreview"
     },
     {
       "label": "CardSidesPreview()",
@@ -379,9 +489,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L674",
       "_origin": "ast",
-      "id": "wall_composer_cardsidespreview",
       "community": 0,
-      "norm_label": "cardsidespreview()"
+      "norm_label": "cardsidespreview()",
+      "id": "wall_composer_cardsidespreview"
     },
     {
       "label": "Composer()",
@@ -389,9 +499,9 @@
       "source_file": "src/features/wall/composer.tsx",
       "source_location": "L758",
       "_origin": "ast",
-      "id": "wall_composer_composer",
       "community": 64,
-      "norm_label": "composer()"
+      "norm_label": "composer()",
+      "id": "wall_composer_composer"
     },
     {
       "label": "image-compare-slider.tsx",
@@ -399,9 +509,9 @@
       "source_file": "src/features/wall/image-compare-slider.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "wall_image_compare_slider",
       "community": 0,
-      "norm_label": "image-compare-slider.tsx"
+      "norm_label": "image-compare-slider.tsx",
+      "id": "wall_image_compare_slider"
     },
     {
       "label": "ImageSwapViewerProps",
@@ -409,9 +519,9 @@
       "source_file": "src/features/wall/image-compare-slider.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "wall_image_compare_slider_imageswapviewerprops",
       "community": 0,
-      "norm_label": "imageswapviewerprops"
+      "norm_label": "imageswapviewerprops",
+      "id": "wall_image_compare_slider_imageswapviewerprops"
     },
     {
       "label": "ImageSwapViewer()",
@@ -419,9 +529,9 @@
       "source_file": "src/features/wall/image-compare-slider.tsx",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "wall_image_compare_slider_imageswapviewer",
       "community": 0,
-      "norm_label": "imageswapviewer()"
+      "norm_label": "imageswapviewer()",
+      "id": "wall_image_compare_slider_imageswapviewer"
     },
     {
       "label": "stress.test.ts",
@@ -429,9 +539,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "convex_stress_test",
       "community": 2,
-      "norm_label": "stress.test.ts"
+      "norm_label": "stress.test.ts",
+      "id": "convex_stress_test"
     },
     {
       "label": "ensureOwnerId()",
@@ -439,9 +549,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L32",
       "_origin": "ast",
-      "id": "convex_stress_test_ensureownerid",
       "community": 2,
-      "norm_label": "ensureownerid()"
+      "norm_label": "ensureownerid()",
+      "id": "convex_stress_test_ensureownerid"
     },
     {
       "label": "insertPublishedCard()",
@@ -449,9 +559,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L51",
       "_origin": "ast",
-      "id": "convex_stress_test_insertpublishedcard",
       "community": 2,
-      "norm_label": "insertpublishedcard()"
+      "norm_label": "insertpublishedcard()",
+      "id": "convex_stress_test_insertpublishedcard"
     },
     {
       "label": "seedCards()",
@@ -459,9 +569,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L80",
       "_origin": "ast",
-      "id": "convex_stress_test_seedcards",
       "community": 2,
-      "norm_label": "seedcards()"
+      "norm_label": "seedcards()",
+      "id": "convex_stress_test_seedcards"
     },
     {
       "label": "seedPgCards()",
@@ -469,9 +579,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L90",
       "_origin": "ast",
-      "id": "convex_stress_test_seedpgcards",
       "community": 2,
-      "norm_label": "seedpgcards()"
+      "norm_label": "seedpgcards()",
+      "id": "convex_stress_test_seedpgcards"
     },
     {
       "label": ".mcp.json",
@@ -971,116 +1081,6 @@
       "community": 83,
       "norm_label": "get()",
       "id": "search_route_get"
-    },
-    {
-      "label": "route.ts",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "route.ts",
-      "id": "moderate_route"
-    },
-    {
-      "label": "allowedImageTypes",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "allowedimagetypes",
-      "id": "moderate_route_allowedimagetypes"
-    },
-    {
-      "label": "ocrQueue",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L23",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "ocrqueue",
-      "id": "moderate_route_ocrqueue"
-    },
-    {
-      "label": "findBlockedText()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L28",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "findblockedtext()",
-      "id": "moderate_route_findblockedtext"
-    },
-    {
-      "label": "getSafetyModel()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L32",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "getsafetymodel()",
-      "id": "moderate_route_getsafetymodel"
-    },
-    {
-      "label": "getOcrWorker()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L40",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "getocrworker()",
-      "id": "moderate_route_getocrworker"
-    },
-    {
-      "label": "readImageText()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L49",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "readimagetext()",
-      "id": "moderate_route_readimagetext"
-    },
-    {
-      "label": "classifyImage()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L59",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "classifyimage()",
-      "id": "moderate_route_classifyimage"
-    },
-    {
-      "label": "moderateImage()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L81",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "moderateimage()",
-      "id": "moderate_route_moderateimage"
-    },
-    {
-      "label": "handleModerate()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L107",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "handlemoderate()",
-      "id": "moderate_route_handlemoderate"
-    },
-    {
-      "label": "POST",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L168",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "post",
-      "id": "moderate_route_post"
     },
     {
       "label": "route.tsx",
@@ -15205,6 +15205,282 @@
   ],
   "links": [
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_distributed_rate_limit"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_distributed_rate_limit_durableuserratelimit"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_observe"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_observe_observe"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_rate_limit"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_rate_limit_issameoriginrequest"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_rate_limit_ratelimit"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "lib_logger"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "lib_logger_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_allowedimagetypes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_classifyimage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_findblockedtext"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_getocrworker"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_getsafetymodel"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L105",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_handlemoderate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_moderateimage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_ocrqueue"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L166",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_post"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_readimagetext"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L128",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "moderate_route_findblockedtext"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_moderateimage",
+      "target": "moderate_route_findblockedtext"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_classifyimage",
+      "target": "moderate_route_getsafetymodel"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L113",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "api_distributed_rate_limit_durableuserratelimit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L106",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "api_rate_limit_issameoriginrequest"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L109",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "api_rate_limit_ratelimit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L131",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "lib_logger_log"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "convex/digest.ts",
@@ -16205,9 +16481,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "convex_stress_test",
-      "target": "convex_stress_test_ensureownerid",
-      "confidence_score": 1.0
+      "target": "convex_stress_test_ensureownerid"
     },
     {
       "relation": "contains",
@@ -16215,9 +16491,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "convex_stress_test",
-      "target": "convex_stress_test_insertpublishedcard",
-      "confidence_score": 1.0
+      "target": "convex_stress_test_insertpublishedcard"
     },
     {
       "relation": "contains",
@@ -16268,9 +16544,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "convex_stress_test_seedcards",
-      "target": "convex_stress_test_ensureownerid",
-      "confidence_score": 1.0
+      "target": "convex_stress_test_ensureownerid"
     },
     {
       "relation": "calls",
@@ -16279,9 +16555,9 @@
       "source_file": "tests/convex/stress.test.ts",
       "source_location": "L84",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "convex_stress_test_seedcards",
-      "target": "convex_stress_test_insertpublishedcard",
-      "confidence_score": 1.0
+      "target": "convex_stress_test_insertpublishedcard"
     },
     {
       "relation": "calls",
@@ -17792,17 +18068,6 @@
       "target": "api_distributed_rate_limit"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_distributed_rate_limit"
-    },
-    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -17822,28 +18087,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "checkout_route_handlecheckout",
-      "target": "api_distributed_rate_limit_durableuserratelimit"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_distributed_rate_limit_durableuserratelimit"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L113",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
       "target": "api_distributed_rate_limit_durableuserratelimit"
     },
     {
@@ -17893,17 +18136,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_observe"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/api/stripe/session/route.ts",
       "source_location": "L5",
       "weight": 1.0,
@@ -17920,17 +18152,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "checkout_route",
-      "target": "api_observe_observe"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
       "target": "api_observe_observe"
     },
     {
@@ -18006,17 +18227,6 @@
       "target": "api_rate_limit"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_rate_limit"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -18053,28 +18263,6 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_rate_limit_ratelimit"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L109",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "api_rate_limit_ratelimit"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/api/stripe/checkout/route.ts",
       "source_location": "L5",
       "weight": 1.0,
@@ -18091,28 +18279,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "checkout_route_handlecheckout",
-      "target": "api_rate_limit_issameoriginrequest"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_rate_limit_issameoriginrequest"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L106",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
       "target": "api_rate_limit_issameoriginrequest"
     },
     {
@@ -18185,172 +18351,6 @@
       "confidence_score": 1.0,
       "source": "search_route",
       "target": "search_route_normalizekey"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "lib_logger"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "lib_logger_log"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L18",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_allowedimagetypes"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L57",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_classifyimage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_findblockedtext"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_getocrworker"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_getsafetymodel"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L105",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_handlemoderate"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_moderateimage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L22",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_ocrqueue"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L166",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_post"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L47",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_readimagetext"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L128",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "moderate_route_findblockedtext"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L101",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_moderateimage",
-      "target": "moderate_route_findblockedtext"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L73",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_classifyimage",
-      "target": "moderate_route_getsafetymodel"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L131",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "lib_logger_log"
     },
     {
       "relation": "imports_from",
@@ -38212,5 +38212,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e6bdb4be928c1bbefea90f262aab48f211efe3da"
+  "built_at_commit": "15b1cc70e34c19118cd0c4438acd18687b6f608d"
 }
