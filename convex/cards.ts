@@ -745,9 +745,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const startedAt = Date.now();
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "start", paidAmount: args.paidAmount, featuredTier: args.featuredTier, imageCount: args.imageIds.length, backImageCount: args.backImageIds?.length ?? 0 }));
     const identity = await requireIdentity(ctx);
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "identity", ms: Date.now() - startedAt }));
     const phone = args.phone?.trim() ?? "";
     const email = args.email?.trim() ?? "";
     const featuredPrices: Record<string, number> = { boost: 2.99, bronze: 2.99, silver: 4.99, gold: 9.99 };
@@ -782,7 +780,6 @@ export const create = mutation({
 
     let user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
     if (!user) {
-      console.log(JSON.stringify({ event: "cards.create.stage", stage: "user.create.start", ms: Date.now() - startedAt }));
       const userId = await ctx.db.insert("users", {
         authProvider: "clerk",
         externalUserId: identity.subject,
@@ -795,11 +792,9 @@ export const create = mutation({
       user = await ctx.db.get(userId);
     }
     if (!user) throw new Error("Your profile could not be created.");
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "user.ready", ms: Date.now() - startedAt }));
     if (user.blockedAt) throw new Error("Your account is blocked by WALL admin. Contact support for help.");
 
     const cardCreationRateLimit: { allowed: boolean; scope: string; limit: number; remaining: number; resetAt: number } = await ctx.runMutation(api.rateLimits.take, { scopes: ["card_create_hour"] });
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "rate_limit.done", ms: Date.now() - startedAt, allowed: cardCreationRateLimit.allowed }));
     if (!cardCreationRateLimit.allowed) {
       return {
         kind: "rate_limited" as const,
@@ -839,7 +834,6 @@ export const create = mutation({
       featuredTier: args.featuredTier,
     };
     if (totalPaidAmount > 0) {
-      console.log(JSON.stringify({ event: "cards.create.stage", stage: "pending.insert.start", ms: Date.now() - startedAt }));
       const pendingCardId = await ctx.db.insert("pendingCards", {
         ownerId: user._id,
         payload: normalizedPayload,
@@ -848,12 +842,10 @@ export const create = mutation({
         createdAt,
         expiresAt: createdAt + 2 * 60 * 60 * 1000,
       });
-      console.log(JSON.stringify({ event: "cards.create.stage", stage: "pending.insert.done", ms: Date.now() - startedAt }));
       return { pendingCardId };
     }
     const expiresAt = createdAt + getExpiryDuration(args.paidAmount);
     const zIndex = createdAt;
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "card.insert.start", ms: Date.now() - startedAt }));
     const cardId = await ctx.db.insert("cards", {
       ownerId: user._id,
       name: args.name.trim(),
@@ -909,19 +901,13 @@ export const create = mutation({
       createdAt,
       clicks: 0,
     });
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "card.insert.done", ms: Date.now() - startedAt, cardId: String(cardId) }));
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "stats.insert.start", ms: Date.now() - startedAt }));
     await ctx.db.insert("cardStats", { cardId, clicks: 0, websiteClicks: 0, phoneClicks: 0, emailClicks: 0, socialClicks: 0, saves: 0, shares: 0, updatedAt: createdAt });
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "stats.insert.done", ms: Date.now() - startedAt }));
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "urls.start", ms: Date.now() - startedAt }));
     const [urls, thumbnailUrls, backUrls, backThumbnailUrls] = await Promise.all([
       Promise.all(args.imageIds.map((imageId) => ctx.storage.getUrl(imageId))),
       Promise.all((args.thumbnailImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
       Promise.all((args.backImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
       Promise.all((args.backThumbnailImageIds ?? []).map((imageId) => ctx.storage.getUrl(imageId))),
     ]);
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "urls.done", ms: Date.now() - startedAt }));
-    console.log(JSON.stringify({ event: "cards.create.stage", stage: "return", ms: Date.now() - startedAt }));
     return {
       id: cardId,
       ownerId: user._id,

@@ -1432,6 +1432,13 @@ button { color: inherit; }
 .empty-note-first strong { font: 900 24px var(--font-barlow-condensed); text-transform: uppercase; letter-spacing: .5px; }
 .empty-note-first span { font: 500 12px var(--font-inter); opacity: .75; text-transform: none; letter-spacing: 0; }
 .empty-note-first .primary { margin-top: 16px; background: #edcf35; color: #111; border: none; width: 100%; min-height: 44px; }
+.empty-wall-card { position: absolute; left: 50%; top: 180px; z-index: 20; width: min(420px, calc(100vw - 32px)); transform: translateX(-50%) rotate(-1.8deg); }
+.empty-wall-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.empty-wall-flag { display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; box-shadow: none; font-size: 16px; line-height: 1; transform: translateY(-5px) rotate(8deg); flex: 0 0 auto; }
+.empty-wall-card .nf-actions { margin-bottom: 20px; }
+.empty-wall-card .nf-btn-primary { width: 100%; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
+.empty-wall-card .nf-btn-primary:hover { transform: translateY(-1px); box-shadow: 4px 4px 0 #9e1915; }
+.empty-wall-card .nf-btn-primary:active { transform: translateY(1px); box-shadow: 2px 2px 0 #9e1915; }
 .wall.is-placing .wall-card:not(.placement-card) { filter: brightness(.72) saturate(.72); }
 .placement-mode { position: absolute; inset: 0; z-index: 3000; background: #1113; cursor: crosshair; }
 .placement-banner { position: fixed; top: 82px; left: 50%; z-index: 3100; width: min(760px, calc(100vw - 32px)); min-height: 68px; display: flex; align-items: center; gap: 13px; padding: 10px 12px 10px 18px; transform: translateX(-50%); background: var(--ui-bg); border: 1px solid #111; box-shadow: 7px 8px 0 #111; }

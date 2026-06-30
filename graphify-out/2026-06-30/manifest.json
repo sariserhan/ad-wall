@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "convex/cards.ts": {
-    "mtime": 1782793018.3997788,
-    "ast_hash": "10b1d97c4e904deb9814ff6476321b13",
+    "mtime": 1782840741.8267365,
+    "ast_hash": "ae1b82a8b2a4b68329e2e1b0948ff59c",
     "semantic_hash": ""
   },
   "convex/contactMessages.ts": {
@@ -560,13 +560,13 @@
     "semantic_hash": ""
   },
   "src/features/wall/composer.tsx": {
-    "mtime": 1782835455.949354,
-    "ast_hash": "e6999c165ddb599e3b6b9c15c743e25f",
+    "mtime": 1782839264.0781896,
+    "ast_hash": "eb09cc72fdd5fccddb76bad1a693dcae",
     "semantic_hash": ""
   },
   "src/features/wall/connected-wall-app.tsx": {
-    "mtime": 1782836548.05578,
-    "ast_hash": "821c6581428825d6bfe9a35c3cc7bb9a",
+    "mtime": 1782840718.8858743,
+    "ast_hash": "30a1a031861ce55cd8e801392ca9bc29",
     "semantic_hash": ""
   },
   "src/features/wall/detail-panel.tsx": {
@@ -620,8 +620,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/wall-app.tsx": {
-    "mtime": 1782794346.6705015,
-    "ast_hash": "e502016f05e54dc26ff5ba3de3ce1dc4",
+    "mtime": 1782840722.5662901,
+    "ast_hash": "bf2e185964a71ec27729da98ae0236c5",
     "semantic_hash": ""
   },
   "src/features/wall/wall-card.tsx": {

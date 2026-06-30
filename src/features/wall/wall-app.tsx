@@ -142,6 +142,44 @@ const defaultSeedLocation = (() => {
   };
 })();
 
+function EmptyWallCard({
+  flag,
+  eyebrow,
+  title,
+  body,
+  actionLabel,
+  onAction,
+}: {
+  flag?: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  actionLabel: string;
+  onAction: () => void;
+}) {
+  return (
+    <div className="nf-card empty-wall-card" role="status" aria-live="polite">
+      <div className="nf-tape" aria-hidden="true" />
+      <div className="nf-stamp" aria-hidden="true">OPEN</div>
+      <div className="empty-wall-kicker">
+        {flag ? <div className="empty-wall-flag" aria-hidden="true">{flag}</div> : null}
+        <p className="nf-eyebrow">{eyebrow}</p>
+      </div>
+      <h2 className="nf-headline">{title}</h2>
+      <p className="nf-body">{body}</p>
+
+      <div className="nf-actions">
+        <button type="button" className="nf-btn-primary" onClick={onAction}>{actionLabel}</button>
+      </div>
+
+      <footer className="nf-card-footer">
+        <span>LocalWall</span>
+        <span>your local bulletin board</span>
+      </footer>
+    </div>
+  );
+}
+
 export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], onRefreshWall, onCreateCard, onCardOpen, onRequestSignIn, isSignedIn = mode === "demo", isLoading = false, authControl, notice, ownerCards, ownerCardsLoading = false, onSetCardStatus, onUpdateCard, onDeleteCard, onRenewCard, onCancelAutoRenewCard, onMoveCard, ownedCardIds, likedCardIds, onToggleLike, onCardEvent, onReportCard, initialCardId, initialLocation, initialKeyword, initialCategory, savedCards = [], onSetSavedCard, savedWall = false, onSetSavedWall, savedWalls = [], onRemoveSavedWall, profile, onRequestVerification, cardDailyStats, wallViewCount, onSubscribeDigest }: WallAppProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -1009,7 +1047,6 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
         setSelected(postedCard);
       }
       setFresh(false);
-      console.info("[localwall] post:complete", postedCard ? String(postedCard.id) : "none");
       toast("Card posted!");
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : "";
@@ -1176,9 +1213,11 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       setFresh(false);
       setSortBy("default");
       setFilterHasWebsite(false);
+      setFilterHasPhone(false);
+      setFilterHasEmail(false);
       setFilterHasPhotos(false);
       setFilterFeaturedOnly(false);
-      router.push("/");
+      router.replace(pathname || "/");
     });
   };
 
@@ -1605,19 +1644,32 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                 ))}
               </div>
             ) : ownCardsOnly ? (
-              <div className="empty-note empty-note-first">
-                <strong>No cards from you on this wall.</strong>
-                <span>Turn off the filter to see everyone again.</span>
-                <button className="primary" onClick={() => setOwnCardsOnly(false)}>Show all cards</button>
-              </div>
+              <EmptyWallCard
+                flag={countryFlagEmoji(selectedCountry)}
+                eyebrow="Notice · My cards"
+                title="No cards from you on this wall."
+                body="Turn off the filter to see everyone again."
+                actionLabel="Show all cards"
+                onAction={() => setOwnCardsOnly(false)}
+              />
             ) : cards.length === 0 ? (
-              <div className="empty-note empty-note-first">
-                <strong>Be the first in {selectedCity || locationLabel()}!</strong>
-                <span>Get 10× more visibility as the first listing on this wall.</span>
-                <button className="primary" onClick={openComposer}>Post your card</button>
-              </div>
+              <EmptyWallCard
+                flag={countryFlagEmoji(selectedCountry)}
+                eyebrow="Notice · Empty wall"
+                title={`Be the first in ${selectedCity || locationLabel()}!`}
+                body="Post the first listing here and take the top spot on this wall."
+                actionLabel="Post your card"
+                onAction={openComposer}
+              />
             ) : (
-              <div className="empty-note"><strong>Nothing matched your filters.</strong><span>Try broadening your search or reset filters.</span><button onClick={resetFilters}>Reset filters</button></div>
+              <EmptyWallCard
+                flag={countryFlagEmoji(selectedCountry)}
+                eyebrow="Notice · No matches"
+                title="Nothing matched your filters."
+                body="Try broadening your search or reset filters."
+                actionLabel="Reset filters"
+                onAction={resetFilters}
+              />
             )
           ) : (
             visible.length ? (
@@ -1648,19 +1700,32 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                 );
               })
             ) : ownCardsOnly ? (
-              <div className="empty-note empty-note-first">
-                <strong>No cards from you on this wall.</strong>
-                <span>Turn off the filter to see everyone again.</span>
-                <button className="primary" onClick={() => setOwnCardsOnly(false)}>Show all cards</button>
-              </div>
+              <EmptyWallCard
+                flag={countryFlagEmoji(selectedCountry)}
+                eyebrow="Notice · My cards"
+                title="No cards from you on this wall."
+                body="Turn off the filter to see everyone again."
+                actionLabel="Show all cards"
+                onAction={() => setOwnCardsOnly(false)}
+              />
             ) : cards.length === 0 ? (
-              <div className="empty-note empty-note-first">
-                <strong>Be the first in {selectedCity || locationLabel()}!</strong>
-                <span>Get 10× more visibility as the first listing on this wall.</span>
-                <button className="primary" onClick={openComposer}>Post your card</button>
-              </div>
+              <EmptyWallCard
+                flag={countryFlagEmoji(selectedCountry)}
+                eyebrow="Notice · Empty wall"
+                title={`Be the first in ${selectedCity || locationLabel()}!`}
+                body="Post the first listing here and take the top spot on this wall."
+                actionLabel="Post your card"
+                onAction={openComposer}
+              />
             ) : (
-              <div className="empty-note"><strong>Nothing matched your filters.</strong><span>Try broadening your search or reset filters.</span><button onClick={resetFilters}>Reset filters</button></div>
+              <EmptyWallCard
+                flag={countryFlagEmoji(selectedCountry)}
+                eyebrow="Notice · No matches"
+                title="Nothing matched your filters."
+                body="Try broadening your search or reset filters."
+                actionLabel="Reset filters"
+                onAction={resetFilters}
+              />
             )
           )
         )}

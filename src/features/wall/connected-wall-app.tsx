@@ -369,7 +369,6 @@ export function ConnectedWallApp({
   }, [searchParams, finalizePaidCard, finalizePaidRenewal, finalizeBundlePosting, finalizeSubscriptionPosting, finalizeSubscriptionRenewal, finalizeVerification, addCardToLocalWall]);
 
   const uploadVariant = async (file: File): Promise<Id<"_storage">> => {
-    console.info("[localwall] uploadVariant:start", file.name, file.type, file.size);
     const uploadUrl = await generateUploadUrl({});
     const response = await fetch(uploadUrl, {
       method: "POST",
@@ -378,38 +377,24 @@ export function ConnectedWallApp({
     });
     if (!response.ok) throw new Error("An image upload failed. Please try again.");
     const result = await response.json() as { storageId: Id<"_storage"> };
-    console.info("[localwall] uploadVariant:done", file.name, result.storageId);
     return result.storageId;
   };
 
   const uploadImageVariants = async (file: File) => {
     if (!allowedImageTypes.has(file.type)) throw new Error("Images must be JPG, PNG, or WEBP.");
     if (file.size > MAX_IMAGE_BYTES) throw new Error("Each image must be smaller than 8MB.");
-    console.info("[localwall] createImageVariants:start", file.name, file.type, file.size);
     const variants = await createImageVariants(file);
-    console.info("[localwall] createImageVariants:done", file.name, variants.full.size, variants.thumbnail.size);
     const [imageId, thumbnailImageId] = await Promise.all([
       uploadVariant(variants.full),
       uploadVariant(variants.thumbnail),
     ]);
-    console.info("[localwall] uploadImageVariants:done", file.name, imageId, thumbnailImageId);
     return { imageId, thumbnailImageId };
   };
 
   const handleCreate = async (draft: CardDraft, placement: Placement): Promise<WallCard | void> => {
     if (!isAuthenticated) throw new Error("Please finish signing in before posting a card.");
-    console.info("[localwall] handleCreate:start", {
-      files: draft.files.length,
-      backFiles: draft.backFiles.length,
-      paymentOption: draft.paymentOption,
-      featuredTier: draft.featuredTier,
-    });
     const uploadedImages = await Promise.all(draft.files.slice(0, 2).map(uploadImageVariants));
     const uploadedBackImages = await Promise.all(draft.backFiles.slice(0, 1).map(uploadImageVariants));
-    console.info("[localwall] handleCreate:uploads-done", {
-      front: uploadedImages.length,
-      back: uploadedBackImages.length,
-    });
     const imageIds = uploadedImages.map((image) => image.imageId);
     const thumbnailImageIds = uploadedImages.map((image) => image.thumbnailImageId);
     const backImageIds = uploadedBackImages.map((image) => image.imageId);
@@ -467,9 +452,7 @@ export function ConnectedWallApp({
       rotation: draft.rotation ?? 0,
       width: draft.imageMode === "business-card" ? getCardFormat("biz", draft.cardShape).width : getImageCardFormat(draft.theme, draft.imageMode).width,
     };
-    console.info("[localwall] handleCreate:createCard:start");
     const result = await createCard(cardPayload) as WallCard | { pendingCardId: Id<"pendingCards"> } | CreateCardRateLimit;
-    console.info("[localwall] handleCreate:createCard:done", "kind" in result ? result.kind : "card");
     if ("kind" in result && result.kind === "rate_limited") {
       setCheckoutMessage(result.message);
       return;
