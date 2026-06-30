@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, type ChangeEvent, type CSSProperties, type
 import { Country, State, City } from "country-state-city";
 import { businessCardShapes, categories, SUBCATEGORY_OPTIONS, getCardFormat, type BusinessCardShape, type CardCategory, type CardDraft, type CardImageMode, type CardTheme } from "./types";
 import { ImageSwapViewer } from "./image-compare-slider";
+import { bakeImageForModeration } from "./image-moderation";
 import { getVisibleFeaturedTierOptions, type FeaturedTierOption, type FeaturedTierValue } from "./wall-helpers";
 
 interface ComposerProps {
@@ -865,29 +866,38 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
     setModerationStatus("checking");
     setModerationError(null);
     setModerationMatches([]);
-    const moderationBody = new FormData();
-    moderationBody.set("name", form.name);
-    moderationBody.set("line", form.line);
-    moderationBody.set("message", form.message);
-    if (includeImages) files.forEach((file) => moderationBody.append("images", file));
     try {
-      const response = await fetch("/api/moderate", { method: "POST", body: moderationBody, signal: controller.signal });
-      const result = await response.json() as { safe?: boolean; error?: string; matches?: ModerationMatch[] };
-      if (moderationRequestRef.current !== controller) return false;
-      if (!response.ok || !result.safe) {
-        setModerationStatus("blocked");
-        setModerationError(result.error ?? "This content did not pass the safety check.");
-        const matches = result.matches ?? [];
-        setModerationMatches(matches);
-        const firstMatch = matches[0];
-        if (firstMatch) {
-          window.requestAnimationFrame(() => {
-            const field = formRef.current?.elements.namedItem(firstMatch.field) as HTMLInputElement | HTMLTextAreaElement | null;
-            field?.focus();
-            field?.setSelectionRange(firstMatch.start, firstMatch.end);
-          });
+      const moderationFiles = includeImages ? await Promise.all(files.slice(0, 2).map((file) => bakeImageForModeration(file))) : [];
+      const moderationBackFiles = includeImages && backFiles[0] ? [await bakeImageForModeration(backFiles[0])] : [];
+      const batches = [moderationFiles, moderationBackFiles].filter((batch) => batch.length > 0);
+      const runBatch = async (batch: File[]) => {
+        const moderationBody = new FormData();
+        moderationBody.set("name", form.name);
+        moderationBody.set("line", form.line);
+        moderationBody.set("message", form.message);
+        batch.forEach((file) => moderationBody.append("images", file));
+        const response = await fetch("/api/moderate", { method: "POST", body: moderationBody, signal: controller.signal });
+        const result = await response.json() as { safe?: boolean; error?: string; matches?: ModerationMatch[] };
+        if (moderationRequestRef.current !== controller) return false;
+        if (!response.ok || !result.safe) {
+          setModerationStatus("blocked");
+          setModerationError(result.error ?? "This content did not pass the safety check.");
+          const matches = result.matches ?? [];
+          setModerationMatches(matches);
+          const firstMatch = matches[0];
+          if (firstMatch) {
+            window.requestAnimationFrame(() => {
+              const field = formRef.current?.elements.namedItem(firstMatch.field) as HTMLInputElement | HTMLTextAreaElement | null;
+              field?.focus();
+              field?.setSelectionRange(firstMatch.start, firstMatch.end);
+            });
+          }
+          return false;
         }
-        return false;
+        return true;
+      };
+      for (const batch of batches) {
+        if (!await runBatch(batch)) return false;
       }
       setModerationStatus("passed");
       moderationRequestRef.current = null;

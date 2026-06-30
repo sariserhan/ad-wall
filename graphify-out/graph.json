@@ -4,14 +4,124 @@
   "graph": {},
   "nodes": [
     {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "moderate_route",
+      "community": 6,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "allowedImageTypes",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "moderate_route_allowedimagetypes",
+      "community": 6,
+      "norm_label": "allowedimagetypes"
+    },
+    {
+      "label": "ocrQueue",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "moderate_route_ocrqueue",
+      "community": 6,
+      "norm_label": "ocrqueue"
+    },
+    {
+      "label": "findBlockedText()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "moderate_route_findblockedtext",
+      "community": 6,
+      "norm_label": "findblockedtext()"
+    },
+    {
+      "label": "getSafetyModel()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "moderate_route_getsafetymodel",
+      "community": 6,
+      "norm_label": "getsafetymodel()"
+    },
+    {
+      "label": "getOcrWorker()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "moderate_route_getocrworker",
+      "community": 6,
+      "norm_label": "getocrworker()"
+    },
+    {
+      "label": "readImageText()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "moderate_route_readimagetext",
+      "community": 6,
+      "norm_label": "readimagetext()"
+    },
+    {
+      "label": "classifyImage()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "moderate_route_classifyimage",
+      "community": 6,
+      "norm_label": "classifyimage()"
+    },
+    {
+      "label": "moderateImage()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "moderate_route_moderateimage",
+      "community": 6,
+      "norm_label": "moderateimage()"
+    },
+    {
+      "label": "handleModerate()",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L107",
+      "_origin": "ast",
+      "id": "moderate_route_handlemoderate",
+      "community": 6,
+      "norm_label": "handlemoderate()"
+    },
+    {
+      "label": "POST",
+      "file_type": "code",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L168",
+      "_origin": "ast",
+      "id": "moderate_route_post",
+      "community": 6,
+      "norm_label": "post"
+    },
+    {
       "label": "analytics-consent-toast.tsx",
       "file_type": "code",
       "source_file": "src/components/analytics-consent-toast.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_analytics_consent_toast",
       "community": 9,
-      "norm_label": "analytics-consent-toast.tsx"
+      "norm_label": "analytics-consent-toast.tsx",
+      "id": "components_analytics_consent_toast"
     },
     {
       "label": "AnalyticsConsentToast()",
@@ -19,9 +129,9 @@
       "source_file": "src/components/analytics-consent-toast.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "components_analytics_consent_toast_analyticsconsenttoast",
       "community": 9,
-      "norm_label": "analyticsconsenttoast()"
+      "norm_label": "analyticsconsenttoast()",
+      "id": "components_analytics_consent_toast_analyticsconsenttoast"
     },
     {
       "label": "bug-report-page.tsx",
@@ -29,9 +139,9 @@
       "source_file": "src/features/support/bug-report-page.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "support_bug_report_page",
       "community": 34,
-      "norm_label": "bug-report-page.tsx"
+      "norm_label": "bug-report-page.tsx",
+      "id": "support_bug_report_page"
     },
     {
       "label": "BugReason",
@@ -39,9 +149,9 @@
       "source_file": "src/features/support/bug-report-page.tsx",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "support_bug_report_page_bugreason",
       "community": 34,
-      "norm_label": "bugreason"
+      "norm_label": "bugreason",
+      "id": "support_bug_report_page_bugreason"
     },
     {
       "label": "BUG_REASONS",
@@ -49,9 +159,9 @@
       "source_file": "src/features/support/bug-report-page.tsx",
       "source_location": "L10",
       "_origin": "ast",
-      "id": "support_bug_report_page_bug_reasons",
       "community": 34,
-      "norm_label": "bug_reasons"
+      "norm_label": "bug_reasons",
+      "id": "support_bug_report_page_bug_reasons"
     },
     {
       "label": "BugReportPage()",
@@ -59,9 +169,9 @@
       "source_file": "src/features/support/bug-report-page.tsx",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "support_bug_report_page_bugreportpage",
       "community": 34,
-      "norm_label": "bugreportpage()"
+      "norm_label": "bugreportpage()",
+      "id": "support_bug_report_page_bugreportpage"
     },
     {
       "label": "contact-page.tsx",
@@ -69,9 +179,9 @@
       "source_file": "src/features/support/contact-page.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "support_contact_page",
       "community": 106,
-      "norm_label": "contact-page.tsx"
+      "norm_label": "contact-page.tsx",
+      "id": "support_contact_page"
     },
     {
       "label": "ClerkContactUser",
@@ -79,9 +189,9 @@
       "source_file": "src/features/support/contact-page.tsx",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "support_contact_page_clerkcontactuser",
       "community": 106,
-      "norm_label": "clerkcontactuser"
+      "norm_label": "clerkcontactuser",
+      "id": "support_contact_page_clerkcontactuser"
     },
     {
       "label": "ContactPage()",
@@ -89,9 +199,9 @@
       "source_file": "src/features/support/contact-page.tsx",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "support_contact_page_contactpage",
       "community": 106,
-      "norm_label": "contactpage()"
+      "norm_label": "contactpage()",
+      "id": "support_contact_page_contactpage"
     },
     {
       "label": "composer.tsx",
@@ -3481,116 +3591,6 @@
       "community": 83,
       "norm_label": "get()",
       "id": "search_route_get"
-    },
-    {
-      "label": "route.ts",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "route.ts",
-      "id": "moderate_route"
-    },
-    {
-      "label": "allowedImageTypes",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "allowedimagetypes",
-      "id": "moderate_route_allowedimagetypes"
-    },
-    {
-      "label": "ocrQueue",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L22",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "ocrqueue",
-      "id": "moderate_route_ocrqueue"
-    },
-    {
-      "label": "findBlockedText()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L27",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "findblockedtext()",
-      "id": "moderate_route_findblockedtext"
-    },
-    {
-      "label": "getSafetyModel()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L31",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "getsafetymodel()",
-      "id": "moderate_route_getsafetymodel"
-    },
-    {
-      "label": "getOcrWorker()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L39",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "getocrworker()",
-      "id": "moderate_route_getocrworker"
-    },
-    {
-      "label": "readImageText()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L47",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "readimagetext()",
-      "id": "moderate_route_readimagetext"
-    },
-    {
-      "label": "classifyImage()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L57",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "classifyimage()",
-      "id": "moderate_route_classifyimage"
-    },
-    {
-      "label": "moderateImage()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L79",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "moderateimage()",
-      "id": "moderate_route_moderateimage"
-    },
-    {
-      "label": "handleModerate()",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L105",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "handlemoderate()",
-      "id": "moderate_route_handlemoderate"
-    },
-    {
-      "label": "POST",
-      "file_type": "code",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L166",
-      "_origin": "ast",
-      "community": 6,
-      "norm_label": "post",
-      "id": "moderate_route_post"
     },
     {
       "label": "route.tsx",
@@ -15238,6 +15238,282 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_distributed_rate_limit"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_distributed_rate_limit_durableuserratelimit"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_observe"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_observe_observe"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_rate_limit"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_rate_limit_issameoriginrequest"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "api_rate_limit_ratelimit"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "lib_logger"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "lib_logger_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_allowedimagetypes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_classifyimage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_findblockedtext"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_getocrworker"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_getsafetymodel"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L105",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_handlemoderate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_moderateimage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_ocrqueue"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L166",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_post"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route",
+      "target": "moderate_route_readimagetext"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L128",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "moderate_route_findblockedtext"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_moderateimage",
+      "target": "moderate_route_findblockedtext"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_classifyimage",
+      "target": "moderate_route_getsafetymodel"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L113",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "api_distributed_rate_limit_durableuserratelimit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L106",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "api_rate_limit_issameoriginrequest"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L109",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "api_rate_limit_ratelimit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/moderate/route.ts",
+      "source_location": "L131",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "moderate_route_handlemoderate",
+      "target": "lib_logger_log"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/analytics-consent-toast.tsx",
       "source_location": "L3",
       "weight": 1.0,
@@ -23389,39 +23665,6 @@
       "target": "generated_api_api"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_distributed_rate_limit"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_distributed_rate_limit_durableuserratelimit"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L113",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "api_distributed_rate_limit_durableuserratelimit"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/api/_observe.ts",
@@ -23457,34 +23700,12 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_observe"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/api/stripe/session/route.ts",
       "source_location": "L5",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "session_route",
       "target": "api_observe"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_observe_observe"
     },
     {
       "relation": "imports",
@@ -23548,17 +23769,6 @@
       "target": "api_rate_limit_ratelimit"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_rate_limit"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -23568,50 +23778,6 @@
       "confidence_score": 1.0,
       "source": "api_rate_limit_ratelimit",
       "target": "api_rate_limit_prunebuckets"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_rate_limit_ratelimit"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L109",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "api_rate_limit_ratelimit"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "api_rate_limit_issameoriginrequest"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L106",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "api_rate_limit_issameoriginrequest"
     },
     {
       "relation": "contains",
@@ -23683,172 +23849,6 @@
       "confidence_score": 1.0,
       "source": "search_route",
       "target": "search_route_normalizekey"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "lib_logger"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "lib_logger_log"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L18",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_allowedimagetypes"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L57",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_classifyimage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_findblockedtext"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_getocrworker"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_getsafetymodel"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L105",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_handlemoderate"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_moderateimage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L22",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_ocrqueue"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L166",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_post"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L47",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route",
-      "target": "moderate_route_readimagetext"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L128",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "moderate_route_findblockedtext"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L101",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_moderateimage",
-      "target": "moderate_route_findblockedtext"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L73",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_classifyimage",
-      "target": "moderate_route_getsafetymodel"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/api/moderate/route.ts",
-      "source_location": "L131",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "moderate_route_handlemoderate",
-      "target": "lib_logger_log"
     },
     {
       "relation": "imports_from",
@@ -38240,5 +38240,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ce4ed3116b9a8dd0ae4c4715048115361d808e92"
+  "built_at_commit": "1e72f261f0780966d600021580a35b76262b9068"
 }

@@ -420,8 +420,8 @@
     "semantic_hash": ""
   },
   "src/components/analytics-consent-toast.tsx": {
-    "mtime": 1782523097.5699942,
-    "ast_hash": "30c15dd5787e55272c29e8039629d33b",
+    "mtime": 1782796690.1540735,
+    "ast_hash": "0f6a94a04be4f29599d97166d0c9d3bb",
     "semantic_hash": ""
   },
   "src/components/analytics-tracker.tsx": {
@@ -535,13 +535,13 @@
     "semantic_hash": ""
   },
   "src/features/support/bug-report-page.tsx": {
-    "mtime": 1782439727.2869048,
-    "ast_hash": "94b85d1b6be7ebf22dcda5f7615969d6",
+    "mtime": 1782796251.7413528,
+    "ast_hash": "e242bda3188aa291195865c029e3a9de",
     "semantic_hash": ""
   },
   "src/features/support/contact-page.tsx": {
-    "mtime": 1782522931.699408,
-    "ast_hash": "ebaf998bc461c49c7c13cc74d5070f6d",
+    "mtime": 1782796284.7903864,
+    "ast_hash": "aa0668147d7200aedcc667afda5f356a",
     "semantic_hash": ""
   },
   "src/features/wall/admin-panel.tsx": {
