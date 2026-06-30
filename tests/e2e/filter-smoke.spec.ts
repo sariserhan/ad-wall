@@ -1,6 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function openFilters(page: Page, mobile = false) {
+  const consent = page.getByRole("dialog", { name: "Analytics consent" });
+  if (await consent.isVisible().catch(() => false)) {
+    const decline = consent.getByRole("button", { name: "Decline" });
+    if (await decline.isVisible().catch(() => false)) {
+      await decline.click();
+      await expect(consent).toHaveCount(0);
+    }
+  }
   const compact = mobile || (page.viewportSize()?.width ?? 1280) < 1000;
   if (compact) {
     await page.locator(".mobile-menu-toggle").click();
@@ -50,5 +58,20 @@ test.describe("Wall filter smoke", () => {
     await page.locator(".filter-panel .primary").click({ force: true });
     await expect.poll(() => page.url(), { timeout: 20_000 }).toMatch(/\/us\/services(?:\?|$)/);
     await expect(page.locator(".filter-badge")).toHaveText("1");
+  });
+
+  test("has phone and has email filters narrow the wall cards", async ({ page }) => {
+    await page.goto("/us", { waitUntil: "domcontentloaded" });
+    await expect(page.locator(".wall")).toBeAttached();
+    await page.waitForTimeout(4000);
+    const beforeCount = await page.locator(".wall-card").count();
+
+    await openFilters(page);
+    await page.getByRole("checkbox", { name: "Has phone" }).check();
+    await page.getByRole("checkbox", { name: "Has email" }).check();
+    await page.locator(".filter-panel .primary").click({ force: true });
+
+    await expect(page.locator(".filter-badge")).toHaveText("2");
+    await expect.poll(() => page.locator(".wall-card").count(), { timeout: 20_000 }).toBeLessThan(beforeCount);
   });
 });

@@ -723,7 +723,7 @@ export const create = mutation({
     whatsapp: v.optional(v.string()),
     telegram: v.optional(v.string()),
     paidAmount: v.number(),
-    featuredTier: v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold"))),
+    featuredTier: v.optional(v.union(v.literal("boost"), v.literal("bronze"), v.literal("silver"), v.literal("gold"))),
     theme,
     imageMode: v.optional(imageMode),
     cardShape,
@@ -747,7 +747,7 @@ export const create = mutation({
     const identity = await requireIdentity(ctx);
     const phone = args.phone?.trim() ?? "";
     const email = args.email?.trim() ?? "";
-    const featuredPrices: Record<string, number> = { bronze: 2.99, silver: 4.99, gold: 9.99 };
+    const featuredPrices: Record<string, number> = { boost: 2.99, bronze: 2.99, silver: 4.99, gold: 9.99 };
     const featuredPaidAmount = args.featuredTier ? (featuredPrices[args.featuredTier] ?? 0) : 0;
     const totalPaidAmount = args.paidAmount + featuredPaidAmount;
     if (args.imageIds.length > 2) throw new Error("A card can have at most two images.");

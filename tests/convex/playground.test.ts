@@ -86,6 +86,14 @@ describe("playgroundCreateCard", () => {
     expect(card!.featuredTier).toBe("gold");
   });
 
+  test("accepts boost as the featured tier", async () => {
+    const t = makeT();
+    const cardId = await createPgCard(t, { featuredTier: "boost" });
+    const data = await t.withIdentity(adminIdentity).query(api.admin.playgroundGetMyCards, {}) as { cards: Array<{ id: Id<"cards">; featuredTier: string | null }> };
+    const card = data.cards.find((c) => c.id === cardId);
+    expect(card!.featuredTier).toBe("boost");
+  });
+
   test("free plan gives 1-day expiry", async () => {
     const t = makeT();
     const before = Date.now();
@@ -174,6 +182,14 @@ describe("playgroundSetFeaturedTier", () => {
     await t.withIdentity(adminIdentity).mutation(api.admin.playgroundSetFeaturedTier, { cardId, tier: "gold" });
     const data = await t.withIdentity(adminIdentity).query(api.admin.playgroundGetMyCards, {}) as { cards: Array<{ id: Id<"cards">; featuredTier: string | null }> };
     expect(data.cards.find((c) => c.id === cardId)!.featuredTier).toBe("gold");
+  });
+
+  test("sets tier to boost", async () => {
+    const t = makeT();
+    const cardId = await createPgCard(t);
+    await t.withIdentity(adminIdentity).mutation(api.admin.playgroundSetFeaturedTier, { cardId, tier: "boost" });
+    const data = await t.withIdentity(adminIdentity).query(api.admin.playgroundGetMyCards, {}) as { cards: Array<{ id: Id<"cards">; featuredTier: string | null }> };
+    expect(data.cards.find((c) => c.id === cardId)!.featuredTier).toBe("boost");
   });
 
   test("clears tier when undefined is passed", async () => {

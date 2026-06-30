@@ -6,6 +6,7 @@ import { Heart, Star, MousePointerClick, Share2, TrendingUp } from "lucide-react
 import { parseWallPath } from "@/lib/wall-slug";
 import { TrendingCardGrid } from "./trending-card-grid";
 import { TrendingCardModal } from "./trending-card-modal";
+import { wallCardStyle } from "./trending-wall-style";
 import type { TopCard } from "@/lib/server-cards";
 
 type TopWall = { path: string; viewCount: number };
@@ -79,7 +80,7 @@ export function TrendingTabs({ walls, liked, reviewed, contacted, shared }: Prop
               {walls.map((wall, i) => {
                 const { city, state, country } = parseWallPath(wall.path);
                 return (
-                  <Link key={wall.path} href={wall.path} className="trending-wall-card">
+                  <Link key={wall.path} href={wall.path} className="trending-wall-card" style={wallCardStyle(wall.path)}>
                     <div className="twc-top">
                       <span className="twc-rank">#{i + 1}</span>
                       <span className="twc-views">{wall.viewCount.toLocaleString()} <em>views</em></span>

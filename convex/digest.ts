@@ -152,8 +152,11 @@ export const sendWeeklyDigests = internalAction({
 
       if (cards.length === 0) continue;
 
-      const promoted = cards.filter((c: DigestCard) => c.featuredTier === "gold" || c.featuredTier === "silver").slice(0, 2);
-      const organic = cards.filter((c: DigestCard) => c.featuredTier !== "gold" && c.featuredTier !== "silver").slice(0, 6);
+      const promoted = cards
+        .filter((c: DigestCard) => c.featuredTier === "boost" || c.featuredTier === "gold" || c.featuredTier === "silver")
+        .sort((a, b) => (a.featuredTier === "boost" ? -1 : b.featuredTier === "boost" ? 1 : 0))
+        .slice(0, 2);
+      const organic = cards.filter((c: DigestCard) => c.featuredTier !== "boost" && c.featuredTier !== "gold" && c.featuredTier !== "silver").slice(0, 6);
 
       // Build a human-readable location label and wall URL for each scope level
       const citySlug = group.city ? group.city.toLowerCase().replace(/\s+/g, "-") : "";

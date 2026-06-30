@@ -401,7 +401,7 @@ export function ConnectedWallApp({
     const backThumbnailImageIds = uploadedBackImages.map((image) => image.thumbnailImageId);
     const isBundle = draft.paymentOption === "bundle";
     const basePaidAmount = isBundle ? 19.99 : draft.paymentOption === "free" ? 0 : Number(draft.paymentOption);
-    const featuredPrices: Record<string, number> = { bronze: 2.99, silver: 4.99, gold: 9.99 };
+    const featuredPrices: Record<string, number> = { boost: 2.99, bronze: 2.99, silver: 4.99, gold: 9.99 };
     const featuredPaidAmount = !isBundle && draft.featuredTier && draft.featuredTier !== "none" ? (featuredPrices[draft.featuredTier] ?? 0) : 0;
     const totalPaidAmount = basePaidAmount + featuredPaidAmount;
     const featuredTierArg = !isBundle && draft.featuredTier && draft.featuredTier !== "none" ? draft.featuredTier : undefined;

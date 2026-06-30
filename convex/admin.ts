@@ -652,7 +652,7 @@ const PG_ADMIN_CATEGORY = v.union(
 const PG_ADMIN_THEME = v.union(v.literal("yellow"), v.literal("paper"), v.literal("pink"), v.literal("cyan"), v.literal("dark"), v.literal("cream"), v.literal("biz"), v.literal("kraft"), v.literal("blueprint"), v.literal("photo"), v.literal("ticket"));
 const PG_ADMIN_IMAGE_MODE = v.union(v.literal("photo"), v.literal("business-card"));
 const PG_ADMIN_CARD_SHAPE = v.optional(v.union(v.literal("vertical"), v.literal("horizontal"), v.literal("square")));
-const PG_ADMIN_FEATURED_TIER = v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold")));
+const PG_ADMIN_FEATURED_TIER = v.optional(v.union(v.literal("boost"), v.literal("bronze"), v.literal("silver"), v.literal("gold")));
 const PG_ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 const PG_ADMIN_CARD_ARGS = {
@@ -753,7 +753,7 @@ type PlaygroundCardArgs = {
   backImageY?: number;
   backImageScale?: number;
   paidAmount: number;
-  featuredTier?: "bronze" | "silver" | "gold";
+  featuredTier?: "boost" | "bronze" | "silver" | "gold";
   status?: "published" | "hidden" | "expired";
   durationDays?: number;
   expiresAt?: number;
@@ -929,7 +929,7 @@ export const playgroundSetExpiry = mutation({
 });
 
 export const playgroundSetFeaturedTier = mutation({
-  args: { cardId: v.id("cards"), tier: v.optional(v.union(v.literal("bronze"), v.literal("silver"), v.literal("gold"))) },
+  args: { cardId: v.id("cards"), tier: v.optional(v.union(v.literal("boost"), v.literal("bronze"), v.literal("silver"), v.literal("gold"))) },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     await ctx.db.patch(args.cardId, { featuredTier: args.tier, updatedAt: Date.now() });

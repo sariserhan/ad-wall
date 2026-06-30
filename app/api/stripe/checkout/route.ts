@@ -11,7 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
 
 // Validate using integer cents to avoid floating-point matching issues.
 // Valid base durations: free (0), $2.99, $7.99, $24.99; bundle: $19.99
-// Valid featured add-ons: none (0), Bronze $2.99, Silver $4.99, Gold $9.99
+// Valid featured add-ons: none (0), Boost $2.99, legacy Bronze $2.99, Silver $4.99, Gold $9.99
 const validBaseCents = [0, 299, 799, 2499];
 const validFeaturedCents = [0, 299, 499, 999];
 const validAmountCents = new Set<number>();

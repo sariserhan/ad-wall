@@ -525,8 +525,8 @@
     "semantic_hash": ""
   },
   "src/features/home/trending-tabs.tsx": {
-    "mtime": 1782794617.3410664,
-    "ast_hash": "99fab3247f5a333c01d461525d95cbcc",
+    "mtime": 1782792343.447167,
+    "ast_hash": "5bc96d199300162ecb5db690b99897ae",
     "semantic_hash": ""
   },
   "src/features/renew/renew-page.tsx": {
@@ -555,13 +555,13 @@
     "semantic_hash": ""
   },
   "src/features/wall/admin-playground.tsx": {
-    "mtime": 1782794568.074439,
-    "ast_hash": "dc15a2939a417b68b10d4337a0ecd32e",
+    "mtime": 1782793226.0068002,
+    "ast_hash": "e4bcff2a08379586875d0bb0c6feb095",
     "semantic_hash": ""
   },
   "src/features/wall/composer.tsx": {
-    "mtime": 1782794194.4835415,
-    "ast_hash": "395b0b8ffd254b4c3d64b72fe315a9a6",
+    "mtime": 1782793081.7359517,
+    "ast_hash": "1460a086322574e0d587dc0e42e64744",
     "semantic_hash": ""
   },
   "src/features/wall/connected-wall-app.tsx": {
@@ -620,8 +620,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/wall-app.tsx": {
-    "mtime": 1782794346.6705015,
-    "ast_hash": "e502016f05e54dc26ff5ba3de3ce1dc4",
+    "mtime": 1782793041.436526,
+    "ast_hash": "d413dcfc9951a737d71d3902ed1d93ce",
     "semantic_hash": ""
   },
   "src/features/wall/wall-card.tsx": {
@@ -760,8 +760,8 @@
     "semantic_hash": ""
   },
   "tests/convex/playground.test.ts": {
-    "mtime": 1782794404.6782377,
-    "ast_hash": "225cf68eb9cc9f9a0691bae081b71d9a",
+    "mtime": 1782499923.5142303,
+    "ast_hash": "415b6beeb033892be29e3827648d04eb",
     "semantic_hash": ""
   },
   "tests/convex/saved-cards.test.ts": {
@@ -1202,21 +1202,6 @@
   "app/sign-up/[[...sign-up]]/page.tsx": {
     "mtime": 1782781219.9961476,
     "ast_hash": "7ae442499c40d4e4f974fb31dcec80d5",
-    "semantic_hash": ""
-  },
-  "src/features/home/trending-wall-style.ts": {
-    "mtime": 1782794607.2496507,
-    "ast_hash": "b562e217ec8904791068f6d197cf79b9",
-    "semantic_hash": ""
-  },
-  "src/features/wall/wall-helpers.ts": {
-    "mtime": 1782794181.9934013,
-    "ast_hash": "60fe3cd6b53c1a0f21de923aeedd78c8",
-    "semantic_hash": ""
-  },
-  "tests/convex/wall-helpers.test.ts": {
-    "mtime": 1782794665.2692657,
-    "ast_hash": "29d429565576380a0d86e620040603c2",
     "semantic_hash": ""
   }
 }

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, type ChangeEvent, type CSSProperties, type
 import { Country, State, City } from "country-state-city";
 import { businessCardShapes, categories, SUBCATEGORY_OPTIONS, getCardFormat, type BusinessCardShape, type CardCategory, type CardDraft, type CardImageMode, type CardTheme } from "./types";
 import { ImageSwapViewer } from "./image-compare-slider";
+import { getVisibleFeaturedTierOptions, type FeaturedTierOption, type FeaturedTierValue } from "./wall-helpers";
 
 interface ComposerProps {
   onClose: () => void;
@@ -48,7 +49,7 @@ interface ComposerForm {
   backImageScale: number;
   rotation: number;
   paymentOption: "free" | "2.99" | "7.99" | "24.99" | "bundle";
-  featuredTier: "none" | "bronze" | "silver" | "gold";
+  featuredTier: FeaturedTierValue;
 }
 
 interface BundleCity { country: string; state: string; city: string; }
@@ -130,8 +131,9 @@ const paymentOptions: ReadonlyArray<{ value: ComposerForm["paymentOption"]; pric
   { value: "bundle", price: "$19.99", duration: "90 days × 3 cities", description: "Post in 3 cities for the price of one.", badge: "Best value" },
 ];
 
-const featuredTierOptions: ReadonlyArray<{ value: ComposerForm["featuredTier"]; price: string; label: string; perks: string[] }> = [
+const featuredTierOptions: ReadonlyArray<FeaturedTierOption> = [
   { value: "none", price: "", label: "No boost", perks: ["Normal card", "Appears in regular results"] },
+  { value: "boost", price: "+$2.99", label: "Boost", perks: ["Higher in search results", "Appears in Featured section", "Pinned to top features"] },
   { value: "bronze", price: "+$2.99", label: "Bronze", perks: ["⭐ Featured badge", "Gold border", "Appears before free listings"] },
   { value: "silver", price: "+$4.99", label: "Silver", perks: ["Everything in Bronze", "Higher in search results", "Appears in Featured section"] },
   { value: "gold", price: "+$9.99", label: "Gold", perks: ["Everything in Silver", "Pinned to top", "Homepage spotlight", "⭐ Featured ribbon"] },
@@ -444,8 +446,8 @@ function ExpandedCardPreview({ form, image, backImage, isVerified }: { form: Com
             ))}
           </div>
           <div className="details-expanded-socials" aria-hidden="true">
-            {socialLabels.map((item) => (
-              <span key={item.label} className={`details-expanded-social-pill${item.value ? " has-value" : ""}`}>
+            {socialLabels.map((item, index) => (
+              <span key={`${item.label}-${index}`} className={`details-expanded-social-pill${item.value ? " has-value" : ""}`}>
                 <span className="details-expanded-social-pill-text">{item.label}</span>
               </span>
             ))}
@@ -1375,7 +1377,7 @@ export function Composer({ onClose, onReady, initialLocation, isVerified = false
             <fieldset className="featured-tier-fieldset" style={form.paymentOption === "bundle" ? { display: "none" } : undefined}>
               <legend>Boost your listing <span>(optional)</span></legend>
               <div className="featured-tier-options" role="radiogroup" aria-label="Choose a featured tier">
-                {featuredTierOptions.map((option) => (
+                {getVisibleFeaturedTierOptions(featuredTierOptions, false).map((option) => (
                   <button
                     key={option.value}
                     type="button"

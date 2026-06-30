@@ -141,7 +141,7 @@ export interface WallCard {
   expiresAt?: number;
   clicks?: number;
   likes?: number;
-  featuredTier?: "bronze" | "silver" | "gold";
+  featuredTier?: "boost" | "bronze" | "silver" | "gold";
   reviewCount?: number;
   verified?: boolean;
 }
@@ -203,7 +203,7 @@ export interface CardDraft {
   rotation?: number;
   paymentOption: "free" | "2.99" | "7.99" | "24.99" | "bundle";
   bundleCities?: Array<{ country: string; state: string; city: string }>;
-  featuredTier: "none" | "bronze" | "silver" | "gold";
+  featuredTier: "none" | "boost" | "bronze" | "silver" | "gold";
   autoRenew?: boolean;
   files: File[];
   previews: string[];

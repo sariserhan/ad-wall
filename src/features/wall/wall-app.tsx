@@ -43,6 +43,7 @@ import { WallCard } from "./wall-card";
 import { WallMinimap } from "./wall-minimap";
 import { WallSkeletons } from "./wall-skeletons";
 import { categories, SUBCATEGORY_OPTIONS, getCardFormat, getImageCardFormat, type CardCategory, type CardDraft, type CardUpdate, type CreateCard, type CreateCardRateLimit, type OwnerCard, type Placement, type RenewalAmount, type WallCard as WallCardModel } from "./types";
+import { activeFilterCount, featuredTierWeight } from "./wall-helpers";
 import { buildWallPath, toCategorySlug } from "@/lib/wall-slug";
 import { BugReportLink } from "@/components/bug-report-link";
 import { ContactLink } from "@/components/contact-link";
@@ -274,10 +275,14 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const [pendingFresh, setPendingFresh] = useState(false);
   const [sortBy, setSortBy] = useState<"default" | "most-viewed" | "most-reviews">("default");
   const [filterHasWebsite, setFilterHasWebsite] = useState(false);
+  const [filterHasPhone, setFilterHasPhone] = useState(false);
+  const [filterHasEmail, setFilterHasEmail] = useState(false);
   const [filterHasPhotos, setFilterHasPhotos] = useState(false);
   const [filterFeaturedOnly, setFilterFeaturedOnly] = useState(false);
   const [pendingSortBy, setPendingSortBy] = useState<"default" | "most-viewed" | "most-reviews">("default");
   const [pendingHasWebsite, setPendingHasWebsite] = useState(false);
+  const [pendingHasPhone, setPendingHasPhone] = useState(false);
+  const [pendingHasEmail, setPendingHasEmail] = useState(false);
   const [pendingHasPhotos, setPendingHasPhotos] = useState(false);
   const [pendingFeaturedOnly, setPendingFeaturedOnly] = useState(false);
   const wallRef = useRef<HTMLElement>(null);
@@ -580,6 +585,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       setPendingFresh(fresh);
       setPendingSortBy(sortBy);
       setPendingHasWebsite(filterHasWebsite);
+      setPendingHasPhone(filterHasPhone);
+      setPendingHasEmail(filterHasEmail);
       setPendingHasPhotos(filterHasPhotos);
       setPendingFeaturedOnly(filterFeaturedOnly);
     }
@@ -713,6 +720,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       if (selectedCity && card.city !== selectedCity) return false;
       if (selectedNeighborhood && card.neighborhood !== selectedNeighborhood) return false;
       if (filterHasWebsite && !card.website) return false;
+      if (filterHasPhone && !card.phone) return false;
+      if (filterHasEmail && !card.email) return false;
       if (filterHasPhotos && (!card.images || card.images.length === 0)) return false;
       if (filterFeaturedOnly && !card.featuredTier) return false;
       const text = `${card.name} ${card.line ?? ""} ${card.ownerName ?? ""} ${card.category} ${card.subcategory ?? ""} ${card.area}`.toLowerCase();
@@ -724,13 +733,12 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
     if (sortBy === "most-reviews") {
       return [...filtered].sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
     }
-    const tierWeight = (t?: string) => t === "gold" ? 3 : t === "silver" ? 2 : t === "bronze" ? 1 : 0;
     return [...filtered].sort((a, b) => {
-      const tierDiff = tierWeight(b.featuredTier) - tierWeight(a.featuredTier);
+      const tierDiff = featuredTierWeight(b.featuredTier) - featuredTierWeight(a.featuredTier);
       if (tierDiff !== 0) return tierDiff;
       return fresh ? a.createdAt - b.createdAt : b.createdAt - a.createdAt;
     });
-  }, [cards, category, subcategory, deferredQuery, fresh, sortBy, filterHasWebsite, filterHasPhotos, filterFeaturedOnly, selectedCountry, selectedState, selectedCity, selectedNeighborhood, locationReady, ownCardsOnly, ownedCardIds]);
+  }, [cards, category, subcategory, deferredQuery, fresh, sortBy, filterHasWebsite, filterHasPhone, filterHasEmail, filterHasPhotos, filterFeaturedOnly, selectedCountry, selectedState, selectedCity, selectedNeighborhood, locationReady, ownCardsOnly, ownedCardIds]);
 
   const similarCards = useMemo(() => {
     if (!selected) return [];
@@ -747,6 +755,18 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
       return true;
     }).length;
   }, [locationReady, pendingCreatedCards, selectedCity, selectedCountry, selectedState]);
+  const activeFilterCountValue = activeFilterCount({
+    categoryIsAll: category === "All",
+    subcategory,
+    selectedNeighborhood,
+    fresh,
+    sortByDefault: sortBy === "default",
+    hasWebsite: filterHasWebsite,
+    hasPhone: filterHasPhone,
+    hasEmail: filterHasEmail,
+    hasPhotos: filterHasPhotos,
+    featuredOnly: filterFeaturedOnly,
+  });
 
   const removeSavedCard = async (card: WallCardModel) => {
     if (!onSetSavedCard) return;
@@ -1243,9 +1263,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
             <button className="filter-btn" onClick={() => setFilterOpen((v) => !v)} aria-expanded={filterOpen} aria-label="Open filters">
               <SlidersHorizontal />
               <span>Filter</span>
-              {((category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)) > 0 && (
-                <span className="filter-badge">{(category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)}</span>
-              )}
+              {activeFilterCountValue > 0 && <span className="filter-badge">{activeFilterCountValue}</span>}
               <ChevronDown />
             </button>
             {filterOpen && (
@@ -1289,6 +1307,14 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                       <span>Has website</span>
                     </label>
                     <label className="filter-panel-toggle">
+                      <input type="checkbox" checked={pendingHasPhone} onChange={(event) => setPendingHasPhone(event.target.checked)} />
+                      <span>Has phone</span>
+                    </label>
+                    <label className="filter-panel-toggle">
+                      <input type="checkbox" checked={pendingHasEmail} onChange={(event) => setPendingHasEmail(event.target.checked)} />
+                      <span>Has email</span>
+                    </label>
+                    <label className="filter-panel-toggle">
                       <input type="checkbox" checked={pendingHasPhotos} onChange={(event) => setPendingHasPhotos(event.target.checked)} />
                       <span>Has photos</span>
                     </label>
@@ -1304,6 +1330,8 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                     setFresh(pendingFresh);
                     setSortBy(pendingSortBy);
                     setFilterHasWebsite(pendingHasWebsite);
+                    setFilterHasPhone(pendingHasPhone);
+                    setFilterHasEmail(pendingHasEmail);
                     setFilterHasPhotos(pendingHasPhotos);
                     setFilterFeaturedOnly(pendingFeaturedOnly);
                     const next = new URLSearchParams(window.location.search);
@@ -1314,10 +1342,10 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
                     router.push(`${target}${qs ? `?${qs}` : ""}`);
                     setFilterOpen(false);
                   }}>Apply filters</button>
-                  {((category !== "All" ? 1 : 0) + (subcategory ? 1 : 0) + (selectedNeighborhood ? 1 : 0) + (fresh ? 1 : 0) + (sortBy !== "default" ? 1 : 0) + (filterHasWebsite ? 1 : 0) + (filterHasPhotos ? 1 : 0) + (filterFeaturedOnly ? 1 : 0)) > 0 && (
+                  {activeFilterCountValue > 0 && (
                     <button className="filter-clear-btn" onClick={() => {
                       applyCategory("All"); setFresh(false);
-                      setSortBy("default"); setFilterHasWebsite(false); setFilterHasPhotos(false); setFilterFeaturedOnly(false);
+                      setSortBy("default"); setFilterHasWebsite(false); setFilterHasPhone(false); setFilterHasEmail(false); setFilterHasPhotos(false); setFilterFeaturedOnly(false);
                       const next = new URLSearchParams(window.location.search);
                       next.delete("subcategory"); next.delete("neighborhood");
                       const qs = next.toString();

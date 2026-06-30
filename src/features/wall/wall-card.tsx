@@ -221,6 +221,7 @@ export function WallCard({ card, active, onOpen, onFront, flipped = false, onFli
     >
       <span className="card-tape" aria-hidden="true" />
       {expiringSoon ? <span className="card-expiry-warn" aria-label="This card is expiring soon — open your dashboard to renew">⚠ Renew</span> : null}
+      {card.featuredTier === "boost" ? <span className="featured-ribbon featured-ribbon-boost" aria-label="Boosted listing">⚡ Boost</span> : null}
       {card.featuredTier === "gold" ? <span className="featured-ribbon" aria-label="Featured Gold">⭐ Featured</span> : null}
       {card.featuredTier === "silver" || card.featuredTier === "bronze" ? <span className="featured-badge" aria-label={`Featured ${card.featuredTier}`}>⭐</span> : null}
       {onFlip ? (

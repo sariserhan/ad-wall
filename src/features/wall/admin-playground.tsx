@@ -8,6 +8,7 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { categories, cardThemes, SUBCATEGORY_OPTIONS, getImageCardFormat, type CardCategory, type CardTheme } from "./types";
 import { buildPlaygroundCsvTemplate, getCsvImageMode, resolveLocationFields } from "./admin-playground-csv";
+import { getVisibleFeaturedTierOptions, type FeaturedTierOption, type FeaturedTierValue } from "./wall-helpers";
 
 const PG_WALL_URL = "/admin/wall";
 const PG_DEFAULTS = { country: "xx", state: "test", city: "Playground" };
@@ -23,11 +24,13 @@ const PLAN_OPTIONS = [
 const DURATION_OPTIONS = [1, 7, 30, 90, 180, 365] as const;
 
 const FEATURED_TIERS = [
-  { label: "None", value: undefined },
-  { label: "Bronze", value: "bronze" as const },
-  { label: "Silver", value: "silver" as const },
-  { label: "Gold", value: "gold" as const },
-];
+  { value: "none" as const, price: "", label: "None", perks: [] },
+  { value: "boost" as const, price: "+$2.99", label: "Boost", perks: ["Higher in search results", "Appears in Featured section", "Pinned to top features"] },
+  { value: "bronze" as const, price: "+$2.99", label: "Bronze", perks: ["⭐ Featured badge", "Gold border", "Appears before free listings"] },
+  { value: "silver" as const, price: "+$4.99", label: "Silver", perks: ["Everything in Bronze", "Higher in search results", "Appears in Featured section"] },
+  { value: "gold" as const, price: "+$9.99", label: "Gold", perks: ["Everything in Silver", "Pinned to top", "Homepage spotlight", "⭐ Featured ribbon"] },
+] as const satisfies ReadonlyArray<FeaturedTierOption>;
+const showLegacyFeaturedTiers = false;
 
 const EXPIRY_PRESETS = [
   { label: "2 min", ms: 2 * 60 * 1000 },
@@ -122,7 +125,7 @@ type PlaygroundCardArgs = {
   imageY?: number;
   imageWidth?: number;
   paidAmount: number;
-  featuredTier?: "bronze" | "silver" | "gold";
+  featuredTier?: FeaturedTierValue;
   status?: "published" | "hidden" | "expired";
   durationDays?: number;
   expiresAt?: number;
@@ -344,7 +347,7 @@ function CreateCardSection() {
   const [line, setLine] = useState("This is a test card posted from admin playground");
   const [theme, setTheme] = useState("yellow");
   const [paidAmount, setPaidAmount] = useState(0);
-  const [featuredTier, setFeaturedTier] = useState<"bronze" | "silver" | "gold" | undefined>(undefined);
+  const [featuredTier, setFeaturedTier] = useState<FeaturedTierValue | undefined>(undefined);
   const [paymentMode, setPaymentMode] = useState<"bypass" | "stripe">("bypass");
   const [country, setCountry] = useState("US");
   const [state, setState] = useState("TX");
@@ -521,8 +524,8 @@ function CreateCardSection() {
             </label>
             <label className="pg-field">
               <span>Featured tier</span>
-              <select value={featuredTier ?? ""} onChange={(e) => setFeaturedTier((e.target.value || undefined) as "bronze" | "silver" | "gold" | undefined)}>
-                {FEATURED_TIERS.map((t) => <option key={t.label} value={t.value ?? ""}>{t.label}</option>)}
+              <select value={featuredTier ?? "none"} onChange={(e) => setFeaturedTier(e.target.value === "none" ? undefined : (e.target.value as Exclude<FeaturedTierValue, "none">))}>
+                {getVisibleFeaturedTierOptions(FEATURED_TIERS, showLegacyFeaturedTiers).map((t) => <option key={t.label} value={t.value}>{t.label}</option>)}
               </select>
             </label>
           </div>
@@ -661,7 +664,7 @@ function BulkCsvImportSection() {
     const paidAmount = paidAmountField.value!;
     const featuredTierRaw = csvString(data, "featuredTier");
     const statusRaw = csvString(data, "status");
-    const featuredTier = csvPick(data, "featuredTier", ["bronze", "silver", "gold"]) as PlaygroundCardArgs["featuredTier"];
+    const featuredTier = csvPick(data, "featuredTier", ["boost", "bronze", "silver", "gold"]) as PlaygroundCardArgs["featuredTier"];
     const status = csvPick(data, "status", ["published", "hidden", "expired"]) as PlaygroundCardArgs["status"];
     const durationDays = durationDaysField.value;
     const expiresAt = expiresAtField.value;
@@ -984,7 +987,7 @@ type PgCard = {
   status: string;
   expiresAt: number;
   paidAmount: number;
-  featuredTier: "bronze" | "silver" | "gold" | null;
+  featuredTier: FeaturedTierValue | null;
   city: string;
   country: string;
   createdAt: number;
@@ -999,7 +1002,7 @@ function CardToolRow({ card }: { card: PgCard }) {
   const renew = useMutation(api.admin.playgroundRenewCard);
   const deleteCard = useMutation(api.admin.playgroundDeleteCard);
   const [renewPlan, setRenewPlan] = useState(card.paidAmount);
-  const [tierPick, setTierPick] = useState<"bronze" | "silver" | "gold" | "">(card.featuredTier ?? "");
+  const [tierPick, setTierPick] = useState<FeaturedTierValue>(card.featuredTier ?? "none");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
@@ -1060,16 +1063,19 @@ function CardToolRow({ card }: { card: PgCard }) {
         <div className="pg-card-action-group">
           <span className="pg-action-label">Featured tier</span>
           <div className="pg-btn-row">
-            <select className="pg-inline-select" value={tierPick} onChange={(e) => setTierPick(e.target.value as "bronze" | "silver" | "gold" | "")}>
-              <option value="">None</option>
-              <option value="bronze">Bronze</option>
-              <option value="silver">Silver</option>
-              <option value="gold">Gold</option>
+            <select className="pg-inline-select" value={tierPick} onChange={(e) => setTierPick(e.target.value as FeaturedTierValue)}>
+              <option value="none">None</option>
+              <option value="boost">Boost</option>
+              {showLegacyFeaturedTiers ? <>
+                <option value="bronze">Bronze</option>
+                <option value="silver">Silver</option>
+                <option value="gold">Gold</option>
+              </> : null}
             </select>
             <button
               className="pg-sm-btn"
               disabled={busy !== null}
-              onClick={() => run("Set tier", () => setTier({ cardId: card.id, tier: (tierPick || undefined) as "bronze" | "silver" | "gold" | undefined }))}
+              onClick={() => run("Set tier", () => setTier({ cardId: card.id, tier: tierPick === "none" ? undefined : tierPick }))}
             >
               <Star size={10} /> Apply
             </button>

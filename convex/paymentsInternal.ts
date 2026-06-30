@@ -43,7 +43,7 @@ export const completePaidCard = internalMutation({
     const payload = pending.payload;
     const basePaidAmount = typeof payload.basePaidAmount === "number" ? payload.basePaidAmount : args.paidAmount;
     if (!packageDurations[basePaidAmount]) throw new Error("The payment amount is invalid.");
-    const featuredTier = payload.featuredTier as "bronze" | "silver" | "gold" | undefined;
+    const featuredTier = payload.featuredTier as "boost" | "bronze" | "silver" | "gold" | undefined;
     const createdAt = Date.now();
     const cardId = await ctx.db.insert("cards", {
       ownerId: pending.ownerId,
@@ -264,7 +264,7 @@ export const completeBundlePosting = internalMutation({
 
     const duration = packageDurations[19.99];
     const payload = pending.payload;
-    const featuredTier = payload.featuredTier as "bronze" | "silver" | "gold" | undefined;
+    const featuredTier = payload.featuredTier as "boost" | "bronze" | "silver" | "gold" | undefined;
     const imageIds = payload.imageIds as Id<"_storage">[];
     const thumbnailImageIds = (payload.thumbnailImageIds ?? []) as Id<"_storage">[];
     const backImageIds = (payload.backImageIds ?? []) as Id<"_storage">[];

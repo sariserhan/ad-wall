@@ -215,6 +215,10 @@ button { color: inherit; }
 .card-price-right { display: block; min-width: 0; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 17px var(--font-caveat); flex: 0 1 auto; text-align: right; }
 .card-price-placeholder { opacity: .45; }
 .card-owner-inline { display: block; font: 500 8px var(--font-inter); opacity: .5; text-transform: none; letter-spacing: .02em; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Boosted cards */
+.wall-card.featured-boost { box-shadow: 2px 5px 2px #0005, 12px 18px 22px #0003, 0 0 0 3px #b45309, 0 0 16px #f59e0b55; transform: rotate(var(--r)) scale(1.12); }
+.wall-card.featured-boost:hover, .wall-card.featured-boost:focus-visible, .wall-card.featured-boost.is-active { box-shadow: 4px 10px 2px #0004, 12px 20px 26px #0004, 0 0 0 3px #b45309, 0 0 22px #f59e0b88; transform: rotate(calc(var(--r) * .72)) scale(1.15); }
+.featured-ribbon-boost { background: linear-gradient(90deg, #b45309, #f59e0b); }
 /* Featured tier card styles */
 .wall-card.featured-bronze { box-shadow: 2px 5px 2px #0005, 12px 18px 22px #0003, 0 0 0 2.5px #c9870a; }
 .wall-card.featured-bronze:hover, .wall-card.featured-bronze:focus-visible, .wall-card.featured-bronze.is-active { box-shadow: 4px 10px 2px #0004, 12px 20px 26px #0004, 0 0 0 2.5px #c9870a; }
@@ -1300,18 +1304,18 @@ button { color: inherit; }
 .featured-tier-option:hover { border-color: #555; }
 .featured-tier-option.selected { border-color: #c9870a; background: #fdf7e6; box-shadow: 3px 3px 0 #c9870a; }
 .featured-tier-option.featured-tier-none.selected { border-color: #111; background: #111; color: #f6f4ef; box-shadow: 3px 3px 0 #555; }
+.featured-tier-option.featured-tier-boost { border-color: #b45309; }
+.featured-tier-option.featured-tier-boost.selected { background: linear-gradient(135deg, #fdf2d6 0%, #fff7e6 100%); box-shadow: 3px 3px 0 #b45309, 0 0 12px #f59e0b30; }
 .featured-tier-header { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
 .featured-tier-header strong { font: 800 12px var(--font-inter); text-transform: uppercase; letter-spacing: .4px; }
-.featured-tier-price { font: 800 13px var(--font-barlow-condensed); color: #c9870a; }
-.featured-tier-option.selected .featured-tier-price { color: #e8b824; }
+.featured-tier-price { font: 800 13px var(--font-barlow-condensed); color: #b45309; }
+.featured-tier-option.selected .featured-tier-price { color: #f59e0b; }
 .featured-tier-option.featured-tier-none.selected .featured-tier-price { color: #aaa; }
 .featured-tier-perks { margin: 0; padding: 0 0 0 14px; font: 500 9px/1.6 var(--font-inter); color: #666; }
 .featured-tier-option.selected .featured-tier-perks { color: #bbb; }
 .featured-tier-option.featured-tier-none.selected .featured-tier-perks { color: #888; }
-.featured-tier-check { position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; color: #c9870a; }
+.featured-tier-check { position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; color: #b45309; }
 .featured-tier-option.featured-tier-none .featured-tier-check { color: #f6f4ef; }
-.featured-tier-option.featured-tier-gold { border-color: #c9870a; }
-.featured-tier-option.featured-tier-gold.selected { background: linear-gradient(135deg, #fdf7e6 0%, #fff9ed 100%); box-shadow: 3px 3px 0 #c9870a, 0 0 12px #d4a01730; }
 .style-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 10px; }
 .style-option { position: relative; height: 78px; display: grid; grid-template-columns: 58px 1fr; align-items: center; gap: 11px; padding: 9px 35px 9px 9px; border: 1px solid #aaa; background: #f8f6f1; color: #111; text-align: left; cursor: pointer; transition: border-color .18s, background .18s, transform .18s, box-shadow .18s; }
 .style-option:hover { border-color: #222; transform: translateY(-1px); }
@@ -2294,14 +2298,14 @@ button { color: inherit; }
 .trending-empty { font: 400 14px var(--font-inter); color: #c8c4bc; margin: 0; }
 /* ── Trending walls grid ─────────────────────────────── */
 .trending-walls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 900px; }
-.trending-wall-card { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 168px; padding: 18px 20px 18px; background: #edede8; border: 1px solid #b7b4ae; text-decoration: none; color: inherit; transition: transform .15s, border-color .18s, box-shadow .18s, background .18s; box-shadow: 2px 4px 0 #0002, 8px 14px 18px #0002; overflow: hidden; }
-.trending-wall-card::before { content: ""; position: absolute; top: -11px; left: 50%; width: 62px; height: 16px; transform: translateX(-50%) rotate(-1.8deg); background: #d9d2b7a8; box-shadow: 0 1px #fff5; opacity: .82; }
+.trending-wall-card { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 168px; padding: 18px 20px 18px; background: var(--twc-bg, #edede8); border: 1px solid var(--twc-border, #b7b4ae); text-decoration: none; color: inherit; transition: transform .15s, border-color .18s, box-shadow .18s, background .18s; box-shadow: 2px 4px 0 #0002, 8px 14px 18px #0002; overflow: hidden; }
+.trending-wall-card::before { content: ""; position: absolute; top: -11px; left: 50%; width: 62px; height: 16px; transform: translateX(-50%) rotate(-1.8deg); background: var(--twc-tape, #d9d2b7a8); box-shadow: 0 1px #fff5; opacity: .82; }
 .trending-wall-card::after { content: ""; position: absolute; inset: auto 0 -1px 0; height: 7px; background: inherit; clip-path: polygon(0 0, 8% 35%, 17% 0, 27% 48%, 38% 4%, 48% 35%, 58% 0, 70% 43%, 81% 7%, 91% 38%, 100% 0, 100% 60%, 0 60%); pointer-events: none; }
 .trending-wall-card:nth-child(4n+1) { transform: rotate(-1deg); }
 .trending-wall-card:nth-child(4n+2) { transform: rotate(.7deg); }
 .trending-wall-card:nth-child(4n+3) { transform: rotate(-.5deg); }
 .trending-wall-card:nth-child(4n+4) { transform: rotate(1deg); }
-.trending-wall-card:hover { background: #f5f3ee; border-color: #f43d38; box-shadow: 3px 5px 0 #0002, 10px 16px 24px #0003; transform: translateY(-2px) scale(1.015); }
+.trending-wall-card:hover { background: var(--twc-hover, #f5f3ee); border-color: #f43d38; box-shadow: 3px 5px 0 #0002, 10px 16px 24px #0003; transform: translateY(-2px) scale(1.015); }
 .twc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .twc-rank { font: 900 11px var(--font-inter); letter-spacing: .8px; color: rgba(20,20,18,.5); }
 .trending-walls-grid > :nth-child(-n+3) .twc-rank { color: #f43d38; }
