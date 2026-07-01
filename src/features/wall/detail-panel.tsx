@@ -300,10 +300,13 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
   return (
     <aside
       ref={sheetRef}
-      className="detail-sheet"
+      className="detail-sheet detail-sheet-404"
       aria-label={`${card.name} details`}
       style={dragOffset > 0 ? { transform: `translateY(${dragOffset}px)`, transition: draggingSheet ? "none" : "transform 180ms cubic-bezier(.2,.8,.2,1)" } : undefined}
     >
+      <div className="nf-tape detail-sheet-tape" aria-hidden="true" />
+      <div className="detail-sheet-stamp" aria-hidden="true">DETAILS</div>
+      <p className="nf-eyebrow detail-sheet-eyebrow">Notice · Card details</p>
       <div
         className="sheet-drag-handle"
         onTouchStart={handleTouchStart}
@@ -382,9 +385,12 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
         <div className="dashboard-confirm-backdrop qr-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setQrOpen(false)}>
           <div className="qr-modal" role="dialog" aria-modal="true" aria-label="QR code for this card">
             <div className="qr-modal-tape" />
-            <button className="icon-btn qr-modal-close" type="button" onClick={() => setQrOpen(false)} aria-label="Close"><X /></button>
-            <h3 className="qr-modal-title">Scan to view card</h3>
+            <div className="qr-modal-stamp" aria-hidden="true">QR</div>
+            {/* <button className="icon-btn qr-modal-close" type="button" onClick={() => setQrOpen(false)} aria-label="Close"><X /></button> */}
+            <p className="nf-eyebrow qr-modal-eyebrow">Notice · Scan to view card</p>
+            <h3 className="nf-headline qr-modal-title">Scan to view card</h3>
             <p className="qr-modal-name">{card.name}</p>
+            <p className="qr-modal-body">Open the card on another device or download the QR code to share it.</p>
             {qrDataUrl ? (
               <>
                 <img src={qrDataUrl} alt={`QR code for ${card.name}`} className="qr-modal-image" width={220} height={220} />
@@ -411,9 +417,13 @@ export function DetailPanel({ card, onClose, viewCount, onEvent, onReport, canSa
           onMouseDown={(e) => e.target === e.currentTarget && setReportOpen(false)}
           onKeyDown={(e) => e.key === "Escape" && setReportOpen(false)}
         >
-          <div className="dashboard-confirm report-modal" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+          <div className="dashboard-confirm report-modal report-modal-404" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+            <div className="nf-tape report-modal-tape" aria-hidden="true" />
+            <div className="report-modal-stamp" aria-hidden="true">REPORT</div>
+            <p className="nf-eyebrow">Notice · Report this card</p>
             <Flag size={34} />
             <h3 id="report-modal-title">Report this card</h3>
+            <p className="report-modal-body">Tell us what looks wrong so we can review it faster.</p>
             {reportDone ? (
               <>
                 <p>Thanks — your report was sent to the moderation queue.</p>

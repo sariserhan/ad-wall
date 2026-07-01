@@ -146,9 +146,9 @@ export function ContactPage({ from, onClose }: { from?: string; onClose: () => v
           <span>LocalWall</span>
           <span>contact support</span>
         </footer>
-        <button className="icon-btn qr-modal-close" type="button" onClick={onClose} aria-label="Close">
+        {/* <button className="icon-btn qr-modal-close" type="button" onClick={onClose} aria-label="Close">
           <X />
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -238,6 +238,7 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
   const [stackPickerCards, setStackPickerCards] = useState<WallCardModel[] | null>(null);
   const [layers, setLayers] = useState<string[]>(seedCards.map((card) => card.id));
   const [flippedCardIds, setFlippedCardIds] = useState<Set<string>>(() => new Set());
+  const [toolsCollapsed, setToolsCollapsed] = useState(false);
 
   // Keep layers in sync with new cards arriving from Convex (e.g. other users posting).
   // New IDs are appended so they appear on top of older cards by default.
@@ -1735,29 +1736,41 @@ export function WallApp({ mode, cards: remoteCards, pendingCreatedCards = [], on
             )
           )
         )}
-        <div className="wall-tools">
-          {showSignedOutAuth ? (
-            <button type="button" className="wall-tools-link" aria-label="Open sign in" onClick={() => onRequestSignIn?.()}>
-              <LogIn />
-            </button>
-          ) : null}
-          {navReady && isSignedIn && ownedCardIds ? (
-            <button
-              aria-label={ownCardsOnly ? "Show all cards" : "Show only my cards"}
-              title={ownCardsHint}
-              onClick={() => setOwnCardsOnly((v) => !v)}
-              className={ownCardsOnly ? "is-active" : ""}
-            >
-              <LayoutGrid />
-              <span>My cards</span>
-            </button>
-          ) : null}
-          <button aria-label={listView ? "Switch to wall view" : "Switch to list view"} onClick={() => setListView((v) => !v)}>
-            {listView ? <LayoutGrid /> : <LayoutList />}
-            <span>{listView ? "Wall" : "List"}</span>
+        <div className={`wall-tools${toolsCollapsed ? " is-collapsed" : ""}`}>
+          <button
+            type="button"
+            className="wall-tools-toggle"
+            aria-label={toolsCollapsed ? "Expand quick tools" : "Collapse quick tools"}
+            aria-expanded={!toolsCollapsed}
+            onClick={() => setToolsCollapsed((value) => !value)}
+          >
+            <Menu />
+            <span>{toolsCollapsed ? "Open" : "Close"}</span>
           </button>
-          <button aria-label="Show newest cards" onClick={() => setFresh(true)}><Layers3 /><span>Newest</span></button>
-          {/* <button aria-label="Reset wall" onClick={resetFilters}><RotateCcw /><span>Reset</span></button> */}
+          <div className="wall-tools-items">
+            {showSignedOutAuth ? (
+              <button type="button" className="wall-tools-link" aria-label="Open sign in" onClick={() => onRequestSignIn?.()}>
+                <LogIn />
+              </button>
+            ) : null}
+            {navReady && isSignedIn && ownedCardIds ? (
+              <button
+                aria-label={ownCardsOnly ? "Show all cards" : "Show only my cards"}
+                title={ownCardsHint}
+                onClick={() => setOwnCardsOnly((v) => !v)}
+                className={ownCardsOnly ? "is-active" : ""}
+              >
+                <LayoutGrid />
+                <span>My cards</span>
+              </button>
+            ) : null}
+            <button aria-label={listView ? "Switch to wall view" : "Switch to list view"} onClick={() => setListView((v) => !v)}>
+              {listView ? <LayoutGrid /> : <LayoutList />}
+              <span>{listView ? "Wall" : "List"}</span>
+            </button>
+            <button aria-label="Show newest cards" onClick={() => setFresh(true)}><Layers3 /><span>Newest</span></button>
+            {/* <button aria-label="Reset wall" onClick={resetFilters}><RotateCcw /><span>Reset</span></button> */}
+          </div>
         </div>
         <div className="wall-count">
           {wallViewCount !== undefined && mode === "connected" ? `${wallViewCount.toLocaleString()} WALL VIEWS · ` : ""}
