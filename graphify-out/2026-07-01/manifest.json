@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "src/components/app-providers.tsx": {
-    "mtime": 1782950270.1566205,
-    "ast_hash": "88b36d0e08af6079a388b58167443e1e",
+    "mtime": 1782956769.0825758,
+    "ast_hash": "e9095ff4efb9c652139d89947d74ed55",
     "semantic_hash": ""
   },
   "src/components/bug-report-link.tsx": {
@@ -1387,6 +1387,11 @@
   "public/assets/pin.webp": {
     "mtime": 1782929260.9565108,
     "ast_hash": "2b883454d46802fbbffc8d3c2242b38a",
+    "semantic_hash": ""
+  },
+  "src/components/checkout-success-handler.tsx": {
+    "mtime": 1782957115.8491256,
+    "ast_hash": "57788d2140b7a6ea15fd4633d4dcbbde",
     "semantic_hash": ""
   }
 }

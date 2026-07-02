@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { ensureCurrentUserDoc } from "./users";
 
 async function getUser(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
@@ -12,16 +13,8 @@ async function ensureActiveUser(ctx: MutationCtx) {
   if (!identity) throw new Error("Sign in to save walls.");
   let user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
   if (!user) {
-    const userId = await ctx.db.insert("users", {
-      authProvider: "clerk",
-      externalUserId: identity.subject,
-      tokenIdentifier: identity.tokenIdentifier,
-      displayName: identity.name,
-      email: identity.email,
-      avatarUrl: identity.pictureUrl,
-      createdAt: Date.now(),
-    });
-    user = await ctx.db.get(userId);
+    const userId = await ensureCurrentUserDoc(ctx);
+    user = userId ? await ctx.db.get(userId) : null;
   }
   if (!user) throw new Error("Your WALL profile could not be created.");
   if (user.blockedAt) throw new Error("Your account is blocked by WALL admin.");

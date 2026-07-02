@@ -1,7 +1,7 @@
 # Graph Report - local-wall  (2026-07-01)
 
 ## Corpus Check
-- 251 files · ~464,625 words
+- 252 files · ~465,022 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8f56ecc6`
+- Built from commit: `1ee97d21`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -549,7 +549,7 @@ Cohesion: 0.14
 Nodes (13): backfillUsernames, purgeStale, quotas, scopeValidator, take, buildReminderEmail(), escapeHtml(), findCardsNeedingReminders (+5 more)
 
 ## Knowledge Gaps
-- **1055 isolated node(s):** `npx`, `Props`, `Props`, `Props`, `Props` (+1050 more)
+- **1055 isolated node(s):** `stripe`, `validBaseCents`, `validFeaturedCents`, `validAmountCents`, `POST` (+1050 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -557,16 +557,16 @@ Nodes (13): backfillUsernames, purgeStale, quotas, scopeValidator, take, buildRe
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `api` connect `Geo-Routed Pages & RSS Feeds` to `Billing, Admin & Test Infrastructure`, `Community 34`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 7`, `Community 8`, `Community 10`, `Community 75`, `Community 11`, `Community 109`, `Community 81`, `Community 17`, `Community 57`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
 - **Why does `WallCard` connect `Community 123` to `Community 64`, `Billing, Admin & Test Infrastructure`, `Community 3`, `Community 7`, `Community 109`, `Community 81`, `Community 23`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
-- **Why does `PrivacySettingsLink()` connect `Community 9` to `Community 4`, `Community 125`, `Community 23`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `parseCountrySlug()` (e.g. with `GET()` and `GET()`) actually correct?**
   _`parseCountrySlug()` has 5 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `npx`, `Props`, `Props` to the rest of the system?**
+- **What connects `stripe`, `validBaseCents`, `validFeaturedCents` to the rest of the system?**
   _1055 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Rate Limiting & API Utilities` be split into smaller, more focused modules?**
   _Cohesion score 0.08067226890756303 - nodes in this community are weakly interconnected._
 - **Should `Billing, Admin & Test Infrastructure` be split into smaller, more focused modules?**
   _Cohesion score 0.08275862068965517 - nodes in this community are weakly interconnected._
+- **Should `Geo-Routed Pages & RSS Feeds` be split into smaller, more focused modules?**
+  _Cohesion score 0.07514124293785311 - nodes in this community are weakly interconnected._

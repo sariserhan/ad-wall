@@ -3,6 +3,7 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation, mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { deleteCardOwnedData } from "./cardCleanup";
+import { ensureCurrentUserDoc } from "./users";
 
 const category = v.union(
   v.literal("Services"),
@@ -785,16 +786,8 @@ export const create = mutation({
 
     let user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
     if (!user) {
-      const userId = await ctx.db.insert("users", {
-        authProvider: "clerk",
-        externalUserId: identity.subject,
-        tokenIdentifier: identity.tokenIdentifier,
-        displayName: identity.name,
-        email: identity.email,
-        avatarUrl: identity.pictureUrl,
-        createdAt: Date.now(),
-      });
-      user = await ctx.db.get(userId);
+      const userId = await ensureCurrentUserDoc(ctx);
+      user = userId ? await ctx.db.get(userId) : null;
     }
     if (!user) throw new Error("Your profile could not be created.");
     if (user.blockedAt) throw new Error("Your account is blocked by WALL admin. Contact support for help.");
