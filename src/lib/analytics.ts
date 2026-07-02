@@ -43,6 +43,8 @@ function getPostHogConfig() {
     token: process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN,
     // PostHog JS should talk to the local reverse proxy path, not the proxy host itself.
     host: "/ingest",
+    // Keep UI/config links on the real PostHog host so the proxy path is only used for API traffic.
+    uiHost: "https://us.posthog.com",
   };
 }
 
@@ -76,12 +78,13 @@ export async function initAnalytics() {
   if (client) return;
   if (!initPromise) {
     initPromise = (async () => {
-      const { token, host } = getPostHogConfig();
+      const { token, host, uiHost } = getPostHogConfig();
       if (!token) return;
       const posthog = await loadPostHog();
       client = posthog;
       posthog.init(token, {
         api_host: host,
+        ui_host: uiHost,
         capture_pageview: false,
         autocapture: true,
         capture_performance: isProduction,
