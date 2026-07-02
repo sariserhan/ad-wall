@@ -20,9 +20,10 @@ interface AppProvidersProps {
   clerkPublishableKey?: string;
   convexUrl?: string;
   withClerk?: boolean;
+  isAdmin?: boolean;
 }
 
-export function AppProviders({ children, clerkPublishableKey, convexUrl, withClerk = true }: AppProvidersProps) {
+export function AppProviders({ children, clerkPublishableKey, convexUrl, withClerk = true, isAdmin = false }: AppProvidersProps) {
   const [convex] = useState(() => (convexUrl ? new ConvexReactClient(convexUrl) : null));
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -100,18 +101,18 @@ export function AppProviders({ children, clerkPublishableKey, convexUrl, withCle
         },
       }}
     >
-      <ConnectedProviders convex={convex}>{children}</ConnectedProviders>
+      <ConnectedProviders convex={convex} isAdmin={isAdmin}>{children}</ConnectedProviders>
     </ClerkProvider>
   );
 }
 
-function ConnectedProviders({ children, convex }: { children: React.ReactNode; convex: ConvexReactClient }) {
+function ConnectedProviders({ children, convex, isAdmin }: { children: React.ReactNode; convex: ConvexReactClient; isAdmin: boolean }) {
   return (
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       <ClerkUsernameSync />
       <CheckoutSuccessHandler />
       {children}
-      <GlobalAdminPanel />
+      <GlobalAdminPanel isAdmin={isAdmin} />
       <GlobalBugReportModal />
       <GlobalContactModal />
       <GlobalOwnerDashboard />

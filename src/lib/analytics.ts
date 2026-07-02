@@ -41,7 +41,8 @@ function persistConsent(next: AnalyticsConsent) {
 function getPostHogConfig() {
   return {
     token: process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN,
-    host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    // PostHog JS should talk to the local reverse proxy path, not the proxy host itself.
+    host: "/ingest",
   };
 }
 
@@ -86,10 +87,12 @@ export async function initAnalytics() {
         capture_performance: isProduction,
         capture_dead_clicks: isProduction,
         capture_exceptions: isProduction,
+        advanced_disable_feature_flags_on_first_load: true,
+        advanced_disable_feature_flags: true,
         disable_surveys: !isProduction,
         disable_surveys_automatic_display: !isProduction,
         disable_session_recording: !isProduction,
-        disable_external_dependency_loading: !isProduction,
+        disable_external_dependency_loading: true,
       });
       if (getAnalyticsConsent() !== "accepted") return;
       if (pendingDistinctId) {

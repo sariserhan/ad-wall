@@ -30,7 +30,7 @@ export async function WallPageShell({
   const isAdmin = await fetchIsAdmin(token);
 
   return (
-    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
+    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey} isAdmin={isAdmin}>
       {isConnected ? (
         <Suspense fallback={<div className="app-loading"><strong>LocalWall</strong><span>Loading your local wall…</span></div>}>
           <ConnectedWallApp

@@ -8,17 +8,18 @@ const isDev = process.env.NODE_ENV === "development";
 // 'unsafe-eval' is required in dev for Next.js Fast Refresh (eval-based HMR).
 // It is intentionally excluded from the production CSP.
 const scriptSrc = isDev
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://clerk.localwall.app https://*.clerk.accounts.dev https://challenges.cloudflare.com"
-  : "script-src 'self' 'unsafe-inline' https://clerk.com https://clerk.localwall.app https://*.clerk.accounts.dev https://challenges.cloudflare.com";
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.localwall.app https://*.posthog.com https://*.i.posthog.com https://*.clerk.accounts.dev https://challenges.cloudflare.com"
+  : "script-src 'self' 'unsafe-inline' https://clerk.com https://*.localwall.app https://*.posthog.com https://*.i.posthog.com https://*.clerk.accounts.dev https://challenges.cloudflare.com";
 
 const CSP = [
   "default-src 'self'",
   scriptSrc,
+  scriptSrc.replace("script-src", "script-src-elem"),
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.convex.cloud https://images.unsplash.com https://img.clerk.com",
   "font-src 'self'",
-  "connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://clerk.com https://clerk.localwall.app https://*.clerk.accounts.dev https://*.sentry.io https://api.open-meteo.com",
-  "frame-src https://challenges.cloudflare.com https://clerk.com https://clerk.localwall.app https://*.clerk.accounts.dev",
+  "connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://clerk.com https://*.localwall.app https://*.posthog.com https://*.i.posthog.com https://*.clerk.accounts.dev https://*.sentry.io https://api.open-meteo.com",
+  "frame-src https://challenges.cloudflare.com https://clerk.com https://*.localwall.app https://*.posthog.com https://*.i.posthog.com https://*.clerk.accounts.dev",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",

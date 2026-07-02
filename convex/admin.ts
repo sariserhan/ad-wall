@@ -130,18 +130,29 @@ export const getDashboard = query({
   handler: async (ctx) => {
     await requireAdmin(ctx);
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    const [cards, users, reports, bugReports, contactMessages, allCardStats, recentSearches, verificationRequests, authEvents, recentWallVisits] = await Promise.all([
-      ctx.db.query("cards").order("desc").take(150),
-      ctx.db.query("users").order("desc").take(1000),
-      ctx.db.query("reports").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(100),
-      ctx.db.query("bugReports").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(100),
-      ctx.db.query("contactMessages").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(100),
-      ctx.db.query("cardStats").take(500),
-      ctx.db.query("searchEvents").withIndex("by_createdAt", (q) => q.gte("createdAt", thirtyDaysAgo)).order("desc").take(1000),
-      ctx.db.query("verificationRequests").order("desc").take(100),
-      ctx.db.query("authEvents").withIndex("by_createdAt", (q) => q.gte("createdAt", thirtyDaysAgo)).order("desc").take(1000),
-      ctx.db.query("wallVisits").withIndex("by_visitedAt", (q) => q.gte("visitedAt", thirtyDaysAgo)).order("desc").take(1000),
-    ]);
+    const settled = await Promise.allSettled([
+      ctx.db.query("cards").order("desc").take(80),
+      ctx.db.query("users").order("desc").take(200),
+      ctx.db.query("reports").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(50),
+      ctx.db.query("bugReports").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(50),
+      ctx.db.query("contactMessages").withIndex("by_status_and_createdAt", (q) => q.eq("status", "open")).order("desc").take(50),
+      ctx.db.query("cardStats").take(200),
+      ctx.db.query("searchEvents").withIndex("by_createdAt", (q) => q.gte("createdAt", thirtyDaysAgo)).order("desc").take(200),
+      ctx.db.query("verificationRequests").order("desc").take(50),
+      ctx.db.query("authEvents").withIndex("by_createdAt", (q) => q.gte("createdAt", thirtyDaysAgo)).order("desc").take(200),
+      ctx.db.query("wallVisits").withIndex("by_visitedAt", (q) => q.gte("visitedAt", thirtyDaysAgo)).order("desc").take(200),
+    ] as const);
+    const [cardsResult, usersResult, reportsResult, bugReportsResult, contactMessagesResult, allCardStatsResult, recentSearchesResult, verificationRequestsResult, authEventsResult, recentWallVisitsResult] = settled;
+    const cards = cardsResult.status === "fulfilled" ? cardsResult.value : [];
+    const users = usersResult.status === "fulfilled" ? usersResult.value : [];
+    const reports = reportsResult.status === "fulfilled" ? reportsResult.value : [];
+    const bugReports = bugReportsResult.status === "fulfilled" ? bugReportsResult.value : [];
+    const contactMessages = contactMessagesResult.status === "fulfilled" ? contactMessagesResult.value : [];
+    const allCardStats = allCardStatsResult.status === "fulfilled" ? allCardStatsResult.value : [];
+    const recentSearches = recentSearchesResult.status === "fulfilled" ? recentSearchesResult.value : [];
+    const verificationRequests = verificationRequestsResult.status === "fulfilled" ? verificationRequestsResult.value : [];
+    const authEvents = authEventsResult.status === "fulfilled" ? authEventsResult.value : [];
+    const recentWallVisits = recentWallVisitsResult.status === "fulfilled" ? recentWallVisitsResult.value : [];
 
     const userById = new Map(users.map((user) => [String(user._id), user] as const));
     const cardCountByUser = new Map<string, number>();
@@ -187,8 +198,9 @@ export const getDashboard = query({
       signupCountsByDay.set(day, (signupCountsByDay.get(day) ?? 0) + 1);
     }
 
+    // Keep the admin payload bounded; the dashboard only needs recent wall records.
     const wallMap = new Map<string, { _id: Id<"walls">; path: string; viewCount: number; createdAt: number; updatedAt: number }>();
-    for (const wall of await ctx.db.query("walls").collect()) {
+    for (const wall of await ctx.db.query("walls").order("desc").take(200)) {
       wallMap.set(String(wall._id), wall);
     }
     const wallVisitCounts = new Map<string, { visits: number; uniqueUsers: Set<string>; lastVisitedAt: number }>();

@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1782775087.1117296,
-    "ast_hash": "4444ec9168a3e09d8ad92e2ae7abf52a",
+    "mtime": 1782974063.172556,
+    "ast_hash": "279dcf1db9a7b6a2e652cabf5587fbb0",
     "semantic_hash": ""
   },
   "app/privacy-policy/page.tsx": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "app/trending/page.tsx": {
-    "mtime": 1782775781.3303034,
-    "ast_hash": "a2cabdd9997f33b002b6ecc15a2bd291",
+    "mtime": 1782974066.5980804,
+    "ast_hash": "311acaf9f75486e06a39c36de6a93ae4",
     "semantic_hash": ""
   },
   "app/unsubscribe/page.tsx": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "convex/admin.ts": {
-    "mtime": 1782970395.1451778,
-    "ast_hash": "dbdf0e5db30c95d5ff591337d01e70d4",
+    "mtime": 1782978434.1478946,
+    "ast_hash": "a3abb8ac65461e56912d90052ae9ceb5",
     "semantic_hash": ""
   },
   "convex/auth.config.ts": {
@@ -375,8 +375,8 @@
     "semantic_hash": ""
   },
   "next.config.ts": {
-    "mtime": 1782949103.9905376,
-    "ast_hash": "d481303e16ec034c156e05747194f20a",
+    "mtime": 1782978132.3038566,
+    "ast_hash": "e30db913d501a80d212d79509097d952",
     "semantic_hash": ""
   },
   "package.json": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "src/components/app-providers.tsx": {
-    "mtime": 1782971093.163498,
-    "ast_hash": "b888e90bec74b4af249d494aa148b9ab",
+    "mtime": 1782974044.9541183,
+    "ast_hash": "7d903aeb9985f1a6bcf262292d8d0a4e",
     "semantic_hash": ""
   },
   "src/components/bug-report-link.tsx": {
@@ -495,13 +495,13 @@
     "semantic_hash": ""
   },
   "src/features/home/home-nav.tsx": {
-    "mtime": 1782971988.352975,
-    "ast_hash": "dc0acd8264f38a23c6aae3afac4f0c59",
+    "mtime": 1782973191.9416623,
+    "ast_hash": "f7d79da6d7acabdf849e279b5b6050c3",
     "semantic_hash": ""
   },
   "src/features/home/home-page.tsx": {
-    "mtime": 1782787148.040453,
-    "ast_hash": "5a0ec42fcd717e94e9c48e16a78469fe",
+    "mtime": 1782973177.5035002,
+    "ast_hash": "73d2d434df9cdd326d29e2724837f97c",
     "semantic_hash": ""
   },
   "src/features/home/home-post-button.tsx": {
@@ -565,8 +565,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/connected-wall-app.tsx": {
-    "mtime": 1782971991.389726,
-    "ast_hash": "79c9d5f324b020d11e952537b8d272a1",
+    "mtime": 1782973252.8307292,
+    "ast_hash": "c65f1946267e892c38fff3dc7bc48756",
     "semantic_hash": ""
   },
   "src/features/wall/detail-panel.tsx": {
@@ -635,8 +635,8 @@
     "semantic_hash": ""
   },
   "src/features/wall/wall-page-shell.tsx": {
-    "mtime": 1782771509.5339131,
-    "ast_hash": "04c7ed974f01b73fd68059f162a7ec71",
+    "mtime": 1782974070.3001983,
+    "ast_hash": "7e25ff3e3afc8f2bb9a4392575f9f8e7",
     "semantic_hash": ""
   },
   "src/features/wall/wall-skeletons.tsx": {
@@ -645,8 +645,8 @@
     "semantic_hash": ""
   },
   "src/lib/analytics.ts": {
-    "mtime": 1782770239.3837523,
-    "ast_hash": "946e0f413ade55dec5c9408afedbf12f",
+    "mtime": 1782978274.8781624,
+    "ast_hash": "eef9aa0733747c2617ce3bc0172fc96c",
     "semantic_hash": ""
   },
   "src/lib/blur-placeholder.ts": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "src/lib/posthog-server.ts": {
-    "mtime": 1782355843.6291544,
-    "ast_hash": "cdfc15fb563a26c8df0e85f3326c4880",
+    "mtime": 1782973914.4882927,
+    "ast_hash": "f59fb1f75564e25e4b38f81c31c58e55",
     "semantic_hash": ""
   },
   "src/lib/rss.ts": {
@@ -1160,8 +1160,8 @@
     "semantic_hash": ""
   },
   "src/components/global-admin-panel.tsx": {
-    "mtime": 1782703859.179573,
-    "ast_hash": "23a7d2ac99771d5b7442d55c78324404",
+    "mtime": 1782977210.668431,
+    "ast_hash": "2cfc79aa76ae587d388f2bc713b52aef",
     "semantic_hash": ""
   },
   "src/lib/admin-signal.ts": {
@@ -1392,6 +1392,16 @@
   "src/components/checkout-success-handler.tsx": {
     "mtime": 1782957115.8491256,
     "ast_hash": "57788d2140b7a6ea15fd4633d4dcbbde",
+    "semantic_hash": ""
+  },
+  "src/lib/server-admin.ts": {
+    "mtime": 1782973155.1231213,
+    "ast_hash": "50be5424644b388ccf25983f0d664486",
+    "semantic_hash": ""
+  },
+  "src/lib/posthog-host.ts": {
+    "mtime": 1782973907.2201393,
+    "ast_hash": "d9edadcef5317639ce6f8e86ee248630",
     "semantic_hash": ""
   }
 }

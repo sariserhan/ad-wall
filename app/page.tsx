@@ -52,7 +52,7 @@ export default async function RootPage({ searchParams }: Props) {
   const token = userId ? await getToken({ template: "convex" }) : null;
   const isAdmin = await fetchIsAdmin(token);
   return (
-    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
+    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey} isAdmin={isAdmin}>
       <HomePage isSignedIn={Boolean(userId)} isAdmin={isAdmin} />
     </AppProviders>
   );

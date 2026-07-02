@@ -40,7 +40,7 @@ export default async function TrendingPage() {
   ]);
 
   return (
-    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
+    <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey} isAdmin={isAdmin}>
       <HomeNav isSignedIn={Boolean(userId)} showAvatarButton={Boolean(userId)} isAdmin={isAdmin} />
       <main className="trending-page">
         <TrendingTabs

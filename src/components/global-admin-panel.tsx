@@ -1,7 +1,8 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { pushAdminHandler } from "@/lib/admin-signal";
@@ -9,11 +10,30 @@ import type { AdminDashboardData } from "@/features/wall/admin-panel";
 
 const AdminPanel = dynamic(() => import("@/features/wall/admin-panel").then((m) => ({ default: m.AdminPanel })), { ssr: false, loading: () => null });
 
-export function GlobalAdminPanel() {
-  const { isAuthenticated } = useConvexAuth();
+export function GlobalAdminPanel({ isAdmin = false }: { isAdmin?: boolean } = {}) {
   const [open, setOpen] = useState(false);
+  const [convexTokenReady, setConvexTokenReady] = useState(false);
+  const { isLoaded: isClerkLoaded, isSignedIn, getToken } = useAuth();
 
   useEffect(() => pushAdminHandler(() => setOpen(true)), []);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!open || !isClerkLoaded || !isSignedIn) {
+      setConvexTokenReady(false);
+      return;
+    }
+    void getToken({ template: "convex" })
+      .then((token) => {
+        if (!cancelled) setConvexTokenReady(Boolean(token));
+      })
+      .catch(() => {
+        if (!cancelled) setConvexTokenReady(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [getToken, isClerkLoaded, isSignedIn, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -27,8 +47,9 @@ export function GlobalAdminPanel() {
     };
   }, [open]);
 
-  const adminAccess = useQuery(api.admin.getAccess, isAuthenticated ? {} : "skip") as { isAdmin: boolean } | undefined;
-  const adminDashboard = useQuery(api.admin.getDashboard, open && adminAccess?.isAdmin ? {} : "skip") as AdminDashboardData | undefined;
+  const adminAccess = useQuery(api.admin.getAccess, isAdmin ? "skip" : {}) as { isAdmin: boolean } | undefined;
+  const canAccess = isAdmin || Boolean(adminAccess?.isAdmin);
+  const adminDashboard = useQuery(api.admin.getDashboard, open && canAccess && convexTokenReady ? {} : "skip") as AdminDashboardData | undefined;
 
   const adminSetCardStatus = useMutation(api.admin.setCardStatus);
   const adminRemoveCard = useMutation(api.admin.removeCard);
@@ -44,7 +65,7 @@ export function GlobalAdminPanel() {
   const adminApproveVerification = useMutation(api.admin.approveVerification);
   const adminRejectVerification = useMutation(api.admin.rejectVerification);
 
-  if (!open || !adminAccess?.isAdmin) return null;
+  if (!open || !canAccess) return null;
 
   return (
     <AdminPanel
