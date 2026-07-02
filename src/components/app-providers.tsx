@@ -118,6 +118,7 @@ function ConnectedProviders({ children, convex }: { children: React.ReactNode; c
 }
 
 function ClerkUsernameSync() {
+  const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
   const { isLoaded, user } = useUser();
   const ensureCurrentUser = useMutation(api.users.ensureCurrentUser);
   const syncClerkUsername = useMutation(api.cards.syncClerkUsername);
@@ -125,17 +126,18 @@ function ClerkUsernameSync() {
   const lastSynced = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isLoaded || !user) return;
+    if (!isAuthLoaded || !isSignedIn || !isLoaded || !user) return;
     const tokenIdentifier = user.id;
     if (lastEnsured.current !== tokenIdentifier) {
-      lastEnsured.current = tokenIdentifier;
-      void ensureCurrentUser();
+      void ensureCurrentUser().then(() => {
+        lastEnsured.current = tokenIdentifier;
+      });
     }
     const username = user.username?.trim() || null;
     if (lastSynced.current === username) return;
     lastSynced.current = username;
     void syncClerkUsername({ username: username ?? undefined });
-  }, [ensureCurrentUser, isLoaded, syncClerkUsername, user]);
+  }, [ensureCurrentUser, isAuthLoaded, isLoaded, isSignedIn, syncClerkUsername, user]);
 
   return null;
 }

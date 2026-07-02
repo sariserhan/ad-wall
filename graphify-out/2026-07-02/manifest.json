@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "convex/cards.ts": {
-    "mtime": 1782965405.8848112,
-    "ast_hash": "42a48f33b08798688e1f96838a0dcb18",
+    "mtime": 1782956215.3469257,
+    "ast_hash": "2e64823594ddfb9ae4debbca33587f67",
     "semantic_hash": ""
   },
   "convex/contactMessages.ts": {
@@ -325,13 +325,13 @@
     "semantic_hash": ""
   },
   "convex/savedCards.ts": {
-    "mtime": 1782965412.3993006,
-    "ast_hash": "dec44fd3a7f14c1d16a1b3a4995ae04e",
+    "mtime": 1782587503.0168967,
+    "ast_hash": "73e23804c6cfc4448fc9dcb39f60bf31",
     "semantic_hash": ""
   },
   "convex/savedWalls.ts": {
-    "mtime": 1782965420.159049,
-    "ast_hash": "dc707107853e8f629709eecafc90ff39",
+    "mtime": 1782175140.5853612,
+    "ast_hash": "e6fb19f83af33e69f1137cf7e384b590",
     "semantic_hash": ""
   },
   "convex/schema.ts": {
@@ -345,8 +345,8 @@
     "semantic_hash": ""
   },
   "convex/users.ts": {
-    "mtime": 1782965394.9126573,
-    "ast_hash": "a1d9f4365d9fc5eced33e880a09f0c99",
+    "mtime": 1782366949.4220407,
+    "ast_hash": "00c6c1039542dbfb7b30aa9f73ac196d",
     "semantic_hash": ""
   },
   "convex/walls.ts": {
@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782962210.6625316,
-    "ast_hash": "60e257913911248b6293f4b3dfaf1246",
+    "mtime": 1782950273.4078403,
+    "ast_hash": "5ecf5ba4d5041f149df7d4b6f27e0a9f",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "src/components/app-providers.tsx": {
-    "mtime": 1782965296.5020862,
-    "ast_hash": "c4dd513368f682f335cfca75e956e104",
+    "mtime": 1782956769.0825758,
+    "ast_hash": "e9095ff4efb9c652139d89947d74ed55",
     "semantic_hash": ""
   },
   "src/components/bug-report-link.tsx": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "src/components/global-client-shell.tsx": {
-    "mtime": 1782962675.138546,
-    "ast_hash": "7abb230aa628d9493a5d37d8103c37e5",
+    "mtime": 1782521822.041922,
+    "ast_hash": "2559b62547665589017dfe43147cf1c5",
     "semantic_hash": ""
   },
   "src/components/global-contact-modal.tsx": {

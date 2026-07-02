@@ -1,6 +1,7 @@
 "use client";
 
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnalyticsConsentProvider } from "./analytics-consent-provider";
 import { AnalyticsConsentToast } from "./analytics-consent-toast";
 import { AnalyticsTracker } from "./analytics-tracker";
@@ -27,5 +28,10 @@ export function GlobalClientShell({
 
 function VercelAnalyticsGate() {
   const { consent } = useAnalyticsConsent();
-  return consent === "accepted" ? <Analytics /> : null;
+  return consent === "accepted" ? (
+    <>
+      <Analytics />
+      <SpeedInsights />
+    </>
+  ) : null;
 }
