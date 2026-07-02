@@ -16,8 +16,18 @@ function configuredAdminEmails() {
 
 async function getAdminIdentity(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
-  const email = identity?.email?.trim().toLowerCase();
-  if (!identity || !email || !configuredAdminEmails().has(email)) return null;
+  if (!identity) return null;
+  const user =
+    (await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .unique()) ??
+    (await ctx.db
+      .query("users")
+      .withIndex("by_external_id", (q) => q.eq("externalUserId", identity.subject))
+      .unique());
+  const email = (identity.email ?? user?.email ?? "").trim().toLowerCase();
+  if (!email || !configuredAdminEmails().has(email)) return null;
   return identity;
 }
 
@@ -40,6 +50,54 @@ async function audit(ctx: MutationCtx, identity: { email?: string | null }, acti
 export const getAccess = query({
   args: {},
   handler: async (ctx) => ({ isAdmin: Boolean(await getAdminIdentity(ctx)) }),
+});
+
+export const getAccessDebug = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return {
+        isSignedIn: false,
+        isAdmin: false,
+        clerkEmail: null,
+        tokenIdentifier: null,
+        clerkUserId: null,
+        syncedEmail: null,
+        allowlistedEmails: [...configuredAdminEmails()],
+      };
+    }
+
+    const user =
+      (await ctx.db
+        .query("users")
+        .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+        .unique()) ??
+      (await ctx.db
+        .query("users")
+        .withIndex("by_external_id", (q) => q.eq("externalUserId", identity.subject))
+        .unique());
+    const clerkEmail = identity.email?.trim().toLowerCase() || null;
+    const syncedEmail = user?.email?.trim().toLowerCase() || null;
+    const allowlistedEmails = [...configuredAdminEmails()];
+    const matchedEmail = clerkEmail && allowlistedEmails.includes(clerkEmail)
+      ? clerkEmail
+      : syncedEmail && allowlistedEmails.includes(syncedEmail)
+      ? syncedEmail
+      : null;
+
+    return {
+      isSignedIn: true,
+      isAdmin: Boolean(matchedEmail),
+      clerkEmail,
+      tokenIdentifier: identity.tokenIdentifier,
+      clerkUserId: identity.subject,
+      syncedEmail,
+      syncedUserId: user?._id ?? null,
+      allowlistedEmails,
+      matchedEmail,
+    };
+  },
 });
 
 export const resetRateLimitsForUser = mutation({

@@ -46,10 +46,10 @@ const popularWalls = [
 
 const SHOW_FUTURE_SECTIONS = false;
 
-export function HomePage({ isSignedIn = false }: { isSignedIn?: boolean } = {}) {
+export function HomePage({ isSignedIn = false, isAdmin = false }: { isSignedIn?: boolean; isAdmin?: boolean } = {}) {
   return (
     <>
-      <HomeNav isSignedIn={isSignedIn} showAvatarButton={isSignedIn} />
+      <HomeNav isSignedIn={isSignedIn} showAvatarButton={isSignedIn} isAdmin={isAdmin} />
       <main className="home">
 
         <section className="home-hero">

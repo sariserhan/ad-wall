@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { fetchIsAdmin } from "@/lib/server-admin";
 import { toCitySlug, toCategorySlug } from "@/lib/wall-slug";
 import { AppProviders } from "@/components/app-providers";
 import { HomePage } from "@/features/home/home-page";
@@ -29,7 +30,7 @@ interface Props {
 
 export default async function RootPage({ searchParams }: Props) {
   const params = await searchParams;
-  const { userId } = await auth();
+  const { userId, getToken } = await auth();
 
   // Redirect legacy ?country= URLs to path-based routes
   if (params.country) {
@@ -48,9 +49,11 @@ export default async function RootPage({ searchParams }: Props) {
 
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
   const clerkPublishableKey = getClerkPublishableKey();
+  const token = userId ? await getToken({ template: "convex" }) : null;
+  const isAdmin = await fetchIsAdmin(token);
   return (
     <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
-      <HomePage isSignedIn={Boolean(userId)} />
+      <HomePage isSignedIn={Boolean(userId)} isAdmin={isAdmin} />
     </AppProviders>
   );
 }

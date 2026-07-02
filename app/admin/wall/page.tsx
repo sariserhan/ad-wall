@@ -24,7 +24,40 @@ export default async function AdminWallPage() {
   convex.setAuth(token);
 
   const access: { isAdmin: boolean } = await convex.query(api.admin.getAccess, {});
-  if (!access.isAdmin) redirect("/");
+  if (!access.isAdmin) {
+    return (
+      <main className="nf-page">
+        <div className="nf-grain" />
+        <div className="nf-ghost nf-ghost-1" aria-hidden="true" />
+        <div className="nf-ghost nf-ghost-2" aria-hidden="true" />
+        <div className="nf-ghost nf-ghost-3" aria-hidden="true" />
+
+        <div className="nf-card support-card">
+          <div className="nf-tape" aria-hidden="true" />
+          <div className="nf-stamp" aria-hidden="true">DENIED</div>
+
+          <p className="nf-eyebrow">Notice · Error 403</p>
+          <h1 className="nf-code">403</h1>
+          <h2 className="nf-headline">Forbidden access.</h2>
+          <p className="support-card-body">
+            You do not have permission to view this admin wall.
+          </p>
+
+          <div className="support-card-actions">
+            <a href="/" className="nf-btn-primary">Back to LocalWall</a>
+            <a href="/trending" className="nf-btn-secondary">Browse listings</a>
+          </div>
+
+          <footer className="nf-card-footer">
+            <span>LocalWall</span>
+            <span>your local bulletin board</span>
+          </footer>
+        </div>
+
+        <p className="nf-brand">WALL</p>
+      </main>
+    );
+  }
 
   const initialCards = await fetchInitialCards(PG_LOCATION);
   return (

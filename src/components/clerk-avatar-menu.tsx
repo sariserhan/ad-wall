@@ -25,6 +25,7 @@ type ClerkAvatarMenuProps = {
   onOpenDashboard?: () => void;
   onOpenTrending?: () => void;
   onOpenBilling?: () => void;
+  isAdmin?: boolean;
 };
 
 export function ClerkAvatarMenu({
@@ -38,9 +39,13 @@ export function ClerkAvatarMenu({
   onOpenDashboard,
   onOpenTrending,
   onOpenBilling,
+  isAdmin = false,
 }: ClerkAvatarMenuProps) {
+  const userButtonKey = isAdmin ? "clerk-avatar-admin" : "clerk-avatar-user";
+
   return (
     <UserButton
+      key={userButtonKey}
       appearance={getClerkUserButtonAppearance(isDark)}
       userProfileProps={{
         appearance: getClerkUserProfileAppearance(isDark),
@@ -65,14 +70,14 @@ export function ClerkAvatarMenu({
             onClick={onOpenHome}
           />
         ) : null}
-        {onOpenAdminPanel ? (
+        {isAdmin && onOpenAdminPanel ? (
           <UserButton.Action
             label="Admin"
             labelIcon={<ShieldCheck size={16} />}
             onClick={onOpenAdminPanel}
           />
         ) : null}
-        {onOpenAdminWall ? (
+        {isAdmin && onOpenAdminWall ? (
           <UserButton.Action
             label="Admin wall"
             labelIcon={<MapPin size={16} />}

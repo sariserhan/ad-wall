@@ -12,14 +12,13 @@ import { useTheme } from "@/lib/use-theme";
 import { ClerkAvatarMenu } from "@/components/clerk-avatar-menu";
 import { HomePostButton } from "./home-post-button";
 
-export function HomeNav({ isSignedIn = false, showAvatarButton = false }: { isSignedIn?: boolean; showAvatarButton?: boolean } = {}) {
+export function HomeNav({ isSignedIn = false, showAvatarButton = false, isAdmin = false }: { isSignedIn?: boolean; showAvatarButton?: boolean; isAdmin?: boolean } = {}) {
   const pathname = usePathname();
   const router = useRouter();
   const isTrending = pathname === "/trending";
   const { isDark } = useTheme();
   const profile = useQuery(api.cards.getMyProfile, isSignedIn ? {} : "skip") as { displayName: string | null; username: string | null; businessName: string | null; verified: boolean; verificationStatus: "pending" | "approved" | "rejected" | null } | null | undefined;
   const updateProfileMutation = useMutation(api.cards.updateProfile);
-  const adminAccess = useQuery(api.admin.getAccess, isSignedIn ? {} : "skip") as { isAdmin: boolean } | undefined;
 
   return (
     <header className={`home-nav${isTrending ? " home-nav--trending" : ""}`}>
@@ -42,11 +41,12 @@ export function HomeNav({ isSignedIn = false, showAvatarButton = false }: { isSi
             isReady={profile !== undefined}
             onUpdateBusinessName={async (businessName) => { await updateProfileMutation({ businessName }); }}
             onOpenHome={() => router.push(HOME_PATH)}
-            onOpenAdminPanel={adminAccess?.isAdmin ? () => openAdminPanel() : undefined}
-            onOpenAdminWall={adminAccess?.isAdmin ? () => router.push("/admin/wall") : undefined}
+            onOpenAdminPanel={() => openAdminPanel()}
+            onOpenAdminWall={() => router.push("/admin/wall")}
             onOpenDashboard={() => openDashboard()}
             onOpenTrending={() => router.push("/trending")}
             onOpenBilling={() => router.push("/billing")}
+            isAdmin={isAdmin}
           />
         ) : (
           isSignedIn ? (

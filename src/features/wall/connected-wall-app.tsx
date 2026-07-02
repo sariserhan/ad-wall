@@ -63,12 +63,14 @@ export function ConnectedWallApp({
   initialKeyword,
   initialCategory,
   initialCards,
+  isAdmin = false,
 }: {
   initialCardId?: string;
   initialLocation?: { country: string; state: string; city: string };
   initialKeyword?: string;
   initialCategory?: string;
   initialCards?: WallCard[];
+  isAdmin?: boolean;
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -149,7 +151,6 @@ export function ConnectedWallApp({
   const ownerCards = useQuery(api.cards.listMine, isAuthenticated ? {} : "skip") as OwnerCard[] | undefined;
   const cardDailyStats = useQuery(api.cards.getMyCardDailyStats, isAuthenticated ? {} : "skip") as { dates: string[]; byCard: Record<string, number[]> } | null | undefined;
   const savedCards = useQuery(api.savedCards.list, isAuthenticated ? {} : "skip") as WallCard[] | undefined;
-  const adminAccess = useQuery(api.admin.getAccess, isAuthenticated ? {} : "skip") as { isAdmin: boolean } | undefined;
   const profile = useQuery(api.cards.getMyProfile, isAuthenticated ? {} : "skip") as { displayName: string | null; username: string | null; businessName: string | null; verified: boolean } | null | undefined;
   const updateProfileMutation = useMutation(api.cards.updateProfile);
   const generateUploadUrl = useMutation(api.cards.generateUploadUrl);
@@ -417,7 +418,7 @@ export function ConnectedWallApp({
     const basePaidAmount = isBundle ? 19.99 : draft.paymentOption === "free" ? 0 : Number(draft.paymentOption);
     const featuredPrices: Record<string, number> = { boost: 2.99, bronze: 2.99, silver: 4.99, gold: 9.99 };
     const featuredPaidAmount = !isBundle && draft.featuredTier && draft.featuredTier !== "none" ? (featuredPrices[draft.featuredTier] ?? 0) : 0;
-    const bypassPayment = Boolean(draft.bypassPayment && adminAccess?.isAdmin && !isBundle);
+    const bypassPayment = Boolean(draft.bypassPayment && isAdmin && !isBundle);
     const totalPaidAmount = bypassPayment ? 0 : basePaidAmount + featuredPaidAmount;
     const featuredTierArg = !isBundle && draft.featuredTier && draft.featuredTier !== "none" ? draft.featuredTier : undefined;
     const primaryCity = isBundle && draft.bundleCities?.[0]
@@ -590,11 +591,12 @@ export function ConnectedWallApp({
           isReady={profile !== undefined}
           onUpdateBusinessName={async (businessName) => { await updateProfileMutation({ businessName }); }}
           onOpenHome={() => router.push(HOME_PATH)}
-          onOpenAdminPanel={adminAccess?.isAdmin ? () => openAdminPanel() : undefined}
-          onOpenAdminWall={adminAccess?.isAdmin ? () => router.push("/admin/wall") : undefined}
+          onOpenAdminPanel={() => openAdminPanel()}
+          onOpenAdminWall={() => router.push("/admin/wall")}
           onOpenDashboard={() => openDashboard()}
           onOpenTrending={() => router.push("/trending")}
           onOpenBilling={() => router.push("/billing")}
+          isAdmin={isAdmin}
         />
       ) : null}
       notice={checkoutMessage}
@@ -641,7 +643,7 @@ export function ConnectedWallApp({
       } : undefined}
       profile={null}
       cardDailyStats={cardDailyStats ?? null}
-      allowPaymentBypass={Boolean(adminAccess?.isAdmin)}
+      allowPaymentBypass={isAdmin}
       onRequestVerification={isAuthenticated ? async (plan) => {
         const response = await fetch("/api/stripe/checkout", {
           method: "POST",

@@ -9,6 +9,7 @@ import { PrivacySettingsLink } from "@/components/privacy-settings-link";
 import { HomeNav } from "@/features/home/home-nav";
 import { TrendingTabs } from "@/features/home/trending-tabs";
 import { getClerkPublishableKey } from "@/lib/clerk";
+import { fetchIsAdmin } from "@/lib/server-admin";
 import { fetchTopWalls, fetchTopCards } from "@/lib/server-cards";
 
 export const metadata: Metadata = {
@@ -24,9 +25,11 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function TrendingPage() {
-  const { userId } = await auth();
+  const { userId, getToken } = await auth();
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
   const clerkPublishableKey = getClerkPublishableKey();
+  const token = userId ? await getToken({ template: "convex" }) : null;
+  const isAdmin = await fetchIsAdmin(token);
 
   const [walls, liked, reviewed, contacted, shared] = await Promise.all([
     fetchTopWalls(20),
@@ -38,7 +41,7 @@ export default async function TrendingPage() {
 
   return (
     <AppProviders convexUrl={convexUrl} clerkPublishableKey={clerkPublishableKey}>
-      <HomeNav isSignedIn={Boolean(userId)} showAvatarButton={Boolean(userId)} />
+      <HomeNav isSignedIn={Boolean(userId)} showAvatarButton={Boolean(userId)} isAdmin={isAdmin} />
       <main className="trending-page">
         <TrendingTabs
           walls={walls}
