@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "convex/_generated/server.d.ts": {
-    "mtime": 1782011680.2830412,
-    "ast_hash": "7ebfb3ab9500dfdf97bf3496083f7ca0",
+    "mtime": 1782966636.457916,
+    "ast_hash": "9af3c73095b025769c4d120562bb77fe",
     "semantic_hash": ""
   },
   "convex/_generated/server.js": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "convex/cards.ts": {
-    "mtime": 1782956215.3469257,
-    "ast_hash": "2e64823594ddfb9ae4debbca33587f67",
+    "mtime": 1782965405.8848112,
+    "ast_hash": "42a48f33b08798688e1f96838a0dcb18",
     "semantic_hash": ""
   },
   "convex/contactMessages.ts": {
@@ -275,8 +275,8 @@
     "semantic_hash": ""
   },
   "convex/convex.config.ts": {
-    "mtime": 1782011679.0590646,
-    "ast_hash": "6f34dd7bda87227bac90481eb6559814",
+    "mtime": 1782966634.1402493,
+    "ast_hash": "cb31fd0603270837ecb69ffe7c02c7ac",
     "semantic_hash": ""
   },
   "convex/crons.ts": {
@@ -295,8 +295,8 @@
     "semantic_hash": ""
   },
   "convex/http.ts": {
-    "mtime": 1782316516.3108127,
-    "ast_hash": "9df8b6075852f74a7f442fdb500afdfb",
+    "mtime": 1782966641.8775806,
+    "ast_hash": "c9c65ea79faa042ce9886a96b1614dd0",
     "semantic_hash": ""
   },
   "convex/payments.ts": {
@@ -325,13 +325,13 @@
     "semantic_hash": ""
   },
   "convex/savedCards.ts": {
-    "mtime": 1782587503.0168967,
-    "ast_hash": "73e23804c6cfc4448fc9dcb39f60bf31",
+    "mtime": 1782965412.3993006,
+    "ast_hash": "dec44fd3a7f14c1d16a1b3a4995ae04e",
     "semantic_hash": ""
   },
   "convex/savedWalls.ts": {
-    "mtime": 1782175140.5853612,
-    "ast_hash": "e6fb19f83af33e69f1137cf7e384b590",
+    "mtime": 1782965420.159049,
+    "ast_hash": "dc707107853e8f629709eecafc90ff39",
     "semantic_hash": ""
   },
   "convex/schema.ts": {
@@ -345,8 +345,8 @@
     "semantic_hash": ""
   },
   "convex/users.ts": {
-    "mtime": 1782366949.4220407,
-    "ast_hash": "00c6c1039542dbfb7b30aa9f73ac196d",
+    "mtime": 1782966631.31042,
+    "ast_hash": "76fba3ae37c9772c6742ac5f6939a5cf",
     "semantic_hash": ""
   },
   "convex/walls.ts": {
@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782950273.4078403,
-    "ast_hash": "5ecf5ba4d5041f149df7d4b6f27e0a9f",
+    "mtime": 1782965986.002676,
+    "ast_hash": "8d5e2c8bdcd0e847feb99756c7beefd9",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "src/components/app-providers.tsx": {
-    "mtime": 1782956769.0825758,
-    "ast_hash": "e9095ff4efb9c652139d89947d74ed55",
+    "mtime": 1782966349.784146,
+    "ast_hash": "0213a3f6469f3d5383c05c101df8d872",
     "semantic_hash": ""
   },
   "src/components/bug-report-link.tsx": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "src/components/global-client-shell.tsx": {
-    "mtime": 1782521822.041922,
-    "ast_hash": "2559b62547665589017dfe43147cf1c5",
+    "mtime": 1782966099.2678084,
+    "ast_hash": "bd5d7a005e6ab1a48c00c81f533c01fb",
     "semantic_hash": ""
   },
   "src/components/global-contact-modal.tsx": {

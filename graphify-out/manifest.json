@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "convex/_generated/server.d.ts": {
-    "mtime": 1782011680.2830412,
-    "ast_hash": "7ebfb3ab9500dfdf97bf3496083f7ca0",
+    "mtime": 1782966636.457916,
+    "ast_hash": "9af3c73095b025769c4d120562bb77fe",
     "semantic_hash": ""
   },
   "convex/_generated/server.js": {
@@ -275,8 +275,8 @@
     "semantic_hash": ""
   },
   "convex/convex.config.ts": {
-    "mtime": 1782011679.0590646,
-    "ast_hash": "6f34dd7bda87227bac90481eb6559814",
+    "mtime": 1782966634.1402493,
+    "ast_hash": "cb31fd0603270837ecb69ffe7c02c7ac",
     "semantic_hash": ""
   },
   "convex/crons.ts": {
@@ -295,8 +295,8 @@
     "semantic_hash": ""
   },
   "convex/http.ts": {
-    "mtime": 1782316516.3108127,
-    "ast_hash": "9df8b6075852f74a7f442fdb500afdfb",
+    "mtime": 1782966707.7679472,
+    "ast_hash": "4e1b0c2793d082120e2f3a7835db7c83",
     "semantic_hash": ""
   },
   "convex/payments.ts": {
@@ -345,8 +345,8 @@
     "semantic_hash": ""
   },
   "convex/users.ts": {
-    "mtime": 1782965394.9126573,
-    "ast_hash": "a1d9f4365d9fc5eced33e880a09f0c99",
+    "mtime": 1782966704.14842,
+    "ast_hash": "dd2961336f84986ae925b95581629a13",
     "semantic_hash": ""
   },
   "convex/walls.ts": {
@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782962210.6625316,
-    "ast_hash": "60e257913911248b6293f4b3dfaf1246",
+    "mtime": 1782965986.002676,
+    "ast_hash": "8d5e2c8bdcd0e847feb99756c7beefd9",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "src/components/app-providers.tsx": {
-    "mtime": 1782965296.5020862,
-    "ast_hash": "c4dd513368f682f335cfca75e956e104",
+    "mtime": 1782966349.784146,
+    "ast_hash": "0213a3f6469f3d5383c05c101df8d872",
     "semantic_hash": ""
   },
   "src/components/bug-report-link.tsx": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "src/components/global-client-shell.tsx": {
-    "mtime": 1782962675.138546,
-    "ast_hash": "7abb230aa628d9493a5d37d8103c37e5",
+    "mtime": 1782966099.2678084,
+    "ast_hash": "bd5d7a005e6ab1a48c00c81f533c01fb",
     "semantic_hash": ""
   },
   "src/components/global-contact-modal.tsx": {

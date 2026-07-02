@@ -26,6 +26,7 @@ import type { DataModel } from "./dataModel.js";
  */
 type Env = {
   readonly ADMIN_EMAILS: string | undefined;
+  readonly CLERK_WEBHOOK_SIGNING_SECRET: string | undefined;
   readonly STRIPE_SECRET_KEY: string | undefined;
 };
 
