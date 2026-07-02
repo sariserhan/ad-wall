@@ -1195,8 +1195,8 @@
     "semantic_hash": ""
   },
   "src/components/clerk-avatar-menu.tsx": {
-    "mtime": 1782971982.2502108,
-    "ast_hash": "95b8f985378142d0c995b35da4994f17",
+    "mtime": 1782979196.021226,
+    "ast_hash": "c77e266fa4310cd0c8cd65f1deebe156",
     "semantic_hash": ""
   },
   "app/sign-up/[[...sign-up]]/page.tsx": {
